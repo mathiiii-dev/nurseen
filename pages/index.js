@@ -1,80 +1,17 @@
 import {
     Button,
     Center,
-    Container,
     Grid,
     Image,
     Space,
     Text,
     Title,
-    MediaQuery,
-    Burger, Group, Header, Navbar, createStyles, SimpleGrid
+    SimpleGrid
 } from "@mantine/core";
-import {useState} from "react";
-
-const useStyles = createStyles((theme) => ({
-    navbar: {
-        [theme.fn.largerThan("sm")]: {
-            display: "none"
-        }
-    },
-
-    links: {
-        [theme.fn.smallerThan("sm")]: {
-            display: "none"
-        }
-    }
-}));
 
 export default function Home() {
-    const {classes} = useStyles();
-    const [opened, setOpened] = useState(false);
     return (
-        <Container size={1280} padding={11}>
-            <Header height={60} padding="xs" style={{marginBottom: 50}}>
-                <MediaQuery largerThan="sm" styles={{display: "none"}}>
-                    <Burger
-                        opened={opened}
-                        onClick={() => setOpened((o) => !o)}
-                        size="sm"
-                        mr="xl"
-                    />
-                </MediaQuery>
-                <Grid className={classes.links}>
-                    <Grid.Col md={2}>
-                        <Title>Nurseen</Title>
-                    </Grid.Col>
-                    <Grid.Col md={10}>
-                        <Group position={"right"}>
-                            <Button variant={"subtle"} size={"md"} color={"dark"}>A propos</Button>
-                            <Button variant={"subtle"} size={"md"} color={"dark"}>Contact</Button>
-                            <Space w="xl"/>
-                            <Button color="dark" size="md">Inscription</Button>
-                            <Button color="dark" size="md">Connexion</Button>
-                        </Group>
-                    </Grid.Col>
-                </Grid>
-                <Navbar
-                    className={classes.navbar}
-                    style={{
-                        backgroundColor: '#f4fdfc',
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
-                        marginTop: 70,
-                        flexDirection: 'column',
-                        width: '100%',
-                        justifyContent: 'center',
-                        alignItems: 'center'
-                    }}
-                    hidden={!opened}
-                >
-                    <Button variant={"subtle"} size={"xl"} color={"dark"}>A propos</Button>
-                    <Button variant={"subtle"} size={"xl"} color={"dark"}>Contact</Button>
-                    <Button variant={"subtle"} color="dark" size="xl">Inscription</Button>
-                    <Button variant={"subtle"} color="dark" size="xl">Connexion</Button>
-                </Navbar>
-            </Header>
+        <>
             <Grid style={{backgroundColor: '#f4fdfc', padding: 50, borderRadius: 11}}>
                 <Grid.Col md={6}>
                     <Center>
@@ -177,6 +114,7 @@ export default function Home() {
                     </SimpleGrid>
                 </Grid.Col>
             </Grid>
-        </Container>
+        </>
     )
 }
+

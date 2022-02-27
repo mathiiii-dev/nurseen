@@ -1,33 +1,20 @@
 import {
     Button,
-    Container,
     Grid,
     Space,
     Title,
-    MediaQuery,
-    Burger, Group, Header, Navbar, createStyles, SimpleGrid, TextInput, Checkbox, Select, Alert
+    TextInput,
+    Select,
+    Alert,
+    PasswordInput
 } from "@mantine/core";
 import {useState} from "react";
 import {useForm} from "@mantine/hooks";
-import {event} from "next/dist/build/output/log";
+import { AiOutlineEye, AiOutlineEyeInvisible} from "react-icons/ai";
+import { useNotifications } from '@mantine/notifications';
 
-const useStyles = createStyles((theme) => ({
-    navbar: {
-        [theme.fn.largerThan("sm")]: {
-            display: "none"
-        }
-    },
-
-    links: {
-        [theme.fn.smallerThan("sm")]: {
-            display: "none"
-        }
-    }
-}));
-
-export default function Home() {
-    const {classes} = useStyles();
-    const [opened, setOpened] = useState(false);
+export default function SignUp() {
+    const notifications = useNotifications();
     const [errorMessage, setErrorMessage] = useState('');
     const [error, setError] = useState(false);
 
@@ -40,17 +27,19 @@ export default function Home() {
 
         validationRules: {
             email: (value) => /^\S+@\S+$/.test(value),
-            password: (password) => password.trim().length >= 8
+            password: (password) => password.trim().length >= 8,
+            roles: (roles) => roles !== ''
         },
 
         errorMessages: {
             email: 'Email invalide',
-            password: 'Mot de passe trop court. Minimum 8 charactères'
+            password: 'Mot de passe trop court. Minimum 8 charactères',
+            roles: 'Vous devez sélectionner un role'
         }
     });
 
     const signUpUser = () => {
-        const res =  fetch(
+        const res = fetch(
             'http://localhost:8010/proxy/api/user',
             {
                 method: 'POST',
@@ -70,7 +59,13 @@ export default function Home() {
                     setError(true)
                     setErrorMessage('Une erreur est survenue pendant l\'envoie du formulaire. Veuillez contacter un administrateur.')
                 } else {
-                    
+                    form.reset()
+                    notifications.showNotification({
+                        title: 'Inscription réussite',
+                        message: 'Vous pouvez désormais vous connecter',
+                        color: 'green',
+                        autoClose: 5000
+                    })
                 }
             }
         )
@@ -78,60 +73,19 @@ export default function Home() {
     }
 
     return (
-        <Container size={1280} padding={11}>
-            <Header height={60} padding="xs" style={{marginBottom: 50}}>
-                <MediaQuery largerThan="sm" styles={{display: "none"}}>
-                    <Burger
-                        opened={opened}
-                        onClick={() => setOpened((o) => !o)}
-                        size="sm"
-                        mr="xl"
-                    />
-                </MediaQuery>
-                <Grid className={classes.links}>
-                    <Grid.Col md={2}>
-                        <Title>Nurseen</Title>
-                    </Grid.Col>
-                    <Grid.Col md={10}>
-                        <Group position={"right"}>
-                            <Button variant={"subtle"} size={"md"} color={"dark"}>A propos</Button>
-                            <Button variant={"subtle"} size={"md"} color={"dark"}>Contact</Button>
-                            <Space w="xl"/>
-                            <Button color="dark" size="md">Inscription</Button>
-                            <Button color="dark" size="md">Connexion</Button>
-                        </Group>
-                    </Grid.Col>
-                </Grid>
-                <Navbar
-                    className={classes.navbar}
-                    style={{
-                        backgroundColor: '#f4fdfc',
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
-                        marginTop: 70,
-                        flexDirection: 'column',
-                        width: '100%',
-                        justifyContent: 'center',
-                        alignItems: 'center'
-                    }}
-                    hidden={!opened}
-                >
-                    <Button variant={"subtle"} size={"xl"} color={"dark"}>A propos</Button>
-                    <Button variant={"subtle"} size={"xl"} color={"dark"}>Contact</Button>
-                    <Button variant={"subtle"} color="dark" size="xl">Inscription</Button>
-                    <Button variant={"subtle"} color="dark" size="xl">Connexion</Button>
-                </Navbar>
-            </Header>
-            <Grid style={{backgroundColor: '#f4fdfc', padding: 50, borderRadius: 11}}>
-                <Grid.Col md={12} style={{padding: 100}}>
+        <>
+            <Grid style={{backgroundColor: '#f4fdfc', borderRadius: 11, padding: 25}}>
+                <Grid.Col md={12} style={{padding: 25}}>
+                    <Title>Création de compte</Title>
                     {
                         error ?
-                            <Alert title="Erreur!" color="red" withCloseButton closeButtonLabel="Close alert">
+                            <Alert title="Erreur!" color="red" withCloseButton closeButtonLabel="Close alert"
+                                   onClose={() => {
+                                       setError(false)
+                                   }}>
                                 {errorMessage}
                             </Alert> : ''
                     }
-
                     <Space h={"xl"}/>
                     <form onSubmit={form.onSubmit(signUpUser)}>
                         <TextInput
@@ -142,15 +96,19 @@ export default function Home() {
                             size={"xl"}
                         />
                         <Space h={"xl"}/>
-                        <TextInput
+                        <PasswordInput
                             required
                             label="Mot de passe"
                             placeholder="********"
+                            visibilityToggleIcon={({ reveal, size }) =>
+                                reveal ? <AiOutlineEyeInvisible size={size} /> : <AiOutlineEye size={size} />
+                            }
                             {...form.getInputProps('password')}
                             size={"xl"}
                         />
                         <Space h={"xl"}/>
                         <Select
+                            required
                             label="Vous êtes"
                             placeholder="Choisir"
                             data={[
@@ -166,6 +124,7 @@ export default function Home() {
                     </form>
                 </Grid.Col>
             </Grid>
-        </Container>
+        </>
     )
 }
+
