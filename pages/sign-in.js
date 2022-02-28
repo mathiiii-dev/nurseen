@@ -4,16 +4,15 @@ import {
     Space,
     Title,
     TextInput,
-    Select,
     Alert,
     PasswordInput
 } from "@mantine/core";
 import {useState} from "react";
 import {useForm} from "@mantine/hooks";
-import { AiOutlineEye, AiOutlineEyeInvisible} from "react-icons/ai";
-import { useNotifications } from '@mantine/notifications';
+import {AiOutlineEye, AiOutlineEyeInvisible} from "react-icons/ai";
+import {useNotifications} from '@mantine/notifications';
 
-export default function SignUp() {
+export default function SignIn() {
     const notifications = useNotifications();
     const [errorMessage, setErrorMessage] = useState('');
     const [error, setError] = useState(false);
@@ -21,61 +20,49 @@ export default function SignUp() {
     const form = useForm({
         initialValues: {
             email: '',
-            password: '',
-            roles: ''
+            password: ''
         },
 
         validationRules: {
             email: (value) => /^\S+@\S+$/.test(value),
-            password: (password) => password.trim().length >= 8,
-            roles: (roles) => roles !== ''
+            password: (password) => password !== ''
         },
 
         errorMessages: {
             email: 'Email invalide',
-            password: 'Mot de passe trop court. Minimum 8 charactères',
-            roles: 'Vous devez sélectionner un role'
+            password: 'Veuillez saisir un mot de passe'
         }
     });
 
-    const signUpUser = () => {
-        fetch(
-            'http://localhost:8010/proxy/api/user',
+    const login = async (event) => {
+        event.preventDefault()
+        await fetch(
+            'http://localhost:8010/proxy/api/login_check',
             {
                 method: 'POST',
                 body: JSON.stringify({
-                        email: form.values.email,
-                        password: form.values.password,
-                        roles: [form.values.roles]
-                    }
-                ),
+                    email: form.values.email,
+                    password: form.values.password
+                }),
                 headers: {
                     'Content-type': 'application/json'
                 }
             }
-        ).then(
-            res => {
-                if (res.status !== 201) {
+        )
+            .then(response => response.json())
+            .then(response => {
+                if (response.code !== 200) {
                     setError(true)
-                    setErrorMessage('Une erreur est survenue pendant l\'envoie du formulaire. Veuillez contacter un administrateur.')
-                } else {
-                    form.reset()
-                    notifications.showNotification({
-                        title: 'Inscription réussite',
-                        message: 'Vous pouvez désormais vous connecter',
-                        color: 'green',
-                        autoClose: 5000
-                    })
+                    setErrorMessage(response.message)
                 }
-            }
-        );
+            })
     }
 
     return (
         <>
             <Grid style={{backgroundColor: '#f4fdfc', borderRadius: 11, padding: 25}}>
                 <Grid.Col md={12} style={{padding: 25}}>
-                    <Title>Création de compte</Title>
+                    <Title>Connexion</Title>
                     {
                         error ?
                             <Alert title="Erreur!" color="red" withCloseButton closeButtonLabel="Close alert"
@@ -86,7 +73,7 @@ export default function SignUp() {
                             </Alert> : ''
                     }
                     <Space h={"xl"}/>
-                    <form onSubmit={form.onSubmit(signUpUser)}>
+                    <form onSubmit={login}>
                         <TextInput
                             required
                             label="Email"
@@ -99,27 +86,15 @@ export default function SignUp() {
                             required
                             label="Mot de passe"
                             placeholder="********"
-                            visibilityToggleIcon={({ reveal, size }) =>
-                                reveal ? <AiOutlineEyeInvisible size={size} /> : <AiOutlineEye size={size} />
+                            visibilityToggleIcon={({reveal, size}) =>
+                                reveal ? <AiOutlineEyeInvisible size={size}/> : <AiOutlineEye size={size}/>
                             }
                             {...form.getInputProps('password')}
                             size={"xl"}
                         />
                         <Space h={"xl"}/>
-                        <Select
-                            required
-                            label="Vous êtes"
-                            placeholder="Choisir"
-                            data={[
-                                {value: 'nurse', label: 'Nourrice'},
-                                {value: 'parent', label: 'Parent'}
-                            ]}
-                            {...form.getInputProps('roles')}
-                            size={"xl"}
-                        />
-                        <Space h={"xl"}/>
                         <Button type="submit" size={"xl"}
-                                style={{backgroundColor: '#4ad4c6', float: 'right'}}>M'inscrire</Button>
+                                style={{backgroundColor: '#4ad4c6', float: 'right'}}>Me connecter</Button>
                     </form>
                 </Grid.Col>
             </Grid>
