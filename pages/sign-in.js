@@ -11,7 +11,8 @@ import {useState} from "react";
 import {useForm} from "@mantine/hooks";
 import {AiOutlineEye, AiOutlineEyeInvisible} from "react-icons/ai";
 import { setCookies } from "../lib/cookies";
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/router';
+import jwtDecode from "jwt-decode";
 
 export default function SignIn() {
     const router = useRouter();
@@ -57,8 +58,11 @@ export default function SignIn() {
                     let message = response.message ?? 'Une erreur est survenue pendant l\'envoie du formulaire. Veuillez contacter un administrateur.'
                     setErrorMessage(message)
                 } else {
+                    const decoded = jwtDecode(response.token);
                     setCookies('token', response.token);
                     setCookies('refresh', response.refresh_token);
+                    setCookies('email', decoded.email);
+                    setCookies('role', decoded.roles[0]);
                     router.push('/');
                 }
             })
