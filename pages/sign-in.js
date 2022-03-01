@@ -10,10 +10,11 @@ import {
 import {useState} from "react";
 import {useForm} from "@mantine/hooks";
 import {AiOutlineEye, AiOutlineEyeInvisible} from "react-icons/ai";
-import {useNotifications} from '@mantine/notifications';
+import { setCookies } from "../lib/cookies";
+import { useRouter } from 'next/router'
 
 export default function SignIn() {
-    const notifications = useNotifications();
+    const router = useRouter();
     const [errorMessage, setErrorMessage] = useState('');
     const [error, setError] = useState(false);
 
@@ -51,9 +52,14 @@ export default function SignIn() {
         )
             .then(response => response.json())
             .then(response => {
-                if (response.code !== 200) {
+                if (response.code && response.code !== 200) {
                     setError(true)
-                    setErrorMessage(response.message)
+                    let message = response.message ?? 'Une erreur est survenue pendant l\'envoie du formulaire. Veuillez contacter un administrateur.'
+                    setErrorMessage(message)
+                } else {
+                    setCookies('token', response.token);
+                    setCookies('refresh', response.refresh_token);
+                    router.push('/');
                 }
             })
     }
