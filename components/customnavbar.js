@@ -43,7 +43,9 @@ export default function CustomNavbar() {
                         <Link href="/sign-up">
                             <Button color="dark" size="md">Inscription</Button>
                         </Link>
-                        <Button color="dark" size="md">Connexion</Button>
+                        <Link href="/sign-in">
+                            <Button color="dark" size="md">Connexion</Button>
+                        </Link>
                     </Group>
                 </Grid.Col>
             </Grid>
@@ -62,12 +64,18 @@ export default function CustomNavbar() {
                 }}
                 hidden={!opened}
             >
-                <Button variant={"subtle"} size={"xl"} color={"dark"}>A propos</Button>
-                <Button variant={"subtle"} size={"xl"} color={"dark"}>Contact</Button>
+                <Button variant={"subtle"} size={"xl"} color={"dark"} onClick={() => setOpened((o) => !o)}>A
+                    propos</Button>
+                <Button variant={"subtle"} size={"xl"} color={"dark"}
+                        onClick={() => setOpened((o) => !o)}>Contact</Button>
                 <Link href="/sign-up">
-                    <Button variant={"subtle"} color="dark" size="xl">Inscription</Button>
+                    <Button variant={"subtle"} color="dark" size="xl"
+                            onClick={() => setOpened((o) => !o)}>Inscription</Button>
                 </Link>
-                <Button variant={"subtle"} color="dark" size="xl">Connexion</Button>
+                <Link href="/sign-in">
+                    <Button variant={"subtle"} color="dark" size="xl"
+                            onClick={() => setOpened((o) => !o)}>Connexion</Button>
+                </Link>
             </Navbar>
         </Header>
     )
