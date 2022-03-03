@@ -1,7 +1,12 @@
-import '../styles/globals.css'
+import Layout from '../components/layout'
+import { NotificationsProvider } from '@mantine/notifications';
 
-function MyApp({ Component, pageProps }) {
-  return <Component {...pageProps} />
+export default function MyApp({ Component, pageProps }) {
+    return (
+        <NotificationsProvider position="top-right">
+            <Layout>
+                <Component {...pageProps} />
+            </Layout>
+        </NotificationsProvider>
+    )
 }
-
-export default MyApp
