@@ -40,7 +40,7 @@ export function privateRoute(WrappedComponent) {
             }
             const initialProps = { auth };
 
-            let role = 'nurse'//auth.decodedToken.roles[0]
+            let role = auth.decodedToken.roles[0]
             if(role === 'parent') {
                 role = 'family';
             }
