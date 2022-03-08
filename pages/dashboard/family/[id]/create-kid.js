@@ -1,10 +1,11 @@
 import {privateRoute} from "../../../../components/privateRoute";
 import {Alert, Button, Grid, NumberInput, Space, TextInput, Title} from "@mantine/core";
-import 'dayjs/locale/fr';
 import {DatePicker} from "@mantine/dates";
 import {useForm} from "@mantine/hooks";
 import {useState} from "react";
 import {useNotifications} from "@mantine/notifications";
+import 'dayjs/locale/fr';
+
 function CreateKid({auth}) {
     const [errorMessage, setErrorMessage] = useState('');
     const [error, setError] = useState(false);
@@ -48,9 +49,9 @@ function CreateKid({auth}) {
                 }
             }
         )
-            .then(response => response.json())
             .then(response => {
-                if (response.code && response.code !== 200) {
+                response.json()
+                if (response.status && response.status !== 200) {
                     setError(true)
                     let message = response.message ?? 'Une erreur est survenue pendant l\'envoie du formulaire. Veuillez contacter un administrateur.'
                     setErrorMessage(message)
@@ -63,7 +64,7 @@ function CreateKid({auth}) {
                 }
             })
     }
-    
+
     return (
         <>
             <Grid style={{backgroundColor: '#f4fdfc', borderRadius: 11, padding: 25}}>
@@ -100,19 +101,19 @@ function CreateKid({auth}) {
                         />
                         <Space h={"xl"}/>
                         <TextInput
-                        required
-                        label="Nom"
-                        placeholder="Doe"
-                        {...form.getInputProps('lastname')}
-                        size={"xl"}
+                            required
+                            label="Nom"
+                            placeholder="Doe"
+                            {...form.getInputProps('lastname')}
+                            size={"xl"}
                         />
                         <Space h={"xl"}/>
                         <DatePicker
                             placeholder="17/08/1999"
                             label="Date d'anniversaire"
                             size={"xl"}
-                            local="fr"
                             {...form.getInputProps('birthday')}
+                            locale="fr"
                         />
                         <Space h={"xl"}/>
                         <Button type="submit" size={"xl"}
