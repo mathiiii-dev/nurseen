@@ -8,6 +8,16 @@ export function privateRoute(WrappedComponent) {
             const token = nookies.get(ctx)['token'];
             let auth = new AuthToken(token);
             const refresh = nookies.get(ctx)['refresh'];
+            console.log(auth.isValid, auth.isExpired)
+
+            if (auth.isExpired) {
+                ctx.res.writeHead(302, {
+                    Location: "/sign-in?redirected=true",
+                });
+                ctx.res.end();
+                return;
+            }
+
             if(auth.isExpired && refresh) {
                 let refreshedToken = null;
                 await fetch(
@@ -29,12 +39,20 @@ export function privateRoute(WrappedComponent) {
                 auth = new AuthToken(refreshedToken);
             }
             const initialProps = { auth };
-            if (auth.isExpired) {
+
+            let role = auth.decodedToken.roles[0]
+            if(role === 'parent') {
+                role = 'family';
+            }
+
+            if(ctx.query.id.toString() !== auth.decodedToken.id.toString() || ctx.pathname.split('/')[2] !== role && auth.isValid) {
                 ctx.res.writeHead(302, {
-                    Location: "/sign-in?redirected=true",
+                    Location: `/dashboard/${role}/${auth.decodedToken.id}`,
                 });
                 ctx.res.end();
+                return;
             }
+
             if (WrappedComponent.getInitialProps) {
                 const wrappedProps = await WrappedComponent.getInitialProps(initialProps);
                 return { ...wrappedProps, auth };

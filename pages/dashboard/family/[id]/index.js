@@ -1,8 +1,8 @@
-import React from "react"
-import {privateRoute} from "../../components/privateRoute";
+import {privateRoute} from "../../../../components/privateRoute";
 
-function Nurse({auth}) {
-    return (<>
+function Family({auth}) {
+    return (
+        <>
             <p><strong>user</strong>: {auth.decodedToken.email}</p>
             <p><strong>isValid</strong>: {auth.isValid.toString()}</p>
             <p><strong>isExpired</strong>: {auth.isExpired.toString()}</p>
@@ -12,4 +12,4 @@ function Nurse({auth}) {
     )
 }
 
-export default privateRoute(Nurse);
+export default privateRoute(Family);
