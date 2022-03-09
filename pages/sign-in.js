@@ -63,7 +63,12 @@ export default function SignIn() {
                     setCookies('refresh', response.refresh_token);
                     setCookies('email', decoded.email);
                     setCookies('role', decoded.roles[0]);
-                    router.push('/');
+                    const role = decoded.roles[0];
+                    if(role === 'nurse') {
+                        router.push(`/dashboard/nurse/${decoded.id}`);
+                    } else if(role === 'parent') {
+                        router.push(`/dashboard/family/${decoded.id}`);
+                    }
                 }
             })
     }
