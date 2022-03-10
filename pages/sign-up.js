@@ -111,8 +111,8 @@ export default function SignUp() {
                             label="Vous êtes"
                             placeholder="Choisir"
                             data={[
-                                {value: 'nurse', label: 'Nourrice'},
-                                {value: 'parent', label: 'Parent'}
+                                {value: 'ROLE_NURSE', label: 'Nourrice'},
+                                {value: 'ROLE_PARENT', label: 'Parent'}
                             ]}
                             {...form.getInputProps('roles')}
                             size={"xl"}
