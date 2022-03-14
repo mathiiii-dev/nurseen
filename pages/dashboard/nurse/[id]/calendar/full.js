@@ -3,16 +3,29 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import {useEffect, useState} from "react";
-import {Button, Modal, Select, Space} from '@mantine/core'
+import {Alert, Button, Modal, Select, Space} from '@mantine/core'
 import {privateRoute} from "../../../../../components/privateRoute";
 import {DatePicker, TimeRangeInput} from "@mantine/dates";
 import dayjs from "dayjs";
-import {useForm} from "@mantine/hooks";
+import {useNotifications} from "@mantine/notifications";
 
 
 function Full({auth}) {
 
     useEffect(() => {
+        fetch(`http://localhost:8010/proxy/api/calendar/nurse/${auth.decodedToken.id}`,
+            {
+                method: 'GET',
+                headers: {
+                    'Content-type': 'application/json',
+                    'Authorization': auth.authorizationString
+                }
+            })
+            .then((res) => res.json())
+            .then((data) => {
+                setDataCalendar(data)
+            })
+
         fetch(`http://localhost:8010/proxy/api/kid/nurse/${auth.decodedToken.id}`,
             {
                 method: 'GET',
@@ -23,38 +36,33 @@ function Full({auth}) {
             })
             .then((res) => res.json())
             .then((data) => {
-                console.log(data)
                 setData(data)
             })
     }, [])
 
-    const events = [
-        {
-            id: 1,
-            title: 'event 1',
-            start: '2021-06-14T10:00:00',
-            end: '2021-06-14T12:00:00',
-        },
-        {
-            id: 2,
-            title: 'event 2',
-            start: '2021-06-16T13:00:00',
-            end: '2021-06-16T18:00:00',
-        },
-        {
-            id: 3,
-            title: 'event 3',
-            start: '2021-06-17',
-            end: '2021-06-20'
-        },
-    ];
     const [opened, setOpened] = useState(false);
     const now = new Date();
     const then = dayjs(now).add(8, 'hours').toDate();
     const [timeRanges, setTimeRanges] = useState([now, then]);
     const [data, setData] = useState('');
+    const [dataCalendar, setDataCalendar] = useState(null);
     const [select, setSelect] = useState(null);
     const [day, setDay] = useState(null);
+    const [showError, setShowError] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
+    const notifications = useNotifications();
+
+    let events = null;
+    if (dataCalendar) {
+        events = dataCalendar.map((element) => (
+            {
+                id: element.id,
+                title: element.firstname + ' ' + element.lastname,
+                start: element.day + ' ' + element.arrival,
+                end: element.day + ' ' + element.departure
+            }
+        ))
+    }
 
     let kids = null;
     if (data) {
@@ -81,22 +89,44 @@ function Full({auth}) {
                     'Authorization': auth.authorizationString
                 }
             }
-        ).then(r => console.log(r.json))
+        ).then(async r => {
+            if (r.status !== 201) {
+                const res = await r.json()
+                setShowError(true)
+                setErrorMessage(res.error_description)
+            } else {
+                setOpened(false)
+                notifications.showNotification({
+                    title: 'Enfant enregistré',
+                    message: 'Il va maintenant apparaitre dans votre calendrier',
+                    color: 'teal'
+                })
+            }
+        })
     }
-
 
     return (
         <>
             <Modal
                 opened={opened}
                 onClose={() => setOpened(false)}
-                title="Introduce yourself!"
+                title="Enregistrer un jour pour un enfant"
             >
+                {
+                    showError ?
+                        <>
+                            <Alert title="Erreur!" color="red">
+                                {errorMessage}
+                            </Alert>
+                            <Space h="xl"/>
+                        </>
+                        : ''
+                }
                 {
                     <form onSubmit={calendar}>
                         <DatePicker
-                            placeholder="Pick date"
-                            label="Event date"
+                            placeholder="Choisir une date"
+                            label="Jour de présence"
                             value={day}
                             onChange={setDay}
                             required/>
@@ -111,8 +141,8 @@ function Full({auth}) {
                             value={select}
                             onChange={setSelect}
                             data={kids}
-                            label="Your favorite framework/library"
-                            placeholder="Pick one"/>
+                            label="Enfant"
+                            placeholder="Choisir un enfant"/>
                         <Space h={"xl"}/>
                         <Button type="submit"
                                 style={{backgroundColor: '#4ad4c6', float: 'right'}}
