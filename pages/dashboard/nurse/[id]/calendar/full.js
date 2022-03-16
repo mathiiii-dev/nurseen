@@ -8,14 +8,10 @@ import {privateRoute} from "../../../../../components/privateRoute";
 import {DatePicker, TimeRangeInput} from "@mantine/dates";
 import dayjs from "dayjs";
 import {useNotifications} from "@mantine/notifications";
+import Router from "next/router";
 
 
 function Full({auth}) {
-    var utc = require('dayjs/plugin/utc')
-    var timezone = require('dayjs/plugin/timezone')
-    dayjs.extend(utc)
-    dayjs.extend(timezone)
-
     useEffect(() => {
         fetch(`http://localhost:8010/proxy/api/calendar/nurse/${auth.decodedToken.id}`,
             {
@@ -55,6 +51,7 @@ function Full({auth}) {
     const [showError, setShowError] = useState(false);
     const [editModal, setEditModal] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
+    const [selectEvent, setSelectEvent] = useState('');
     const notifications = useNotifications();
 
     let events = null;
@@ -62,6 +59,7 @@ function Full({auth}) {
         events = dataCalendar.map((element) => (
             {
                 id: element.kid_id,
+                groupId: element.id,
                 title: element.firstname + ' ' + element.lastname,
                 start: element.day + ' ' + element.arrival,
                 end: element.day + ' ' + element.departure
@@ -106,6 +104,67 @@ function Full({auth}) {
                     message: 'Il va maintenant apparaitre dans votre calendrier',
                     color: 'teal'
                 })
+                Router.reload()
+            }
+        })
+    }
+
+    const deleteEvent = async (event) => {
+        event.preventDefault()
+        fetch(
+            `http://localhost:8010/proxy/api/calendar/${selectEvent}`,
+            {
+                method: 'DELETE',
+                headers: {
+                    'Content-type': 'application/json',
+                    'Authorization': auth.authorizationString
+                }
+            }
+        ).then(async r => {
+            if (r.status !== 200) {
+                const res = await r.json()
+                setShowError(true)
+                setErrorMessage(res.error_description)
+            } else {
+                setOpened(false)
+                notifications.showNotification({
+                    title: 'Jour de précense supprimé',
+                    message: 'Il va maintenant disparaitre de votre calendrier',
+                    color: 'teal'
+                })
+                Router.reload()
+            }
+        })
+    }
+
+    const edit = async (event) => {
+        event.preventDefault()
+        fetch(
+            `http://localhost:8010/proxy/api/calendar/${selectEvent}/kid/${select}`,
+            {
+                method: 'PATCH',
+                body: JSON.stringify({
+                    day,
+                    timeRanges
+                }),
+                headers: {
+                    'Content-type': 'application/json',
+                    'Authorization': auth.authorizationString
+                }
+            }
+        ).then(async r => {
+            if (r.status !== 200) {
+                const res = await r.json()
+                setShowError(true)
+                setErrorMessage(res.error_description)
+            } else {
+                setEditModal(false)
+                notifications.showNotification({
+                    title: 'Jour de précense modifié',
+                    message: 'Il va maintenant apparaitre dans votre calendrier',
+                    color: 'teal'
+                })
+                Router.reload()
             }
         })
     }
@@ -117,7 +176,7 @@ function Full({auth}) {
                 onClose={() => setEditModal(false)}
                 title="Modifier ou supprimer le jour d'un enfant"
             >
-                <Button fullWidth color="red">Supprimer</Button>
+                <Button fullWidth color="red" onClick={deleteEvent}>Supprimer</Button>
                 <Space h={"xl"}/>
                 {
                     showError ?
@@ -130,7 +189,7 @@ function Full({auth}) {
                         : ''
                 }
                 {
-                    <form>
+                    <form onSubmit={edit}>
                         <DatePicker
                             placeholder="Choisir une date"
                             label="Jour de présence"
@@ -230,6 +289,7 @@ function Full({auth}) {
                     setDay(e.event.start)
                     setTimeRanges([dayjs(e.event.startStr).subtract(1, 'hours').toDate(), dayjs(e.event.endStr).subtract(1, 'hours').toDate()])
                     setSelect(e.event.id)
+                    setSelectEvent(e.event.groupId)
                     setEditModal(true)
                 }}
                 timeZone='UTC'
