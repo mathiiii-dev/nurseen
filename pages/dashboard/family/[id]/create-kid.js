@@ -51,7 +51,7 @@ function CreateKid({auth}) {
         )
             .then(response => {
                 response.json()
-                if (response.status && response.status !== 200) {
+                if (response.status && response.status !== 201) {
                     setError(true)
                     let message = response.message ?? 'Une erreur est survenue pendant l\'envoie du formulaire. Veuillez contacter un administrateur.'
                     setErrorMessage(message)

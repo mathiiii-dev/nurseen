@@ -41,8 +41,10 @@ export function privateRoute(WrappedComponent) {
             const initialProps = { auth };
 
             let role = auth.decodedToken.roles[0]
-            if(role === 'parent') {
+            if(role === 'ROLE_PARENT') {
                 role = 'family';
+            } else if (role === 'ROLE_NURSE') {
+                role = 'nurse'
             }
 
             if(ctx.query.id.toString() !== auth.decodedToken.id.toString() || ctx.pathname.split('/')[2] !== role && auth.isValid) {

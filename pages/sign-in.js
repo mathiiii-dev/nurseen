@@ -64,9 +64,9 @@ export default function SignIn() {
                     setCookies('email', decoded.email);
                     setCookies('role', decoded.roles[0]);
                     const role = decoded.roles[0];
-                    if(role === 'nurse') {
+                    if(role === 'ROLE_NURSE') {
                         router.push(`/dashboard/nurse/${decoded.id}`);
-                    } else if(role === 'parent') {
+                    } else if(role === 'ROLE_PARENT') {
                         router.push(`/dashboard/family/${decoded.id}`);
                     }
                 }
