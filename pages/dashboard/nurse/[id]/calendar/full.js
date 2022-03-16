@@ -11,6 +11,10 @@ import {useNotifications} from "@mantine/notifications";
 
 
 function Full({auth}) {
+    var utc = require('dayjs/plugin/utc')
+    var timezone = require('dayjs/plugin/timezone')
+    dayjs.extend(utc)
+    dayjs.extend(timezone)
 
     useEffect(() => {
         fetch(`http://localhost:8010/proxy/api/calendar/nurse/${auth.decodedToken.id}`,
@@ -53,11 +57,6 @@ function Full({auth}) {
     const [errorMessage, setErrorMessage] = useState('');
     const notifications = useNotifications();
 
-
-    if(select) {
-        console.log(select)
-    }
-
     let events = null;
     if (dataCalendar) {
         events = dataCalendar.map((element) => (
@@ -74,7 +73,7 @@ function Full({auth}) {
     if (data) {
         kids = data.map((element) => (
             {
-                value: element.id,
+                value: element.id.toString(),
                 label: element.firstname + ' ' + element.lastname
             }
         ))
@@ -229,7 +228,7 @@ function Full({auth}) {
                 }}
                 eventClick={(e) => {
                     setDay(e.event.start)
-                    setTimeRanges([e.event.start, e.event.end])
+                    setTimeRanges([dayjs(e.event.startStr).subtract(1, 'hours').toDate(), dayjs(e.event.endStr).subtract(1, 'hours').toDate()])
                     setSelect(e.event.id)
                     setEditModal(true)
                 }}
