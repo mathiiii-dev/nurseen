@@ -3,4 +3,8 @@ const nextConfig = {
   reactStrictMode: true,
 }
 
-module.exports = nextConfig
+const { withGlobalCss } = require('next-global-css')
+
+const withConfig = withGlobalCss()
+
+module.exports = withConfig(nextConfig)
