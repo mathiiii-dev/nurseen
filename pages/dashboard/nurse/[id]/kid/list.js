@@ -84,6 +84,9 @@ function KidList({auth}) {
                         </Button>
                     }
                 </td>
+                <td>
+                    <Button>Note</Button>
+                </td>
             </tr>
         ));
     }
@@ -119,6 +122,7 @@ function KidList({auth}) {
                     <th>Date d'anniversaire</th>
                     <th>Enfant actif</th>
                     <th>Archiver</th>
+                    <th>Note du jour</th>
                 </tr>
                 </thead>
                 <tbody>{rows}</tbody>
