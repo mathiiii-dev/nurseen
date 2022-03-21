@@ -1,6 +1,6 @@
-import {privateRoute} from "../../../../../../components/privateRoute";
+import {privateRoute} from "../../../../../../../components/privateRoute";
 import {useEffect, useState} from 'react';
-import RichTextEditor from '../../../../../../components/rte';
+import RichTextEditor from '../../../../../../../components/rte';
 import {Button, Space, Title} from "@mantine/core";
 import {useRouter} from 'next/router'
 
@@ -46,7 +46,7 @@ function Note({auth}) {
             {
                 data ?
                     <Title>Rédiger une note sur la journée de {data.firstname} </Title>
-                : ''
+                    : ''
             }
             <Space h="xl"/>
             <form onSubmit={create}>

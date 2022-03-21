@@ -54,7 +54,6 @@ function KidList({auth}) {
                     'Authorization': auth.authorizationString
                 }
             }).then(r => {
-            console.log(r.json())
             router.reload(window.location.pathname)
         })
     }
