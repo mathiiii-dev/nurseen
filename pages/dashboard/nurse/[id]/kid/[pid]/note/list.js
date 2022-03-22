@@ -6,16 +6,19 @@ import {useRouter} from 'next/router'
 import dayjs from "dayjs";
 import 'dayjs/locale/fr';
 import utc from "dayjs/plugin/utc";
+import {useNotifications} from "@mantine/notifications";
 
 
 function NoteList({auth}) {
     const [opened, setOpened] = useState(false)
+    const [edited, setEdited] = useState(false)
     const [openedDrawer, setOpenedDrawer] = useState(false)
     const router = useRouter();
     const [data, setData] = useState(null);
     const [value, onChange] = useState('');
     const [notes, setNotes] = useState(null);
     const [noteId, setNoteId] = useState(null);
+    const notifications = useNotifications();
 
     dayjs.locale('fr')
     dayjs.extend(utc)
@@ -52,8 +55,8 @@ function NoteList({auth}) {
     if (notes) {
         rows = notes.map((element) => (
             <tr key={element.id}>
-                <td >{dayjs(element.data).utc().format('DD MMMM YYYY')}</td>
-                <td >
+                <td>{dayjs(element.data).utc().format('DD MMMM YYYY')}</td>
+                <td>
                     <Spoiler maxHeight={120} showLabel="Show more" hideLabel="Hide">
                         {
                             <Text dangerouslySetInnerHTML={{__html: element.note}}/>
@@ -79,8 +82,8 @@ function NoteList({auth}) {
         ));
     }
 
-    const deleteNote = () => {
-        fetch(`http://localhost:8010/proxy/api/note/${noteId}`,
+    const deleteNote =  () => {
+         fetch(`http://localhost:8010/proxy/api/note/${noteId}`,
             {
                 method: 'DELETE',
                 headers: {
@@ -88,24 +91,26 @@ function NoteList({auth}) {
                     'Authorization': auth.authorizationString
                 }
             }).then(r => {
-            router.reload()
-        })
+             console.log(r.status)
+             if(r.status === 204) {
+                 setOpened(false)
+                 router.reload()
+             }
+         })
     }
 
-    const edit = () => {
-        fetch(`http://localhost:8010/proxy/api/note/${noteId}/edit`,
+    const edit = async () => {
+        await fetch(`http://localhost:8010/proxy/api/note/${noteId}/edit`,
             {
                 method: 'PATCH',
-                body:JSON.stringify({
+                body: JSON.stringify({
                     note: value
                 }),
                 headers: {
                     'Content-type': 'application/json',
                     'Authorization': auth.authorizationString
                 }
-            }).then(r => {
-            router.reload()
-        })
+            })
     }
 
     return (

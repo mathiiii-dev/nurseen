@@ -3,12 +3,14 @@ import {useEffect, useState} from 'react';
 import RichTextEditor from '../../../../../../../components/rte';
 import {Button, Space, Title} from "@mantine/core";
 import {useRouter} from 'next/router'
+import {useNotifications} from "@mantine/notifications";
 
 
 function Note({auth}) {
     const router = useRouter();
     const [value, onChange] = useState('');
     const [data, setData] = useState(null);
+    const notifications = useNotifications();
 
     useEffect(() => {
         fetch(`http://localhost:8010/proxy/api/kid/${router.query.pid}`,
@@ -37,7 +39,16 @@ function Note({auth}) {
                     'Content-type': 'application/json',
                     'Authorization': auth.authorizationString
                 }
-            }).then(r => console.log(r))
+            }).then(r => {
+            if(r.status === 201) {
+                onChange('')
+                notifications.showNotification({
+                    title: 'Note enregistrée',
+                    message: 'Votre note a été enregistrée',
+                    color: 'teal'
+                })
+            }
+        })
     }
 
     return (
@@ -51,6 +62,9 @@ function Note({auth}) {
             <Space h="xl"/>
             <form onSubmit={create}>
                 <RichTextEditor
+                    styles={{
+                        root: {height: 250}
+                    }}
                     placeholder="Résumer en quelques phrases la journée d'un enfant"
                     value={value}
                     onChange={onChange}/>
