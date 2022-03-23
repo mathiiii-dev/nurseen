@@ -5,6 +5,7 @@ import dayjs from "dayjs";
 import 'dayjs/locale/fr';
 import utc from 'dayjs/plugin/utc'
 import {useRouter} from 'next/router'
+import Link from 'next/link'
 
 function KidList({auth}) {
     const router = useRouter()
@@ -53,7 +54,6 @@ function KidList({auth}) {
                     'Authorization': auth.authorizationString
                 }
             }).then(r => {
-            console.log(r.json())
             router.reload(window.location.pathname)
         })
     }
@@ -83,6 +83,14 @@ function KidList({auth}) {
                             Archiver
                         </Button>
                     }
+                </td>
+                <td>
+                    <Link href={{
+                        pathname: `/dashboard/nurse/[id]/kid/[pid]/note`,
+                        query: {id: auth.decodedToken.id, pid: element.id}
+                    }}>
+                        <Button>Note</Button>
+                    </Link>
                 </td>
             </tr>
         ));
@@ -119,6 +127,7 @@ function KidList({auth}) {
                     <th>Date d'anniversaire</th>
                     <th>Enfant actif</th>
                     <th>Archiver</th>
+                    <th>Note du jour</th>
                 </tr>
                 </thead>
                 <tbody>{rows}</tbody>
