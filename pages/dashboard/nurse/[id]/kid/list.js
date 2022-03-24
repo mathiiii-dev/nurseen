@@ -1,4 +1,3 @@
-import {privateRoute} from "../../../../../components/privateRoute";
 import {Button, Table, Modal, Alert, Space} from "@mantine/core";
 import {useEffect, useState} from "react";
 import dayjs from "dayjs";
@@ -6,8 +5,12 @@ import 'dayjs/locale/fr';
 import utc from 'dayjs/plugin/utc'
 import {useRouter} from 'next/router'
 import Link from 'next/link'
+import { getServerSideProps } from '../index'
+import {AuthToken} from "../../../../../services/auth_token";
 
 function KidList({auth}) {
+    auth = JSON.parse(auth)
+    auth = new AuthToken(auth.token)
     const router = useRouter()
     const [data, setData] = useState(null);
     const [opened, setOpened] = useState(false);
@@ -41,7 +44,7 @@ function KidList({auth}) {
                     'Authorization': auth.authorizationString
                 }
             }).then(r => {
-            router.reload(window.location.pathname)
+            router.reload()
         })
     }
 
@@ -54,7 +57,7 @@ function KidList({auth}) {
                     'Authorization': auth.authorizationString
                 }
             }).then(r => {
-            router.reload(window.location.pathname)
+            router.reload()
         })
     }
 
@@ -136,4 +139,6 @@ function KidList({auth}) {
     )
 }
 
-export default privateRoute(KidList);
+export default KidList;
+
+export { getServerSideProps };

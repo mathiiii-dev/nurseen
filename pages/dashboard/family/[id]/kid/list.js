@@ -40,7 +40,7 @@ function FamilyKidList({auth}) {
                 <td>{dayjs(element.birthday).utc().format('DD MMMM YYYY')}</td>
                 <td>
                     <Link href={{
-                        pathname: `/dashboard/family/[id]/kid/[pid]/notes`,
+                        pathname: `/dashboard/family/[id]/kid/[pid]/note`,
                         query: {id: auth.decodedToken.id, pid: element.id}
                     }}>
                         <Button>Note</Button>

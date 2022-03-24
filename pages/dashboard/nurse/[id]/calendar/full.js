@@ -4,14 +4,16 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import {useEffect, useState} from "react";
 import {Alert, Button, Modal, Select, Space} from '@mantine/core'
-import {privateRoute} from "../../../../../components/privateRoute";
 import {DatePicker, TimeRangeInput} from "@mantine/dates";
 import dayjs from "dayjs";
 import {useNotifications} from "@mantine/notifications";
 import Router from "next/router";
-
+import {AuthToken} from "../../../../../services/auth_token";
+import {getServerSideProps} from "../index";
 
 function Full({auth}) {
+    auth = JSON.parse(auth)
+    auth = new AuthToken(auth.token)
     useEffect(() => {
         fetch(`http://localhost:8010/proxy/api/calendar/nurse/${auth.decodedToken.id}`,
             {
@@ -299,4 +301,6 @@ function Full({auth}) {
     );
 }
 
-export default privateRoute(Full);
+export default Full;
+
+export { getServerSideProps }

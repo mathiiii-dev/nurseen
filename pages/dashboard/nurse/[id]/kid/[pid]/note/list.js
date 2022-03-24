@@ -1,4 +1,3 @@
-import {privateRoute} from "../../../../../../../components/privateRoute";
 import {useEffect, useState} from 'react';
 import RichTextEditor from '../../../../../../../components/rte';
 import {Alert, Button, Modal, Space, Spoiler, Table, Text, Title, Drawer} from "@mantine/core";
@@ -6,19 +5,20 @@ import {useRouter} from 'next/router'
 import dayjs from "dayjs";
 import 'dayjs/locale/fr';
 import utc from "dayjs/plugin/utc";
-import {useNotifications} from "@mantine/notifications";
+import {AuthToken} from "../../../../../../../services/auth_token";
+import { getServerSideProps } from "../../../index";
 
 
 function NoteList({auth}) {
+    auth = JSON.parse(auth)
+    auth = new AuthToken(auth.token)
     const [opened, setOpened] = useState(false)
-    const [edited, setEdited] = useState(false)
     const [openedDrawer, setOpenedDrawer] = useState(false)
     const router = useRouter();
     const [data, setData] = useState(null);
     const [value, onChange] = useState('');
     const [notes, setNotes] = useState(null);
     const [noteId, setNoteId] = useState(null);
-    const notifications = useNotifications();
 
     dayjs.locale('fr')
     dayjs.extend(utc)
@@ -175,4 +175,6 @@ function NoteList({auth}) {
     );
 }
 
-export default privateRoute(NoteList);
+export default NoteList;
+
+export { getServerSideProps }

@@ -14,8 +14,6 @@ import {
 import {useState} from "react";
 import Link from 'next/link'
 import {destroyCookie, parseCookies} from "nookies";
-import {destroy} from "../lib/cookies";
-import {AuthToken} from "../services/auth_token";
 import {useRouter} from "next/router";
 
 const useStyles = createStyles((theme) => ({
@@ -37,7 +35,7 @@ export default function CustomNavbar() {
     const {classes} = useStyles();
     const [opened, setOpened] = useState(false);
     const token = parseCookies()['token'];
-    let auth = new AuthToken(token);
+    let auth = false;
     const logout = async () => {
         console.log(parseCookies())
         destroyCookie(null, 'token', {
@@ -71,7 +69,7 @@ export default function CustomNavbar() {
                     </Link>
                 </Grid.Col>
                 {
-                    !auth.isValid ?
+                    !auth ?
                         <Grid.Col md={10}>
                             <Group position={"right"}>
 
@@ -95,7 +93,7 @@ export default function CustomNavbar() {
                         </Grid.Col>
                 }
             </Grid>{
-            !auth.isValid ?
+            !auth ?
                 <Navbar
                     className={classes.navbar}
                     style={{
