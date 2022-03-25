@@ -15,6 +15,7 @@ import {useState} from "react";
 import Link from 'next/link'
 import {destroyCookie, parseCookies} from "nookies";
 import {useRouter} from "next/router";
+import {signIn} from "next-auth/react";
 
 const useStyles = createStyles((theme) => ({
     navbar: {
@@ -79,9 +80,7 @@ export default function CustomNavbar() {
                                 <Link href="/sign-up">
                                     <Button color="dark" size="md">Inscription</Button>
                                 </Link>
-                                <Link href="/sign-in">
-                                    <Button color="dark" size="md">Connexion</Button>
-                                </Link>
+                                    <Button color="dark" size="md" onClick={() => signIn()}>Connexion</Button>
 
                             </Group>
                         </Grid.Col>

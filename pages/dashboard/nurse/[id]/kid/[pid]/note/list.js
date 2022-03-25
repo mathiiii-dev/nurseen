@@ -6,7 +6,7 @@ import dayjs from "dayjs";
 import 'dayjs/locale/fr';
 import utc from "dayjs/plugin/utc";
 import {AuthToken} from "../../../../../../../services/auth_token";
-import { getServerSideProps } from "../../../index";
+import { getStaticProps  } from "../../../index";
 
 
 function NoteList({auth}) {
@@ -175,6 +175,17 @@ function NoteList({auth}) {
     );
 }
 
+
+
 export default NoteList;
 
-export { getServerSideProps }
+export { getStaticProps }
+
+export async function getStaticPaths() {
+    return {
+        paths: [
+            { params: { id: '1', pid: '1' } }
+        ],
+        fallback: true // false or 'blocking'
+    };
+}

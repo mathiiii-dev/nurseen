@@ -1,12 +1,11 @@
-import {Box, Button, Group, Modal, Space, Text} from "@mantine/core";
+import { useSession, getSession } from "next-auth/react"
+import {ActionIcon, Box, Button, Group, Modal, Space, Text} from "@mantine/core";
 import {useState} from "react";
+import {AiOutlineCopy} from "react-icons/ai";
 import {useNotifications} from "@mantine/notifications";
-import nookies from "nookies";
-import {AuthToken} from "../../../../services/auth_token";
 
-function Nurse({authenticated, auth}) {
-    auth = JSON.parse(auth)
-    auth = new AuthToken(auth.token)
+export default function Page() {
+    const { data: session } = useSession()
     const [opened, setOpened] = useState(false);
     const [link, setLink] = useState('');
     const notifications = useNotifications();
@@ -18,7 +17,7 @@ function Nurse({authenticated, auth}) {
         tomorrow.setDate(today.getDate() + 1)
         const expiration = tomorrow
         fetch(
-            `http://localhost:8010/proxy/api/link_code/${auth.decodedToken.id}`,
+            `http://localhost:8010/proxy/api/link_code/`,
             {
                 method: 'POST',
                 body: JSON.stringify({
@@ -27,7 +26,6 @@ function Nurse({authenticated, auth}) {
                 }),
                 headers: {
                     'Content-type': 'application/json',
-                    'Authorization': auth.authorizationString
                 }
             }
         )
@@ -44,76 +42,52 @@ function Nurse({authenticated, auth}) {
         })
         navigator.clipboard.writeText(link)
     }
+    if (typeof window === "undefined") return null
 
-    return (
-        <>
+    if (session) {
+        return (
+            <>
+                <h1>Protected Page</h1>
+                <p>You can view this page because you are signed in.</p>
+                <Modal
+                    opened={opened}
+                    onClose={() => setOpened(false)}
+                    title="Création d'un code parent nécessaire à l'ajout d'un enfant"
+                >
+                    <Box sx={(theme) => ({
+                        backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[0],
+                        textAlign: 'center',
+                        padding: theme.spacing.xl,
+                        borderRadius: theme.radius.md,
+                        cursor: 'pointer',
 
-            {
-                authenticated ?
-                    <>
-
-                        <Modal
-                            opened={opened}
-                            onClose={() => setOpened(false)}
-                            title="Création d'un code parent nécessaire à l'ajout d'un enfant"
-                        >
-                            <Box sx={(theme) => ({
-                                backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[0],
-                                textAlign: 'center',
-                                padding: theme.spacing.xl,
-                                borderRadius: theme.radius.md,
-                                cursor: 'pointer',
-
-                                '&:hover': {
-                                    backgroundColor:
-                                        theme.colorScheme === 'dark' ? theme.colors.dark[5] : theme.colors.gray[1],
-                                },
-                            })}
-                                 onClick={() => copyToClipboard()}
-                            >
-                                <Text>{link}</Text>
-                            </Box>
-                            <Space h={"xl"}/>
-                            <Text>Cliquez sur le code pour le copier</Text>
-                            <Button style={{backgroundColor: '#4ad4c6', float: 'right'}} onClick={() => linkParent()}>Créer
-                                un
-                                code</Button>
-                        </Modal>
-
-                        <Group position="center">
-                            <Button onClick={() => setOpened(true)}>Liaison parent</Button>
-                        </Group>
-                    </>
-
-                    :
-                    ''
-            }
-        </>
-
-    )
+                        '&:hover': {
+                            backgroundColor:
+                                theme.colorScheme === 'dark' ? theme.colors.dark[5] : theme.colors.gray[1],
+                        },
+                    })}
+                         onClick={() => copyToClipboard()}
+                    >
+                        <Text>{link}</Text>
+                    </Box>
+                    <Space h={"xl"}/>
+                    <Text>Cliquez sur le code pour le copier</Text>
+                    <Button style={{backgroundColor: '#4ad4c6', float: 'right'}} onClick={() => linkParent()}>Créer un
+                        code</Button>
+                </Modal>
+                <Group position="center">
+                    <Button onClick={() => setOpened(true)}>Liaison parent</Button>
+                </Group>
+            </>
+        )
+    }
+    return <p>Access Denied</p>
 }
 
-export async function getServerSideProps(ctx) {
-
-    const token = nookies.get(ctx)['token'];
-    let auth = new AuthToken(token);
-
-    if (!auth.isValid && auth.isExpired) {
-        return {
-            redirect: {
-                permanent: false,
-                destination: "/sign-in",
-            },
-            props:{},
-        };
-    }
-
+export async function getServerSideProps(context) {
     return {
         props: {
-            authenticated: true,
-            auth:  JSON.stringify(auth)
+            session: await getSession(context),
         },
-    };
+    }
 }
-
-export default Nurse;
