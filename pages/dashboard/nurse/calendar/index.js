@@ -8,12 +8,10 @@ import {DatePicker, TimeRangeInput} from "@mantine/dates";
 import dayjs from "dayjs";
 import {useNotifications} from "@mantine/notifications";
 import Router from "next/router";
-import {AuthToken} from "../../../../../services/auth_token";
 import {getServerSideProps} from "../index";
 
-function Full({auth}) {
-    auth = JSON.parse(auth)
-    auth = new AuthToken(auth.token)
+function Index({session}) {
+    console.log(session)
     useEffect(() => {
         fetch(`http://localhost:8010/proxy/api/calendar/nurse/${auth.decodedToken.id}`,
             {
@@ -301,6 +299,6 @@ function Full({auth}) {
     );
 }
 
-export default Full;
+export default Index;
 
 export { getServerSideProps }

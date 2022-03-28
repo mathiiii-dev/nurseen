@@ -32,7 +32,6 @@ const options = {
 
                 const token = await res.json();
                 const user = jwt_decode(token.token);
-
                 if (!res.ok) {
                     throw new Error(user.exception);
                 }
@@ -46,15 +45,23 @@ const options = {
             }
         })
     ],
-    session: {
-        jwt: true
+    callbacks: {
+        async session({ session, token, user }) {
+            return {
+                session: {
+                    user: {
+                        session,
+                        token,
+                        user
+                    }
+                }
+            }
+        }
     },
-    jwt: {
-        // A secret to use for key generation - you should set this explicitly
-        // Defaults to NextAuth.js secret if not explicitly specified.
-        secret: 'INp8IvdIyeMcoGAgFGoA61DdBglwwSqnXJZkgz8PSnw',
-    }
-
+    pages: {
+        signIn: '/sign-in',
+    },
+    secret: process.env.SECRET,
 }
 
 export default (req, res) => NextAuth(req, res, options)

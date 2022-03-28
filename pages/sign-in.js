@@ -10,10 +10,8 @@ import {
 import {useState} from "react";
 import {useForm} from "@mantine/hooks";
 import {AiOutlineEye, AiOutlineEyeInvisible} from "react-icons/ai";
-import {setCookies} from "../lib/cookies";
 import {useRouter} from 'next/router';
-import jwtDecode from "jwt-decode";
-import {signIn} from "next-auth/react";
+import {getCsrfToken, signIn, } from "next-auth/react";
 
 export default function SignIn() {
     const router = useRouter();
@@ -52,7 +50,23 @@ export default function SignIn() {
                             </Alert> : ''
                     }
                     <Space h={"xl"}/>
-                    <form>
+                    <form onSubmit={async (event) => {
+                        event.preventDefault()
+                        const res = await signIn('credentials', {
+                            redirect: false,
+                            email: form.values.email,
+                            password: form.values.password,
+                            callbackUrl: `${window.location.origin}/dashboard/nurse/`,
+                        });
+                        if (res?.error) {
+                            setError(res.error);
+                        } else {
+                            setError(null);
+                        }
+                        if (res.url) {
+                            await router.push(res.url);
+                        }
+                    }}>
                         <TextInput
                             required
                             label="Email"
@@ -79,5 +93,13 @@ export default function SignIn() {
             </Grid>
         </>
     )
+}
+
+export async function getServerSideProps(context) {
+    return {
+        props: {
+            csrfToken: await getCsrfToken(context),
+        },
+    };
 }
 

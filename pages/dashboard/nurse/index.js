@@ -1,11 +1,11 @@
 import { useSession, getSession } from "next-auth/react"
-import {ActionIcon, Box, Button, Group, Modal, Space, Text} from "@mantine/core";
+import { Box, Button, Group, Modal, Space, Text} from "@mantine/core";
 import {useState} from "react";
-import {AiOutlineCopy} from "react-icons/ai";
 import {useNotifications} from "@mantine/notifications";
 
-export default function Page() {
-    const { data: session } = useSession()
+export default function Page({auth}) {
+    console.log(useSession())
+    const {data: session} = useSession()
     const [opened, setOpened] = useState(false);
     const [link, setLink] = useState('');
     const notifications = useNotifications();
@@ -84,10 +84,21 @@ export default function Page() {
     return <p>Access Denied</p>
 }
 
-export async function getServerSideProps(context) {
+export async function getServerSideProps(ctx) {
+    const auth = await getSession(ctx);
+
+    if (!auth) {
+        return {
+            redirect: {
+                destination: '/sign-in',
+                permanent: false
+            },
+        }
+    }
+
     return {
         props: {
-            session: await getSession(context),
-        },
+            ...auth,
+        }
     }
 }
