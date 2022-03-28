@@ -56,9 +56,10 @@ export default function SignIn() {
                             redirect: false,
                             email: form.values.email,
                             password: form.values.password,
-                            callbackUrl: `${window.location.origin}/dashboard/nurse/`,
+                            callbackUrl: `${window.location.origin}/dashboard/nurse`,
                         });
                         if (res?.error) {
+                            console.log(res)
                             setError(res.error);
                         } else {
                             setError(null);

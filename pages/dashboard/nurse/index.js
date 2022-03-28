@@ -2,9 +2,14 @@ import { useSession, getSession } from "next-auth/react"
 import { Box, Button, Group, Modal, Space, Text} from "@mantine/core";
 import {useState} from "react";
 import {useNotifications} from "@mantine/notifications";
+import {getToken} from "next-auth/jwt";
+import jwt_decode from "jwt-decode";
 
-export default function Page({auth}) {
-    console.log(useSession())
+export default function Page({...auth}) {
+    const user = {...auth}
+    const token = user.token.token.token.token.user.token;
+    const decoded = jwt_decode(token);
+    const id = decoded.id;
     const {data: session} = useSession()
     const [opened, setOpened] = useState(false);
     const [link, setLink] = useState('');

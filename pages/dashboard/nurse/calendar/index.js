@@ -9,29 +9,37 @@ import dayjs from "dayjs";
 import {useNotifications} from "@mantine/notifications";
 import Router from "next/router";
 import {getServerSideProps} from "../index";
+import sign from "jwt-encode";
+import jwt_decode from "jwt-decode";
 
-function Index({session}) {
-    console.log(session)
+function Index({...auth}) {
+    const user = {...auth}
+    const token = user.token.token.token.token.user.token;
+    const decoded = jwt_decode(token);
+    const id = decoded.id;
     useEffect(() => {
-        fetch(`http://localhost:8010/proxy/api/calendar/nurse/${auth.decodedToken.id}`,
+        fetch(`http://localhost:8010/proxy/api/calendar/nurse/${id}`,
             {
                 method: 'GET',
                 headers: {
                     'Content-type': 'application/json',
-                    'Authorization': auth.authorizationString
+                    'Authorization': `Bearer ${token}`
                 }
             })
             .then((res) => res.json())
+            .catch(e => console.log(e))
             .then((data) => {
                 setDataCalendar(data)
-            })
+            }).catch(function(error) {
+            console.log('Il y a eu un problème avec l\'opération fetch: ' + error.message);
+        });
 
-        fetch(`http://localhost:8010/proxy/api/kid/nurse/${auth.decodedToken.id}`,
+        fetch(`http://localhost:8010/proxy/api/kid/nurse/${id}`,
             {
                 method: 'GET',
                 headers: {
                     'Content-type': 'application/json',
-                    'Authorization': auth.authorizationString
+                    'Authorization': `Bearer ${token}`
                 }
             })
             .then((res) => res.json())
@@ -89,7 +97,7 @@ function Index({session}) {
                 }),
                 headers: {
                     'Content-type': 'application/json',
-                    'Authorization': auth.authorizationString
+                    'Authorization': `Bearer ${token}`
                 }
             }
         ).then(async r => {
@@ -117,7 +125,7 @@ function Index({session}) {
                 method: 'DELETE',
                 headers: {
                     'Content-type': 'application/json',
-                    'Authorization': auth.authorizationString
+                    'Authorization': `Bearer ${token}`
                 }
             }
         ).then(async r => {
@@ -149,7 +157,7 @@ function Index({session}) {
                 }),
                 headers: {
                     'Content-type': 'application/json',
-                    'Authorization': auth.authorizationString
+                    'Authorization': `Bearer ${token}`
                 }
             }
         ).then(async r => {
