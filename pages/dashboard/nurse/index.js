@@ -4,12 +4,10 @@ import {useState} from "react";
 import {useNotifications} from "@mantine/notifications";
 import {getToken} from "next-auth/jwt";
 import jwt_decode from "jwt-decode";
+import {AuthToken} from "../../../services/auth_token";
 
-export default function Page({...auth}) {
-    const user = {...auth}
-    const token = user.token.token.token.token.user.token;
-    const decoded = jwt_decode(token);
-    const id = decoded.id;
+export default function Page({userId, bearer}) {
+
     const {data: session} = useSession()
     const [opened, setOpened] = useState(false);
     const [link, setLink] = useState('');
@@ -22,7 +20,7 @@ export default function Page({...auth}) {
         tomorrow.setDate(today.getDate() + 1)
         const expiration = tomorrow
         fetch(
-            `http://localhost:8010/proxy/api/link_code/`,
+            `http://localhost:8010/proxy/api/link_code/${userId}`,
             {
                 method: 'POST',
                 body: JSON.stringify({
@@ -31,6 +29,7 @@ export default function Page({...auth}) {
                 }),
                 headers: {
                     'Content-type': 'application/json',
+                    'Authorization': bearer
                 }
             }
         )
@@ -90,9 +89,9 @@ export default function Page({...auth}) {
 }
 
 export async function getServerSideProps(ctx) {
-    const auth = await getSession(ctx);
+    const sessionCallBack = await getSession(ctx);
 
-    if (!auth) {
+    if (!sessionCallBack) {
         return {
             redirect: {
                 destination: '/sign-in',
@@ -101,9 +100,12 @@ export async function getServerSideProps(ctx) {
         }
     }
 
+    const authToken = new AuthToken(sessionCallBack.user.access_token);
+
     return {
         props: {
-            ...auth,
+            userId: sessionCallBack.user.id,
+            bearer: authToken.authorizationString,
         }
     }
 }

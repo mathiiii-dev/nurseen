@@ -1,17 +1,14 @@
 import {useEffect, useState} from 'react';
-import RichTextEditor from '../../../../../../../components/rte';
+import RichTextEditor from '../../../../../../components/rte';
 import {Alert, Button, Modal, Space, Spoiler, Table, Text, Title, Drawer} from "@mantine/core";
 import {useRouter} from 'next/router'
 import dayjs from "dayjs";
 import 'dayjs/locale/fr';
 import utc from "dayjs/plugin/utc";
-import {AuthToken} from "../../../../../../../services/auth_token";
-import { getStaticProps  } from "../../../index";
+import { getServerSideProps } from "../../../index";
 
+function NoteList({bearer, userId}) {
 
-function NoteList({auth}) {
-    auth = JSON.parse(auth)
-    auth = new AuthToken(auth.token)
     const [opened, setOpened] = useState(false)
     const [openedDrawer, setOpenedDrawer] = useState(false)
     const router = useRouter();
@@ -30,7 +27,7 @@ function NoteList({auth}) {
                 method: 'GET',
                 headers: {
                     'Content-type': 'application/json',
-                    'Authorization': auth.authorizationString
+                    'Authorization': bearer
                 }
             })
             .then((res) => res.json())
@@ -42,7 +39,7 @@ function NoteList({auth}) {
                 method: 'GET',
                 headers: {
                     'Content-type': 'application/json',
-                    'Authorization': auth.authorizationString
+                    'Authorization': bearer
                 }
             })
             .then((res) => res.json())
@@ -88,7 +85,7 @@ function NoteList({auth}) {
                 method: 'DELETE',
                 headers: {
                     'Content-type': 'application/json',
-                    'Authorization': auth.authorizationString
+                    'Authorization': bearer
                 }
             }).then(r => {
              console.log(r.status)
@@ -108,7 +105,7 @@ function NoteList({auth}) {
                 }),
                 headers: {
                     'Content-type': 'application/json',
-                    'Authorization': auth.authorizationString
+                    'Authorization': bearer
                 }
             })
     }
@@ -175,17 +172,6 @@ function NoteList({auth}) {
     );
 }
 
-
-
 export default NoteList;
 
-export { getStaticProps }
-
-export async function getStaticPaths() {
-    return {
-        paths: [
-            { params: { id: '1', pid: '1' } }
-        ],
-        fallback: true // false or 'blocking'
-    };
-}
+export { getServerSideProps }

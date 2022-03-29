@@ -9,21 +9,15 @@ import dayjs from "dayjs";
 import {useNotifications} from "@mantine/notifications";
 import Router from "next/router";
 import {getServerSideProps} from "../index";
-import sign from "jwt-encode";
-import jwt_decode from "jwt-decode";
 
-function Index({...auth}) {
-    const user = {...auth}
-    const token = user.token.token.token.token.user.token;
-    const decoded = jwt_decode(token);
-    const id = decoded.id;
+function Index({userId, bearer}) {
     useEffect(() => {
-        fetch(`http://localhost:8010/proxy/api/calendar/nurse/${id}`,
+        fetch(`http://localhost:8010/proxy/api/calendar/nurse/${userId}`,
             {
                 method: 'GET',
                 headers: {
                     'Content-type': 'application/json',
-                    'Authorization': `Bearer ${token}`
+                    'Authorization': bearer
                 }
             })
             .then((res) => res.json())
@@ -34,12 +28,12 @@ function Index({...auth}) {
             console.log('Il y a eu un problème avec l\'opération fetch: ' + error.message);
         });
 
-        fetch(`http://localhost:8010/proxy/api/kid/nurse/${id}`,
+        fetch(`http://localhost:8010/proxy/api/kid/nurse/${userId}`,
             {
                 method: 'GET',
                 headers: {
                     'Content-type': 'application/json',
-                    'Authorization': `Bearer ${token}`
+                    'Authorization': bearer
                 }
             })
             .then((res) => res.json())
@@ -97,7 +91,7 @@ function Index({...auth}) {
                 }),
                 headers: {
                     'Content-type': 'application/json',
-                    'Authorization': `Bearer ${token}`
+                    'Authorization': bearer
                 }
             }
         ).then(async r => {
@@ -125,7 +119,7 @@ function Index({...auth}) {
                 method: 'DELETE',
                 headers: {
                     'Content-type': 'application/json',
-                    'Authorization': `Bearer ${token}`
+                    'Authorization': bearer
                 }
             }
         ).then(async r => {
@@ -157,7 +151,7 @@ function Index({...auth}) {
                 }),
                 headers: {
                     'Content-type': 'application/json',
-                    'Authorization': `Bearer ${token}`
+                    'Authorization': bearer
                 }
             }
         ).then(async r => {

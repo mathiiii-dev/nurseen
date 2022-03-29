@@ -1,14 +1,11 @@
 import {useState} from 'react';
-import RichTextEditor from '../../../../../../../components/rte';
+import RichTextEditor from '../../../../../../components/rte';
 import {Button, Space, Title} from "@mantine/core";
 import {useRouter} from 'next/router'
 import {useNotifications} from "@mantine/notifications";
-import {AuthToken} from "../../../../../../../services/auth_token";
 import { getServerSideProps } from "../../../index";
 
-function Note({auth}) {
-    auth = JSON.parse(auth)
-    auth = new AuthToken(auth.token)
+function Note({userId, bearer}) {
     const router = useRouter();
     const [value, onChange] = useState('');
     const notifications = useNotifications();
@@ -23,7 +20,7 @@ function Note({auth}) {
                 }),
                 headers: {
                     'Content-type': 'application/json',
-                    'Authorization': auth.authorizationString
+                    'Authorization': bearer
                 }
             }).then(r => {
             if(r.status === 201) {

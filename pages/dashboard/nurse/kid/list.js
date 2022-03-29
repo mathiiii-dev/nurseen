@@ -6,11 +6,8 @@ import utc from 'dayjs/plugin/utc'
 import {useRouter} from 'next/router'
 import Link from 'next/link'
 import { getServerSideProps } from '../index'
-import {AuthToken} from "../../../../../services/auth_token";
 
-function KidList({auth}) {
-    auth = JSON.parse(auth)
-    auth = new AuthToken(auth.token)
+function KidList({userId, bearer}) {
     const router = useRouter()
     const [data, setData] = useState(null);
     const [opened, setOpened] = useState(false);
@@ -20,12 +17,12 @@ function KidList({auth}) {
     dayjs.extend(utc)
     dayjs.utc().format()
     useEffect(() => {
-        fetch(`http://localhost:8010/proxy/api/kid/nurse/${auth.decodedToken.id}`,
+        fetch(`http://localhost:8010/proxy/api/kid/nurse/${userId}`,
             {
                 method: 'GET',
                 headers: {
                     'Content-type': 'application/json',
-                    'Authorization': auth.authorizationString
+                    'Authorization': bearer
                 }
             })
             .then((res) => res.json())
@@ -41,7 +38,7 @@ function KidList({auth}) {
                 method: 'POST',
                 headers: {
                     'Content-type': 'application/json',
-                    'Authorization': auth.authorizationString
+                    'Authorization': bearer
                 }
             }).then(r => {
             router.reload()
@@ -54,7 +51,7 @@ function KidList({auth}) {
                 method: 'POST',
                 headers: {
                     'Content-type': 'application/json',
-                    'Authorization': auth.authorizationString
+                    'Authorization': bearer
                 }
             }).then(r => {
             router.reload()
@@ -89,8 +86,8 @@ function KidList({auth}) {
                 </td>
                 <td>
                     <Link href={{
-                        pathname: `/dashboard/nurse/[id]/kid/[pid]/note`,
-                        query: {id: auth.decodedToken.id, pid: element.id}
+                        pathname: `/dashboard/nurse/kid/[pid]/note`,
+                        query: {pid: element.id}
                     }}>
                         <Button>Note</Button>
                     </Link>
