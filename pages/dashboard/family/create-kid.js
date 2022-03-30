@@ -1,12 +1,12 @@
-import {privateRoute} from "../../../../components/privateRoute";
 import {Alert, Button, Grid, NumberInput, Space, TextInput, Title} from "@mantine/core";
 import {DatePicker} from "@mantine/dates";
 import {useForm} from "@mantine/hooks";
 import {useState} from "react";
 import {useNotifications} from "@mantine/notifications";
 import 'dayjs/locale/fr';
+import { getServerSideProps } from "./index";
 
-function CreateKid({auth}) {
+function CreateKid({userId, bearer}) {
     const [errorMessage, setErrorMessage] = useState('');
     const [error, setError] = useState(false);
     const notifications = useNotifications();
@@ -34,7 +34,7 @@ function CreateKid({auth}) {
     const create = async (event) => {
         event.preventDefault()
         await fetch(
-            `http://localhost:8010/proxy/api/family/${auth.decodedToken.id}/kid`,
+            `http://localhost:8010/proxy/api/family/${userId}/kid`,
             {
                 method: 'POST',
                 body: JSON.stringify({
@@ -45,7 +45,7 @@ function CreateKid({auth}) {
                 }),
                 headers: {
                     'Content-type': 'application/json',
-                    'Authorization': auth.authorizationString
+                    'Authorization': bearer
                 }
             }
         )
@@ -125,4 +125,6 @@ function CreateKid({auth}) {
     )
 }
 
-export default privateRoute(CreateKid);
+export default CreateKid;
+
+export { getServerSideProps };

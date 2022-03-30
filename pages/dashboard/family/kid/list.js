@@ -1,28 +1,24 @@
-import {privateRoute} from "../../../../../components/privateRoute";
-import {Button, Table, Modal, Alert, Space} from "@mantine/core";
+import {Button, Table} from "@mantine/core";
 import {useEffect, useState} from "react";
 import dayjs from "dayjs";
 import 'dayjs/locale/fr';
 import utc from 'dayjs/plugin/utc'
-import {useRouter} from 'next/router'
 import Link from 'next/link'
+import {getServerSideProps} from "../index";
 
-function FamilyKidList({auth}) {
-    const router = useRouter()
+function FamilyKidList({userId, bearer}) {
     const [data, setData] = useState(null);
-    const [opened, setOpened] = useState(false);
-    const [kidId, setKidId] = useState(false);
     let rows = null;
     dayjs.locale('fr')
     dayjs.extend(utc)
     dayjs.utc().format()
     useEffect(() => {
-        fetch(`http://localhost:8010/proxy/api/kid/family/${auth.decodedToken.id}`,
+        fetch(`http://localhost:8010/proxy/api/kid/family/${userId}`,
             {
                 method: 'GET',
                 headers: {
                     'Content-type': 'application/json',
-                    'Authorization': auth.authorizationString
+                    'Authorization': bearer
                 }
             })
             .then((res) => res.json())
@@ -40,8 +36,8 @@ function FamilyKidList({auth}) {
                 <td>{dayjs(element.birthday).utc().format('DD MMMM YYYY')}</td>
                 <td>
                     <Link href={{
-                        pathname: `/dashboard/family/[id]/kid/[pid]/notes`,
-                        query: {id: auth.decodedToken.id, pid: element.id}
+                        pathname: `/dashboard/family/kid/[pid]/note`,
+                        query: {pid: element.id}
                     }}>
                         <Button>Note</Button>
                     </Link>
@@ -71,4 +67,6 @@ function FamilyKidList({auth}) {
     )
 }
 
-export default privateRoute(FamilyKidList);
+export default FamilyKidList;
+
+export {getServerSideProps};

@@ -4,34 +4,36 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import {useEffect, useState} from "react";
 import {Alert, Button, Modal, Select, Space} from '@mantine/core'
-import {privateRoute} from "../../../../../components/privateRoute";
 import {DatePicker, TimeRangeInput} from "@mantine/dates";
 import dayjs from "dayjs";
 import {useNotifications} from "@mantine/notifications";
 import Router from "next/router";
+import {getServerSideProps} from "../index";
 
-
-function Full({auth}) {
+function Index({userId, bearer}) {
     useEffect(() => {
-        fetch(`http://localhost:8010/proxy/api/calendar/nurse/${auth.decodedToken.id}`,
+        fetch(`http://localhost:8010/proxy/api/calendar/nurse/${userId}`,
             {
                 method: 'GET',
                 headers: {
                     'Content-type': 'application/json',
-                    'Authorization': auth.authorizationString
+                    'Authorization': bearer
                 }
             })
             .then((res) => res.json())
+            .catch(e => console.log(e))
             .then((data) => {
                 setDataCalendar(data)
-            })
+            }).catch(function(error) {
+            console.log('Il y a eu un problème avec l\'opération fetch: ' + error.message);
+        });
 
-        fetch(`http://localhost:8010/proxy/api/kid/nurse/${auth.decodedToken.id}`,
+        fetch(`http://localhost:8010/proxy/api/kid/nurse/${userId}`,
             {
                 method: 'GET',
                 headers: {
                     'Content-type': 'application/json',
-                    'Authorization': auth.authorizationString
+                    'Authorization': bearer
                 }
             })
             .then((res) => res.json())
@@ -89,7 +91,7 @@ function Full({auth}) {
                 }),
                 headers: {
                     'Content-type': 'application/json',
-                    'Authorization': auth.authorizationString
+                    'Authorization': bearer
                 }
             }
         ).then(async r => {
@@ -117,7 +119,7 @@ function Full({auth}) {
                 method: 'DELETE',
                 headers: {
                     'Content-type': 'application/json',
-                    'Authorization': auth.authorizationString
+                    'Authorization': bearer
                 }
             }
         ).then(async r => {
@@ -149,7 +151,7 @@ function Full({auth}) {
                 }),
                 headers: {
                     'Content-type': 'application/json',
-                    'Authorization': auth.authorizationString
+                    'Authorization': bearer
                 }
             }
         ).then(async r => {
@@ -299,4 +301,6 @@ function Full({auth}) {
     );
 }
 
-export default privateRoute(Full);
+export default Index;
+
+export { getServerSideProps }

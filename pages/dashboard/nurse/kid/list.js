@@ -1,4 +1,3 @@
-import {privateRoute} from "../../../../../components/privateRoute";
 import {Button, Table, Modal, Alert, Space} from "@mantine/core";
 import {useEffect, useState} from "react";
 import dayjs from "dayjs";
@@ -6,8 +5,9 @@ import 'dayjs/locale/fr';
 import utc from 'dayjs/plugin/utc'
 import {useRouter} from 'next/router'
 import Link from 'next/link'
+import { getServerSideProps } from '../index'
 
-function KidList({auth}) {
+function KidList({userId, bearer}) {
     const router = useRouter()
     const [data, setData] = useState(null);
     const [opened, setOpened] = useState(false);
@@ -17,12 +17,12 @@ function KidList({auth}) {
     dayjs.extend(utc)
     dayjs.utc().format()
     useEffect(() => {
-        fetch(`http://localhost:8010/proxy/api/kid/nurse/${auth.decodedToken.id}`,
+        fetch(`http://localhost:8010/proxy/api/kid/nurse/${userId}`,
             {
                 method: 'GET',
                 headers: {
                     'Content-type': 'application/json',
-                    'Authorization': auth.authorizationString
+                    'Authorization': bearer
                 }
             })
             .then((res) => res.json())
@@ -38,10 +38,10 @@ function KidList({auth}) {
                 method: 'POST',
                 headers: {
                     'Content-type': 'application/json',
-                    'Authorization': auth.authorizationString
+                    'Authorization': bearer
                 }
             }).then(r => {
-            router.reload(window.location.pathname)
+            router.reload()
         })
     }
 
@@ -51,10 +51,10 @@ function KidList({auth}) {
                 method: 'POST',
                 headers: {
                     'Content-type': 'application/json',
-                    'Authorization': auth.authorizationString
+                    'Authorization': bearer
                 }
             }).then(r => {
-            router.reload(window.location.pathname)
+            router.reload()
         })
     }
 
@@ -86,8 +86,8 @@ function KidList({auth}) {
                 </td>
                 <td>
                     <Link href={{
-                        pathname: `/dashboard/nurse/[id]/kid/[pid]/note`,
-                        query: {id: auth.decodedToken.id, pid: element.id}
+                        pathname: `/dashboard/nurse/kid/[pid]/note`,
+                        query: {pid: element.id}
                     }}>
                         <Button>Note</Button>
                     </Link>
@@ -136,4 +136,6 @@ function KidList({auth}) {
     )
 }
 
-export default privateRoute(KidList);
+export default KidList;
+
+export { getServerSideProps };

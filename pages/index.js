@@ -1,3 +1,4 @@
+import React from 'react';
 import {
     Button,
     Center,
@@ -9,7 +10,7 @@ import {
     SimpleGrid
 } from "@mantine/core";
 
-export default function Home() {
+function Home()  {
     return (
         <>
             <Grid style={{backgroundColor: '#f4fdfc', padding: 50, borderRadius: 11}}>
@@ -118,3 +119,4 @@ export default function Home() {
     )
 }
 
+export default Home;
