@@ -1,4 +1,3 @@
-import {privateRoute} from "../../../../../../../components/privateRoute";
 import {useEffect, useState} from 'react';
 import {Button, Space, Spoiler, Table, Text, Title} from "@mantine/core";
 import {useRouter} from 'next/router'
@@ -6,8 +5,9 @@ import dayjs from "dayjs";
 import 'dayjs/locale/fr';
 import utc from "dayjs/plugin/utc";
 import Link from 'next/link'
+import {getServerSideProps} from "../../../index";
 
-function KidNotes({auth}) {
+function KidNotes({userId, bearer}) {
     const router = useRouter();
     const [data, setData] = useState(null);
     const [notes, setNotes] = useState(null);
@@ -22,7 +22,7 @@ function KidNotes({auth}) {
                 method: 'GET',
                 headers: {
                     'Content-type': 'application/json',
-                    'Authorization': auth.authorizationString
+                    'Authorization': bearer
                 }
             })
             .then((res) => res.json())
@@ -34,7 +34,7 @@ function KidNotes({auth}) {
                 method: 'GET',
                 headers: {
                     'Content-type': 'application/json',
-                    'Authorization': auth.authorizationString
+                    'Authorization': bearer
                 }
             })
             .then((res) => res.json())
@@ -56,10 +56,7 @@ function KidNotes({auth}) {
                     </Spoiler>
                 </td>
                 <td>
-                    <Link href={{
-                        pathname: `/dashboard/family/[id]/kid/[pid]/note/${element.id}`,
-                        query: {id: auth.decodedToken.id, pid: router.query.id}
-                    }}>
+                    <Link href={`/dashboard/family/kid/${router.query.pid}/note/${element.id}`}>
                         <Button>Note</Button>
                     </Link>
                 </td>
@@ -93,4 +90,6 @@ function KidNotes({auth}) {
     );
 }
 
-export default privateRoute(KidNotes);
+export default KidNotes;
+
+export { getServerSideProps };

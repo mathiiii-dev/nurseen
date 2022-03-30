@@ -1,9 +1,7 @@
-import { useSession, getSession } from "next-auth/react"
-import { Box, Button, Group, Modal, Space, Text} from "@mantine/core";
+import {useSession, getSession} from "next-auth/react"
+import {Box, Button, Group, Modal, Space, Text} from "@mantine/core";
 import {useState} from "react";
 import {useNotifications} from "@mantine/notifications";
-import {getToken} from "next-auth/jwt";
-import jwt_decode from "jwt-decode";
 import {AuthToken} from "../../../services/auth_token";
 
 export default function Page({userId, bearer}) {
@@ -91,7 +89,16 @@ export default function Page({userId, bearer}) {
 export async function getServerSideProps(ctx) {
     const sessionCallBack = await getSession(ctx);
 
-    if (!sessionCallBack) {
+    if (sessionCallBack && sessionCallBack.user.role !== 'ROLE_NURSE') {
+        return {
+            redirect: {
+                destination: '/dashboard/family',
+                permanent: false
+            },
+        }
+    }
+
+    if (!sessionCallBack || sessionCallBack.user.role !== 'ROLE_NURSE') {
         return {
             redirect: {
                 destination: '/sign-in',
