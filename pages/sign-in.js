@@ -10,9 +10,8 @@ import {
 import {useState} from "react";
 import {useForm} from "@mantine/hooks";
 import {AiOutlineEye, AiOutlineEyeInvisible} from "react-icons/ai";
-import { setCookies } from "../lib/cookies";
-import { useRouter } from 'next/router';
-import jwtDecode from "jwt-decode";
+import {useRouter} from 'next/router';
+import {getCsrfToken, signIn, } from "next-auth/react";
 
 export default function SignIn() {
     const router = useRouter();
@@ -36,43 +35,6 @@ export default function SignIn() {
         }
     });
 
-    const login = async (event) => {
-        event.preventDefault()
-        await fetch(
-            'http://localhost:8010/proxy/api/login_check',
-            {
-                method: 'POST',
-                body: JSON.stringify({
-                    email: form.values.email,
-                    password: form.values.password
-                }),
-                headers: {
-                    'Content-type': 'application/json'
-                }
-            }
-        )
-            .then(response => response.json())
-            .then(response => {
-                if (response.code && response.code !== 200) {
-                    setError(true)
-                    let message = response.message ?? 'Une erreur est survenue pendant l\'envoie du formulaire. Veuillez contacter un administrateur.'
-                    setErrorMessage(message)
-                } else {
-                    const decoded = jwtDecode(response.token);
-                    setCookies('token', response.token);
-                    setCookies('refresh', response.refresh_token);
-                    setCookies('email', decoded.email);
-                    setCookies('role', decoded.roles[0]);
-                    const role = decoded.roles[0];
-                    if(role === 'ROLE_NURSE') {
-                        router.push(`/dashboard/nurse/${decoded.id}`);
-                    } else if(role === 'ROLE_PARENT') {
-                        router.push(`/dashboard/family/${decoded.id}`);
-                    }
-                }
-            })
-    }
-
     return (
         <>
             <Grid style={{backgroundColor: '#f4fdfc', borderRadius: 11, padding: 25}}>
@@ -88,7 +50,24 @@ export default function SignIn() {
                             </Alert> : ''
                     }
                     <Space h={"xl"}/>
-                    <form onSubmit={login}>
+                    <form onSubmit={async (event) => {
+                        event.preventDefault()
+                        const res = await signIn('credentials', {
+                            redirect: false,
+                            email: form.values.email,
+                            password: form.values.password,
+                            callbackUrl: `${window.location.origin}/dashboard/nurse`,
+                        });
+                        if (res?.error) {
+                            console.log(res)
+                            setError(res.error);
+                        } else {
+                            setError(null);
+                        }
+                        if (res.url) {
+                            await router.push(res.url);
+                        }
+                    }}>
                         <TextInput
                             required
                             label="Email"
@@ -115,5 +94,13 @@ export default function SignIn() {
             </Grid>
         </>
     )
+}
+
+export async function getServerSideProps(context) {
+    return {
+        props: {
+            csrfToken: await getCsrfToken(context),
+        },
+    };
 }
 

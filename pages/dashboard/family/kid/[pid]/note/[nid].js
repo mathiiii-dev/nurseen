@@ -1,9 +1,9 @@
-import {privateRoute} from "../../../../../../../components/privateRoute";
+import {getServerSideProps} from "../../../index";
 import {useEffect, useState} from "react";
 import {useRouter} from "next/router";
 import {Button, Text} from "@mantine/core";
 
-function Note({auth}) {
+function Note({userId, bearer}) {
     const router = useRouter();
     const [note, setNote] = useState();
     useEffect(() => {
@@ -12,7 +12,7 @@ function Note({auth}) {
                 method: 'GET',
                 headers: {
                     'Content-type': 'application/json',
-                    'Authorization': auth.authorizationString
+                    'Authorization': bearer
                 }
             })
             .then((res) => res.json())
@@ -33,4 +33,6 @@ function Note({auth}) {
     )
 }
 
-export default privateRoute(Note)
+export default Note;
+
+export {getServerSideProps};
