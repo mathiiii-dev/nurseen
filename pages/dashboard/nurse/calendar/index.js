@@ -11,6 +11,7 @@ import Router from "next/router";
 import {getServerSideProps} from "../index";
 
 function Index({userId, bearer}) {
+
     useEffect(() => {
         fetch(`http://localhost:8010/proxy/api/calendar/nurse/${userId}`,
             {
@@ -24,7 +25,7 @@ function Index({userId, bearer}) {
             .catch(e => console.log(e))
             .then((data) => {
                 setDataCalendar(data)
-            }).catch(function(error) {
+            }).catch(function (error) {
             console.log('Il y a eu un problème avec l\'opération fetch: ' + error.message);
         });
 
@@ -303,4 +304,4 @@ function Index({userId, bearer}) {
 
 export default Index;
 
-export { getServerSideProps }
+export {getServerSideProps};
