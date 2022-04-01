@@ -3,7 +3,7 @@ import {Box, Button, Group, Modal, Space, Text} from "@mantine/core";
 import {useState} from "react";
 import {useNotifications} from "@mantine/notifications";
 import {AuthToken} from "../../../services/auth_token";
-
+import Link from 'next/link';
 
 export default function Page({userId, bearer}) {
 
@@ -78,6 +78,15 @@ export default function Page({userId, bearer}) {
             </Modal>
             <Group position="center">
                 <Button onClick={() => setOpened(true)}>Liaison parent</Button>
+                <Link href={'nurse/calendar'}>
+                    <Button>Calendar</Button>
+                </Link>
+                <Link href={'nurse/kid/list'}>
+                    <Button>Kid List</Button>
+                </Link>
+                <Link href={'nurse/note'}>
+                    <Button>Note</Button>
+                </Link>
             </Group>
         </>
     )
