@@ -1,52 +1,24 @@
-import {useEffect, useState} from 'react';
+import {useState} from 'react';
 import RichTextEditor from '../../../../../../components/rte';
 import {Alert, Button, Modal, Space, Spoiler, Table, Text, Title, Drawer} from "@mantine/core";
 import {useRouter} from 'next/router'
 import dayjs from "dayjs";
 import 'dayjs/locale/fr';
 import utc from "dayjs/plugin/utc";
-import { getServerSideProps } from "../../../index";
+import {getSession} from "next-auth/react";
+import {AuthToken} from "../../../../../../services/auth_token";
 
-function NoteList({bearer, userId}) {
+function NoteList({bearer, kid, notes}) {
 
     const [opened, setOpened] = useState(false)
     const [openedDrawer, setOpenedDrawer] = useState(false)
     const router = useRouter();
-    const [data, setData] = useState(null);
     const [value, onChange] = useState('');
-    const [notes, setNotes] = useState(null);
     const [noteId, setNoteId] = useState(null);
 
     dayjs.locale('fr')
     dayjs.extend(utc)
     dayjs.utc().format()
-
-    useEffect(() => {
-        fetch(`http://localhost:8010/proxy/api/kid/${router.query.pid}`,
-            {
-                method: 'GET',
-                headers: {
-                    'Content-type': 'application/json',
-                    'Authorization': bearer
-                }
-            })
-            .then((res) => res.json())
-            .then((data) => {
-                setData(data)
-            })
-        fetch(`http://localhost:8010/proxy/api/note/kid/${router.query.pid}/all`,
-            {
-                method: 'GET',
-                headers: {
-                    'Content-type': 'application/json',
-                    'Authorization': bearer
-                }
-            })
-            .then((res) => res.json())
-            .then((data) => {
-                setNotes(data)
-            })
-    }, [])
 
     let rows = null;
     if (notes) {
@@ -80,7 +52,7 @@ function NoteList({bearer, userId}) {
     }
 
     const deleteNote =  () => {
-         fetch(`http://localhost:8010/proxy/api/note/${noteId}`,
+        fetch(`http://localhost:8010/proxy/api/note/${noteId}`,
             {
                 method: 'DELETE',
                 headers: {
@@ -88,12 +60,12 @@ function NoteList({bearer, userId}) {
                     'Authorization': bearer
                 }
             }).then(r => {
-             console.log(r.status)
-             if(r.status === 204) {
-                 setOpened(false)
-                 router.reload()
-             }
-         })
+            console.log(r.status)
+            if(r.status === 204) {
+                setOpened(false)
+                router.reload()
+            }
+        })
     }
 
     const edit = async () => {
@@ -148,8 +120,8 @@ function NoteList({bearer, userId}) {
             </Modal>
             <Space h="xl"/>
             {
-                data ?
-                    <Title>Les notes de {data.firstname} </Title>
+                kid ?
+                    <Title>Les notes de {kid.firstname} </Title>
                     : ''
             }
             <Space h="xl"/>
@@ -174,4 +146,38 @@ function NoteList({bearer, userId}) {
 
 export default NoteList;
 
-export { getServerSideProps }
+export async function getServerSideProps(ctx) {
+    const sessionCallBack = await getSession(ctx);
+
+    const authToken = new AuthToken(sessionCallBack.user.access_token);
+
+    const res1 = await fetch(`http://localhost:8010/proxy/api/kid/${ctx.params.pid}`,
+        {
+            method: 'GET',
+            headers: {
+                'Content-type': 'application/json',
+                'Authorization': authToken.authorizationString
+            }
+        });
+
+    const res2 = await fetch(`http://localhost:8010/proxy/api/note/kid/${ctx.params.pid}/all`,
+        {
+            method: 'GET',
+            headers: {
+                'Content-type': 'application/json',
+                'Authorization': authToken.authorizationString
+            }
+        });
+
+    const kid = await res1.json();
+    const notes = await res2.json();
+
+    return {
+        props: {
+            userId: sessionCallBack.user.id,
+            bearer: authToken.authorizationString,
+            kid,
+            notes
+        }
+    }
+}

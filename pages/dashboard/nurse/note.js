@@ -1,18 +1,26 @@
 import {useState} from 'react';
-import RichTextEditor from '../../../../../../components/rte';
-import {Button, Space, Title} from "@mantine/core";
-import {useRouter} from 'next/router'
+import RichTextEditor from '/components/rte';
+import {Button, Select, Space} from "@mantine/core";
 import {useNotifications} from "@mantine/notifications";
-import { getServerSideProps } from "../../../index";
+import {getSession} from "next-auth/react";
+import {AuthToken} from "../../../services/auth_token";
 
-function Note({userId, bearer}) {
-    const router = useRouter();
+function Note({bearer, kids}) {
     const [value, onChange] = useState('');
     const notifications = useNotifications();
-
+    const [select, setSelect] = useState(null);
+    let nurseKids = null;
+    if (kids) {
+        nurseKids = kids.map((element) => (
+            {
+                value: element.id.toString(),
+                label: element.firstname + ' ' + element.lastname
+            }
+        ))
+    }
     const create = (event) => {
         event.preventDefault()
-        fetch(`http://localhost:8010/proxy/api/note/kid/${router.query.pid}`,
+        fetch(`http://localhost:8010/proxy/api/note/kid/${select}`,
             {
                 method: 'POST',
                 body: JSON.stringify({
@@ -40,6 +48,12 @@ function Note({userId, bearer}) {
 
             <Space h="xl"/>
             <form onSubmit={create}>
+                <Select
+                    value={select}
+                    onChange={setSelect}
+                    data={nurseKids}
+                    label="Enfant"
+                    placeholder="Choisir un enfant"/>
                 <RichTextEditor
                     styles={{
                         root: {height: 250}
@@ -58,4 +72,26 @@ function Note({userId, bearer}) {
 
 export default Note;
 
-export { getServerSideProps }
+export async function getServerSideProps(ctx) {
+    const sessionCallBack = await getSession(ctx);
+
+    const authToken = new AuthToken(sessionCallBack.user.access_token);
+
+    const res = await fetch(`http://localhost:8010/proxy/api/kid/nurse/${authToken.decodedToken.id}`,
+        {
+            method: 'GET',
+            headers: {
+                'Content-type': 'application/json',
+                'Authorization': authToken.authorizationString
+            }
+        });
+    const kids = await res.json();
+
+    return {
+        props: {
+            userId: sessionCallBack.user.id,
+            bearer: authToken.authorizationString,
+            kids
+        }
+    }
+}
