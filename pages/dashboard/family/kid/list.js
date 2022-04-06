@@ -1,35 +1,19 @@
 import {Button, Table} from "@mantine/core";
-import {useEffect, useState} from "react";
 import dayjs from "dayjs";
 import 'dayjs/locale/fr';
 import utc from 'dayjs/plugin/utc'
-import Link from 'next/link'
-import {getServerSideProps} from "../index";
+import Link from 'next/link';
+import {getSession} from "next-auth/react";
+import {AuthToken} from "../../../../services/auth_token";
+function FamilyKidList({kids}) {
 
-function FamilyKidList({userId, bearer}) {
-    const [data, setData] = useState(null);
     let rows = null;
     dayjs.locale('fr')
     dayjs.extend(utc)
     dayjs.utc().format()
-    useEffect(() => {
-        fetch(`http://localhost:8010/proxy/api/kid/family/${userId}`,
-            {
-                method: 'GET',
-                headers: {
-                    'Content-type': 'application/json',
-                    'Authorization': bearer
-                }
-            })
-            .then((res) => res.json())
-            .then((data) => {
-                console.log(data)
-                setData(data)
-            })
-    }, [])
 
-    if (data) {
-        rows = data.map((element) => (
+    if (kids) {
+        rows = kids.map((element) => (
             <tr key={element.id}>
                 <td>{element.firstname}</td>
                 <td>{element.lastname}</td>
@@ -69,4 +53,24 @@ function FamilyKidList({userId, bearer}) {
 
 export default FamilyKidList;
 
-export {getServerSideProps};
+export async function getServerSideProps(ctx) {
+    const sessionCallBack = await getSession(ctx);
+
+    const authToken = new AuthToken(sessionCallBack.user.access_token);
+
+    const res = await fetch(process.env.BASE_URL + `kid/family/${authToken.decodedToken.id}`,
+        {
+            method: 'GET',
+            headers: {
+                'Content-type': 'application/json',
+                'Authorization': authToken.authorizationString
+            }
+        });
+    const kids = await res.json()
+
+    return {
+        props: {
+            kids
+        }
+    }
+}

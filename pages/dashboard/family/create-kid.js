@@ -34,7 +34,7 @@ function CreateKid({userId, bearer}) {
     const create = async (event) => {
         event.preventDefault()
         await fetch(
-            `http://localhost:8010/proxy/api/family/${userId}/kid`,
+            process.env.BASE_URL + `family/${userId}/kid`,
             {
                 method: 'POST',
                 body: JSON.stringify({

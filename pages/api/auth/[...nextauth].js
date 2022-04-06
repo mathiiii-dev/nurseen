@@ -1,6 +1,49 @@
 import NextAuth from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials';
 import jwt_decode from 'jwt-decode';
+import {AuthToken} from "../../../services/auth_token";
+
+async function refreshAccessToken(token) {
+    try {
+        const response = await fetch(process.env.BASE_URL + 'token/refresh', {
+            method: 'POST',
+            body: JSON.stringify({
+                refresh_token: token.refresh_token
+            }),
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        const refreshedTokens = await response.json()
+
+        if (!response.ok) {
+            throw refreshedTokens
+        }
+
+        const decoded = jwt_decode(refreshedTokens.token)
+
+        token.user = [
+            token.id = decoded.id,
+            token.email = decoded.email,
+            token.token = refreshedTokens.token,
+            token.refresh_token = refreshedTokens.refresh_token,
+            token.role = decoded.roles[0]
+        ]
+
+        return {
+            ...token
+        }
+    } catch (error) {
+        console.log(error)
+
+        return {
+            ...token,
+            error: "RefreshAccessTokenError",
+        }
+    }
+}
+
 
 const options = {
     providers: [
@@ -17,7 +60,7 @@ const options = {
                     password: credentials.password,
                 };
 
-                const res = await fetch('http://localhost:8010/proxy/api/login_check', {
+                const res = await fetch(process.env.BASE_URL + 'login_check', {
                     method: 'POST',
                     body: JSON.stringify(payload),
                     headers: {
@@ -50,6 +93,10 @@ const options = {
                     token.refresh_token = t.refresh_token,
                     token.role = decoded.roles[0]
                 ]
+            }
+            const authToken = new AuthToken(token.token);
+            if (authToken.isExpired) {
+                return refreshAccessToken(token)
             }
             return Promise.resolve(token);
         },
