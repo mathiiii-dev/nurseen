@@ -18,7 +18,7 @@ export default function Page({userId, bearer}) {
         tomorrow.setDate(today.getDate() + 1)
         const expiration = tomorrow
         fetch(
-            `http://localhost:8010/proxy/api/link_code/${userId}`,
+            process.env.BASE_URL + `link_code/${userId}`,
             {
                 method: 'POST',
                 body: JSON.stringify({
@@ -86,6 +86,9 @@ export default function Page({userId, bearer}) {
                 </Link>
                 <Link href={'nurse/note'}>
                     <Button>Note</Button>
+                </Link>
+                <Link href={'nurse/gallery'}>
+                    <Button>Gallery</Button>
                 </Link>
             </Group>
         </>

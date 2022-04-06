@@ -26,7 +26,7 @@ export async function getServerSideProps(ctx) {
 
     const authToken = new AuthToken(sessionCallBack.user.access_token);
 
-    const res = await fetch(`http://localhost:8010/proxy/api/note/${ctx.params.nid}`,
+    const res = await fetch(process.env.BASE_URL + `note/${ctx.params.nid}`,
         {
             method: 'GET',
             headers: {
