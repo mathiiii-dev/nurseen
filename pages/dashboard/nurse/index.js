@@ -87,6 +87,9 @@ export default function Page({userId, bearer}) {
                 <Link href={'nurse/note'}>
                     <Button>Note</Button>
                 </Link>
+                <Link href={'nurse/gallery'}>
+                    <Button>Gallery</Button>
+                </Link>
             </Group>
         </>
     )
