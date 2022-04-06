@@ -52,7 +52,7 @@ function NoteList({bearer, kid, notes}) {
     }
 
     const deleteNote =  () => {
-        fetch(`http://localhost:8010/proxy/api/note/${noteId}`,
+        fetch(process.env.BASE_URL + `note/${noteId}`,
             {
                 method: 'DELETE',
                 headers: {
@@ -69,7 +69,7 @@ function NoteList({bearer, kid, notes}) {
     }
 
     const edit = async () => {
-        await fetch(`http://localhost:8010/proxy/api/note/${noteId}/edit`,
+        await fetch(process.env.BASE_URL + `note/${noteId}/edit`,
             {
                 method: 'PATCH',
                 body: JSON.stringify({
@@ -151,7 +151,7 @@ export async function getServerSideProps(ctx) {
 
     const authToken = new AuthToken(sessionCallBack.user.access_token);
 
-    const res1 = await fetch(`http://localhost:8010/proxy/api/kid/${ctx.params.pid}`,
+    const res1 = await fetch(process.env.BASE_URL + `kid/${ctx.params.pid}`,
         {
             method: 'GET',
             headers: {
@@ -160,7 +160,7 @@ export async function getServerSideProps(ctx) {
             }
         });
 
-    const res2 = await fetch(`http://localhost:8010/proxy/api/note/kid/${ctx.params.pid}/all`,
+    const res2 = await fetch(process.env.BASE_URL + `note/kid/${ctx.params.pid}/all`,
         {
             method: 'GET',
             headers: {
