@@ -1,15 +1,14 @@
 import NextAuth from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials';
 import jwt_decode from 'jwt-decode';
-import {setCookie} from "nookies";
 
 const options = {
     providers: [
         CredentialsProvider({
             name: "Credentials",
             credentials: {
-                email: { label: "Email", type: "email", placeholder: "jsmith@mail.com" },
-                password: {  label: "Password", type: "password" }
+                email: {label: "Email", type: "email", placeholder: "jsmith@mail.com"},
+                password: {label: "Password", type: "password"}
             },
             async authorize(credentials, req) {
 
@@ -26,10 +25,8 @@ const options = {
                     },
                 });
 
-                const user = await res.json();
-
-                if (res.ok && user) {
-                    return user;
+                if (res) {
+                    return res;
                 } else {
                     return null;
                 }
@@ -40,16 +37,33 @@ const options = {
         jwt: true
     },
     callbacks: {
-        async jwt(token, user, account, profile, isNewUser) {
-            if (user?.token) {
-                token.token = user.token;
+        async jwt({token, user}) {
+            if (user) {
+                const t = await user.json()
+                const decoded = jwt_decode(t.token)
+
+                token.jwt = user.jwt;
+                token.user = [
+                    token.id = decoded.id,
+                    token.email = decoded.email,
+                    token.token = t.token,
+                    token.refresh_token = t.refresh_token,
+                    token.role = decoded.roles[0]
+                ]
             }
-            return token;
+            return Promise.resolve(token);
         },
 
-        async session(session, token) {
-            return session;
-        }
+        async session({session, token}) {
+            session.user = {
+                id: token.id,
+                email: token.email,
+                access_token: token.token,
+                refresh_token: token.refresh_token,
+                role: token.role,
+            }
+            return Promise.resolve(session);
+        },
     },
     pages: {
         signIn: '/sign-in',

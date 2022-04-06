@@ -1,55 +1,24 @@
-import {useEffect, useState} from 'react';
-import RichTextEditor from '../../../../../../../components/rte';
+import {useState} from 'react';
+import RichTextEditor from '../../../../../../components/rte';
 import {Alert, Button, Modal, Space, Spoiler, Table, Text, Title, Drawer} from "@mantine/core";
 import {useRouter} from 'next/router'
 import dayjs from "dayjs";
 import 'dayjs/locale/fr';
 import utc from "dayjs/plugin/utc";
-import {AuthToken} from "../../../../../../../services/auth_token";
-import { getStaticProps  } from "../../../index";
+import {getSession} from "next-auth/react";
+import {AuthToken} from "../../../../../../services/auth_token";
 
+function NoteList({bearer, kid, notes}) {
 
-function NoteList({auth}) {
-    auth = JSON.parse(auth)
-    auth = new AuthToken(auth.token)
     const [opened, setOpened] = useState(false)
     const [openedDrawer, setOpenedDrawer] = useState(false)
     const router = useRouter();
-    const [data, setData] = useState(null);
     const [value, onChange] = useState('');
-    const [notes, setNotes] = useState(null);
     const [noteId, setNoteId] = useState(null);
 
     dayjs.locale('fr')
     dayjs.extend(utc)
     dayjs.utc().format()
-
-    useEffect(() => {
-        fetch(`http://localhost:8010/proxy/api/kid/${router.query.pid}`,
-            {
-                method: 'GET',
-                headers: {
-                    'Content-type': 'application/json',
-                    'Authorization': auth.authorizationString
-                }
-            })
-            .then((res) => res.json())
-            .then((data) => {
-                setData(data)
-            })
-        fetch(`http://localhost:8010/proxy/api/note/kid/${router.query.pid}/all`,
-            {
-                method: 'GET',
-                headers: {
-                    'Content-type': 'application/json',
-                    'Authorization': auth.authorizationString
-                }
-            })
-            .then((res) => res.json())
-            .then((data) => {
-                setNotes(data)
-            })
-    }, [])
 
     let rows = null;
     if (notes) {
@@ -83,20 +52,20 @@ function NoteList({auth}) {
     }
 
     const deleteNote =  () => {
-         fetch(`http://localhost:8010/proxy/api/note/${noteId}`,
+        fetch(`http://localhost:8010/proxy/api/note/${noteId}`,
             {
                 method: 'DELETE',
                 headers: {
                     'Content-type': 'application/json',
-                    'Authorization': auth.authorizationString
+                    'Authorization': bearer
                 }
             }).then(r => {
-             console.log(r.status)
-             if(r.status === 204) {
-                 setOpened(false)
-                 router.reload()
-             }
-         })
+            console.log(r.status)
+            if(r.status === 204) {
+                setOpened(false)
+                router.reload()
+            }
+        })
     }
 
     const edit = async () => {
@@ -108,7 +77,7 @@ function NoteList({auth}) {
                 }),
                 headers: {
                     'Content-type': 'application/json',
-                    'Authorization': auth.authorizationString
+                    'Authorization': bearer
                 }
             })
     }
@@ -151,8 +120,8 @@ function NoteList({auth}) {
             </Modal>
             <Space h="xl"/>
             {
-                data ?
-                    <Title>Les notes de {data.firstname} </Title>
+                kid ?
+                    <Title>Les notes de {kid.firstname} </Title>
                     : ''
             }
             <Space h="xl"/>
@@ -175,17 +144,40 @@ function NoteList({auth}) {
     );
 }
 
-
-
 export default NoteList;
 
-export { getStaticProps }
+export async function getServerSideProps(ctx) {
+    const sessionCallBack = await getSession(ctx);
 
-export async function getStaticPaths() {
+    const authToken = new AuthToken(sessionCallBack.user.access_token);
+
+    const res1 = await fetch(`http://localhost:8010/proxy/api/kid/${ctx.params.pid}`,
+        {
+            method: 'GET',
+            headers: {
+                'Content-type': 'application/json',
+                'Authorization': authToken.authorizationString
+            }
+        });
+
+    const res2 = await fetch(`http://localhost:8010/proxy/api/note/kid/${ctx.params.pid}/all`,
+        {
+            method: 'GET',
+            headers: {
+                'Content-type': 'application/json',
+                'Authorization': authToken.authorizationString
+            }
+        });
+
+    const kid = await res1.json();
+    const notes = await res2.json();
+
     return {
-        paths: [
-            { params: { id: '1', pid: '1' } }
-        ],
-        fallback: true // false or 'blocking'
-    };
+        props: {
+            userId: sessionCallBack.user.id,
+            bearer: authToken.authorizationString,
+            kid,
+            notes
+        }
+    }
 }

@@ -2,58 +2,21 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
-import {useEffect, useState} from "react";
+import {useState} from "react";
 import {Alert, Button, Modal, Select, Space} from '@mantine/core'
 import {DatePicker, TimeRangeInput} from "@mantine/dates";
 import dayjs from "dayjs";
 import {useNotifications} from "@mantine/notifications";
 import Router from "next/router";
-import {getServerSideProps} from "../index";
-import sign from "jwt-encode";
-import jwt_decode from "jwt-decode";
+import {AuthToken} from "../../../../services/auth_token";
+import {getSession} from "next-auth/react";
 
-function Index({...auth}) {
-    const user = {...auth}
-    const token = user.token.token.token.token.user.token;
-    const decoded = jwt_decode(token);
-    const id = decoded.id;
-    useEffect(() => {
-        fetch(`http://localhost:8010/proxy/api/calendar/nurse/${id}`,
-            {
-                method: 'GET',
-                headers: {
-                    'Content-type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                }
-            })
-            .then((res) => res.json())
-            .catch(e => console.log(e))
-            .then((data) => {
-                setDataCalendar(data)
-            }).catch(function(error) {
-            console.log('Il y a eu un problème avec l\'opération fetch: ' + error.message);
-        });
-
-        fetch(`http://localhost:8010/proxy/api/kid/nurse/${id}`,
-            {
-                method: 'GET',
-                headers: {
-                    'Content-type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                }
-            })
-            .then((res) => res.json())
-            .then((data) => {
-                setData(data)
-            })
-    }, [])
+function Index({bearer, kids, dayKidsCalendar}) {
 
     const [opened, setOpened] = useState(false);
     const now = new Date();
     const then = dayjs(now).add(8, 'hours').toDate();
     const [timeRanges, setTimeRanges] = useState([now, then]);
-    const [data, setData] = useState('');
-    const [dataCalendar, setDataCalendar] = useState(null);
     const [select, setSelect] = useState(null);
     const [day, setDay] = useState(null);
     const [showError, setShowError] = useState(false);
@@ -63,8 +26,8 @@ function Index({...auth}) {
     const notifications = useNotifications();
 
     let events = null;
-    if (dataCalendar) {
-        events = dataCalendar.map((element) => (
+    if (dayKidsCalendar) {
+        events = dayKidsCalendar.map((element) => (
             {
                 id: element.kid_id,
                 groupId: element.id,
@@ -75,9 +38,9 @@ function Index({...auth}) {
         ))
     }
 
-    let kids = null;
-    if (data) {
-        kids = data.map((element) => (
+    let nurseKids = null;
+    if (kids) {
+        nurseKids = kids.map((element) => (
             {
                 value: element.id.toString(),
                 label: element.firstname + ' ' + element.lastname
@@ -97,7 +60,7 @@ function Index({...auth}) {
                 }),
                 headers: {
                     'Content-type': 'application/json',
-                    'Authorization': `Bearer ${token}`
+                    'Authorization': bearer
                 }
             }
         ).then(async r => {
@@ -125,7 +88,7 @@ function Index({...auth}) {
                 method: 'DELETE',
                 headers: {
                     'Content-type': 'application/json',
-                    'Authorization': `Bearer ${token}`
+                    'Authorization': bearer
                 }
             }
         ).then(async r => {
@@ -157,7 +120,7 @@ function Index({...auth}) {
                 }),
                 headers: {
                     'Content-type': 'application/json',
-                    'Authorization': `Bearer ${token}`
+                    'Authorization': bearer
                 }
             }
         ).then(async r => {
@@ -214,7 +177,7 @@ function Index({...auth}) {
                         <Select
                             value={select}
                             onChange={setSelect}
-                            data={kids}
+                            data={nurseKids}
                             label="Enfant"
                             placeholder="Choisir un enfant"/>
                         <Space h={"xl"}/>
@@ -259,7 +222,7 @@ function Index({...auth}) {
                         <Select
                             value={select}
                             onChange={setSelect}
-                            data={kids}
+                            data={nurseKids}
                             label="Enfant"
                             placeholder="Choisir un enfant"/>
                         <Space h={"xl"}/>
@@ -309,4 +272,37 @@ function Index({...auth}) {
 
 export default Index;
 
-export { getServerSideProps }
+export async function getServerSideProps(ctx) {
+    const sessionCallBack = await getSession(ctx);
+
+    const authToken = new AuthToken(sessionCallBack.user.access_token);
+
+    const res1 = await fetch(`http://localhost:8010/proxy/api/calendar/nurse/${authToken.decodedToken.id}`,
+        {
+            method: 'GET',
+            headers: {
+                'Content-type': 'application/json',
+                'Authorization': authToken.authorizationString
+            }
+        });
+    const dayKidsCalendar = await res1.json();
+
+    const res2 = await fetch(`http://localhost:8010/proxy/api/kid/nurse/${authToken.decodedToken.id}`,
+        {
+            method: 'GET',
+            headers: {
+                'Content-type': 'application/json',
+                'Authorization': authToken.authorizationString
+            }
+        });
+    const kids = await res2.json();
+
+    return {
+        props: {
+            userId: sessionCallBack.user.id,
+            bearer: authToken.authorizationString,
+            dayKidsCalendar,
+            kids
+        }
+    }
+}

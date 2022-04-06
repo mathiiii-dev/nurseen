@@ -1,39 +1,22 @@
 import {Button, Table, Modal, Alert, Space} from "@mantine/core";
-import {useEffect, useState} from "react";
+import {useState} from "react";
 import dayjs from "dayjs";
 import 'dayjs/locale/fr';
 import utc from 'dayjs/plugin/utc'
 import {useRouter} from 'next/router'
-import Link from 'next/link'
-import { getServerSideProps } from '../index'
-import {AuthToken} from "../../../../../services/auth_token";
+import Link from 'next/link';
+import {getServerSideProps} from "../note";
 
-function KidList({auth}) {
-    auth = JSON.parse(auth)
-    auth = new AuthToken(auth.token)
+function KidList({bearer, kids}) {
+
     const router = useRouter()
-    const [data, setData] = useState(null);
     const [opened, setOpened] = useState(false);
     const [kidId, setKidId] = useState(false);
+
     let rows = null;
     dayjs.locale('fr')
     dayjs.extend(utc)
     dayjs.utc().format()
-    useEffect(() => {
-        fetch(`http://localhost:8010/proxy/api/kid/nurse/${auth.decodedToken.id}`,
-            {
-                method: 'GET',
-                headers: {
-                    'Content-type': 'application/json',
-                    'Authorization': auth.authorizationString
-                }
-            })
-            .then((res) => res.json())
-            .then((data) => {
-                console.log(data)
-                setData(data)
-            })
-    }, [])
 
     const activate = (kidId) => {
         fetch(`http://localhost:8010/proxy/api/kid/${kidId}/activate`,
@@ -41,7 +24,7 @@ function KidList({auth}) {
                 method: 'POST',
                 headers: {
                     'Content-type': 'application/json',
-                    'Authorization': auth.authorizationString
+                    'Authorization': bearer
                 }
             }).then(r => {
             router.reload()
@@ -54,15 +37,15 @@ function KidList({auth}) {
                 method: 'POST',
                 headers: {
                     'Content-type': 'application/json',
-                    'Authorization': auth.authorizationString
+                    'Authorization': bearer
                 }
             }).then(r => {
             router.reload()
         })
     }
 
-    if (data) {
-        rows = data.map((element) => (
+    if (kids) {
+        rows = kids.map((element) => (
             <tr key={element.id}>
                 <td>{element.firstname}</td>
                 <td>{element.lastname}</td>
@@ -89,8 +72,8 @@ function KidList({auth}) {
                 </td>
                 <td>
                     <Link href={{
-                        pathname: `/dashboard/nurse/[id]/kid/[pid]/note`,
-                        query: {id: auth.decodedToken.id, pid: element.id}
+                        pathname: `/dashboard/nurse/kid/[pid]/notes`,
+                        query: {pid: element.id}
                     }}>
                         <Button>Note</Button>
                     </Link>
@@ -141,4 +124,4 @@ function KidList({auth}) {
 
 export default KidList;
 
-export { getServerSideProps };
+export {getServerSideProps};

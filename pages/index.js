@@ -1,6 +1,4 @@
-import Head from 'next/head';
 import React from 'react';
-import { useSession, signIn, signOut } from "next-auth/react"
 import {
     Button,
     Center,
@@ -12,24 +10,9 @@ import {
     SimpleGrid
 } from "@mantine/core";
 
-const  home = () => {
-
-    const { data: session } = useSession()
-    if (session) {
-        console.log(JSON.stringify(session.user))
-        return (
-            <>
-                Signed in as {session.user.email} <br />
-                <button onClick={() => signOut()}>Sign out</button>
-            </>
-        )
-    }
+function Home()  {
     return (
         <>
-            Not signed in <br />
-            <button onClick={() => signIn('Credentials', {
-                callbackUrl: `${window.location.origin}`
-            })}>Sign in</button>
             <Grid style={{backgroundColor: '#f4fdfc', padding: 50, borderRadius: 11}}>
                 <Grid.Col md={6}>
                     <Center>
@@ -136,4 +119,4 @@ const  home = () => {
     )
 }
 
-export default home;
+export default Home;
