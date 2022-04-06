@@ -51,7 +51,7 @@ function Index({bearer, kids, dayKidsCalendar}) {
     const calendar = async (event) => {
         event.preventDefault()
         fetch(
-            `http://localhost:8010/proxy/api/calendar/kid/${select}`,
+            process.env.BASE_URL + `calendar/kid/${select}`,
             {
                 method: 'POST',
                 body: JSON.stringify({
@@ -83,7 +83,7 @@ function Index({bearer, kids, dayKidsCalendar}) {
     const deleteEvent = async (event) => {
         event.preventDefault()
         fetch(
-            `http://localhost:8010/proxy/api/calendar/${selectEvent}`,
+            process.env.BASE_URL + `calendar/${selectEvent}`,
             {
                 method: 'DELETE',
                 headers: {
@@ -111,7 +111,7 @@ function Index({bearer, kids, dayKidsCalendar}) {
     const edit = async (event) => {
         event.preventDefault()
         fetch(
-            `http://localhost:8010/proxy/api/calendar/${selectEvent}/kid/${select}`,
+            process.env.BASE_URL + `calendar/${selectEvent}/kid/${select}`,
             {
                 method: 'PATCH',
                 body: JSON.stringify({
@@ -277,7 +277,7 @@ export async function getServerSideProps(ctx) {
 
     const authToken = new AuthToken(sessionCallBack.user.access_token);
 
-    const res1 = await fetch(`http://localhost:8010/proxy/api/calendar/nurse/${authToken.decodedToken.id}`,
+    const res1 = await fetch(process.env.BASE_URL + `calendar/nurse/${authToken.decodedToken.id}`,
         {
             method: 'GET',
             headers: {
@@ -287,7 +287,7 @@ export async function getServerSideProps(ctx) {
         });
     const dayKidsCalendar = await res1.json();
 
-    const res2 = await fetch(`http://localhost:8010/proxy/api/kid/nurse/${authToken.decodedToken.id}`,
+    const res2 = await fetch(process.env.BASE_URL + `kid/nurse/${authToken.decodedToken.id}`,
         {
             method: 'GET',
             headers: {

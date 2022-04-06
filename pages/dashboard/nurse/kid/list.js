@@ -19,7 +19,7 @@ function KidList({bearer, kids}) {
     dayjs.utc().format()
 
     const activate = (kidId) => {
-        fetch(`http://localhost:8010/proxy/api/kid/${kidId}/activate`,
+        fetch(process.env.BASE_URL + `kid/${kidId}/activate`,
             {
                 method: 'POST',
                 headers: {
@@ -32,7 +32,7 @@ function KidList({bearer, kids}) {
     }
 
     const archived = () => {
-        fetch(`http://localhost:8010/proxy/api/kid/${kidId}/archive`,
+        fetch(process.env.BASE_URL + `kid/${kidId}/archive`,
             {
                 method: 'POST',
                 headers: {
