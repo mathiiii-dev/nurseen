@@ -1,24 +1,20 @@
 import {useCallback, useEffect, useState} from "react";
-import {AuthToken} from "../../../../services/auth_token";
+import {AuthToken} from "../../../services/auth_token";
 import {getSession} from "next-auth/react";
 import Gallery from "react-photo-gallery";
 import Carousel, {Modal, ModalGateway} from "react-images";
-import {ActionIcon, Button, Divider, Group, LoadingOverlay, Space, Text} from "@mantine/core";
-import {AiOutlineClose, AiTwotoneDelete} from "react-icons/ai";
-import {useRouter} from "next/router";
-import Link from 'next/link';
+import {LoadingOverlay, Space} from "@mantine/core";
 
 function AddGallery({bearer, userId}) {
 
     const [currentImage, setCurrentImage] = useState(0);
     const [viewerIsOpen, setViewerIsOpen] = useState(false);
     const [photos, setPhotos] = useState([]);
-    const router = useRouter();
     const [isLoading, setLoading] = useState(false)
 
     useEffect( () => {
         setLoading(true)
-        fetch(process.env.BASE_URL + `gallery/nurse/${userId}`, {
+        fetch(process.env.BASE_URL + `gallery/family/${userId}`, {
             method: 'GET',
             headers: {
                 'Content-type': 'application/json',
@@ -37,8 +33,7 @@ function AddGallery({bearer, userId}) {
         galleryPhoto = photos.map(
             (element) => (
                 {
-                    id: element.id,
-                    src: process.env.MEDIA_URL + userId + '/' + element.url,
+                    src: process.env.MEDIA_URL + element.nurse.nurse.id + '/' + element.url,
                     width: 4,
                     height: 3,
                 }
@@ -55,56 +50,10 @@ function AddGallery({bearer, userId}) {
         setViewerIsOpen(false);
     };
 
-    const deleteImage = async () => {
-        const res = await fetch(process.env.BASE_URL + `gallery/${galleryPhoto[currentImage].id}`, {
-            method: 'DELETE',
-            headers: {
-                'Content-type': 'application/json',
-                'Authorization': bearer
-            }
-        })
-
-        if (res.status === 204) {
-            router.reload();
-        }
-    }
-
-    const CustomHeader = ({innerProps, isModal}) => isModal ? (
-        <div
-            style={{
-                marginTop: 100,
-                marginLeft: 50,
-            }}
-        >
-            <Group>
-                <ActionIcon
-                    onClick={deleteImage}
-                    color="gray"
-                    size="xl"
-                    radius="xs"
-                    variant="filled">
-                    <AiTwotoneDelete size={25}/>
-                </ActionIcon>
-                <Divider size="xl" orientation={"vertical"} variant={"solid"}/>
-                <ActionIcon
-                    onClick={closeLightbox}
-                    color="gray"
-                    size="xl"
-                    radius="xs"
-                    variant="filled">
-                    <AiOutlineClose size={25}/>
-                </ActionIcon>
-            </Group>
-        </div>
-    ) : null;
-
 
     return (
         <div>
             <LoadingOverlay visible={isLoading} />
-            <Link href={'gallery/add'}>
-                <Button>Ajouter des photos</Button>
-            </Link>
             <Space h={"xl"}/>
             {
                 galleryPhoto && galleryPhoto.length === 0 ?
@@ -117,7 +66,6 @@ function AddGallery({bearer, userId}) {
                                 (
                                     <Modal onClose={closeLightbox}>
                                         <Carousel
-                                            components={{Header: CustomHeader}}
                                             currentIndex={currentImage}
                                             views={galleryPhoto.map(x => (
                                                 {

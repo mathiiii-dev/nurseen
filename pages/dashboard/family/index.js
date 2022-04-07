@@ -14,6 +14,9 @@ function Family({userId, bearer}) {
             <Link href={'family/kid/list'}>
                 <Button>List kid</Button>
             </Link>
+            <Link href={'family/gallery'}>
+                <Button>Gallery</Button>
+            </Link>
         </>
     )
 }
