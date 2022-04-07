@@ -1,6 +1,6 @@
-import {Group, Text, useMantineTheme, MantineTheme, Space, Button, Title} from '@mantine/core';
-import {Upload, Photo, X, Icon as TablerIcon} from 'tabler-icons-react';
-import {Dropzone, DropzoneStatus, IMAGE_MIME_TYPE} from '@mantine/dropzone';
+import {Group, Text, useMantineTheme, Space, Button, Title} from '@mantine/core';
+import {Upload, Photo, X} from 'tabler-icons-react';
+import {Dropzone, IMAGE_MIME_TYPE} from '@mantine/dropzone';
 import {getServerSideProps} from "./../index";
 import {useState} from "react";
 
@@ -80,7 +80,7 @@ function AddGallery({bearer, userId}) {
                 }
             )
         }
-        fetch(`http://localhost:8010/proxy/api/gallery/${userId}`, {
+        fetch(process.env.BASE_URL + `gallery/${userId}`, {
             body: data,
             method: 'POST',
             headers: {

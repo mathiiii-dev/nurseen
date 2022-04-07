@@ -40,7 +40,7 @@ export default function SignUp() {
 
     const signUpUser = () => {
         fetch(
-            'http://localhost:8010/proxy/api/user',
+            process.env.BASE_URL + 'user',
             {
                 method: 'POST',
                 body: JSON.stringify({

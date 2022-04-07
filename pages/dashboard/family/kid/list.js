@@ -5,8 +5,8 @@ import utc from 'dayjs/plugin/utc'
 import Link from 'next/link';
 import {getSession} from "next-auth/react";
 import {AuthToken} from "../../../../services/auth_token";
-
 function FamilyKidList({kids}) {
+
     let rows = null;
     dayjs.locale('fr')
     dayjs.extend(utc)
@@ -58,7 +58,7 @@ export async function getServerSideProps(ctx) {
 
     const authToken = new AuthToken(sessionCallBack.user.access_token);
 
-    const res = await fetch(`http://localhost:8010/proxy/api/kid/family/${authToken.decodedToken.id}`,
+    const res = await fetch(process.env.BASE_URL + `kid/family/${authToken.decodedToken.id}`,
         {
             method: 'GET',
             headers: {
