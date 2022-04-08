@@ -3,7 +3,8 @@ import {AuthToken} from "../../../services/auth_token";
 import {getSession} from "next-auth/react";
 import Gallery from "react-photo-gallery";
 import Carousel, {Modal, ModalGateway} from "react-images";
-import {LoadingOverlay, Space} from "@mantine/core";
+import {Center, LoadingOverlay, Pagination, Space} from "@mantine/core";
+import {usePagination} from "@mantine/hooks";
 
 function AddGallery({bearer, userId}) {
 
@@ -11,10 +12,13 @@ function AddGallery({bearer, userId}) {
     const [viewerIsOpen, setViewerIsOpen] = useState(false);
     const [photos, setPhotos] = useState([]);
     const [isLoading, setLoading] = useState(false)
+    const [page, onChange] = useState(1);
+    const [total, setTotal] = useState(1);
+    const pagination = usePagination({ total, page, onChange });
 
     useEffect( () => {
         setLoading(true)
-        fetch(process.env.BASE_URL + `gallery/family/${userId}`, {
+        fetch(process.env.BASE_URL + `gallery/family/${userId}?page=${page}`, {
             method: 'GET',
             headers: {
                 'Content-type': 'application/json',
@@ -23,10 +27,11 @@ function AddGallery({bearer, userId}) {
         }).then((res) => res.json())
             .then((data) => {
                 setLoading(false)
-                setPhotos(data)
+                setPhotos(data.items)
+                setTotal(data.pagination.total_pages)
             })
 
-    }, [])
+    }, [page])
 
     let galleryPhoto = [];
     if (photos.length !== 0) {
@@ -79,7 +84,11 @@ function AddGallery({bearer, userId}) {
                         </ModalGateway>
                     </>
             }
-
+            <Space h={"xl"}/>
+            <Center>
+                <Pagination total={total} onChange={onChange}/>
+            </Center>
+            <Space h={"xl"}/>
         </div>
     )
 }

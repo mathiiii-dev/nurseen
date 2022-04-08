@@ -3,10 +3,11 @@ import {AuthToken} from "../../../../services/auth_token";
 import {getSession} from "next-auth/react";
 import Gallery from "react-photo-gallery";
 import Carousel, {Modal, ModalGateway} from "react-images";
-import {ActionIcon, Button, Divider, Group, LoadingOverlay, Space, Text} from "@mantine/core";
+import {ActionIcon, Button, Center, Divider, Group, LoadingOverlay, Pagination, Space, Text} from "@mantine/core";
 import {AiOutlineClose, AiTwotoneDelete} from "react-icons/ai";
 import {useRouter} from "next/router";
 import Link from 'next/link';
+import {usePagination} from "@mantine/hooks";
 
 function AddGallery({bearer, userId}) {
 
@@ -15,10 +16,13 @@ function AddGallery({bearer, userId}) {
     const [photos, setPhotos] = useState([]);
     const router = useRouter();
     const [isLoading, setLoading] = useState(false)
+    const [page, onChange] = useState(1);
+    const [total, setTotal] = useState(1);
+    const pagination = usePagination({ total, page, onChange });
 
     useEffect( () => {
         setLoading(true)
-        fetch(process.env.BASE_URL + `gallery/nurse/${userId}`, {
+        fetch(process.env.BASE_URL + `gallery/nurse/${userId}?page=${page}`, {
             method: 'GET',
             headers: {
                 'Content-type': 'application/json',
@@ -27,10 +31,11 @@ function AddGallery({bearer, userId}) {
         }).then((res) => res.json())
             .then((data) => {
                 setLoading(false)
-                setPhotos(data)
+                setPhotos(data.items)
+                setTotal(data.pagination.total_pages)
             })
 
-    }, [])
+    }, [page])
 
     let galleryPhoto = [];
     if (photos.length !== 0) {
@@ -131,6 +136,11 @@ function AddGallery({bearer, userId}) {
                         </ModalGateway>
                     </>
             }
+            <Space h={"xl"}/>
+            <Center>
+                <Pagination total={total} onChange={onChange}/>
+            </Center>
+            <Space h={"xl"}/>
 
         </div>
     )
