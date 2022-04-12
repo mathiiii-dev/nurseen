@@ -1,15 +1,15 @@
-import Menu from '../../../../components/Menu'
+import MenuList from "../../../../components/MenuList";
 import {getSession} from "next-auth/react";
 import {AuthToken} from "../../../../services/auth_token";
 
-function MenuNurse({menu}) {
+function MenuListNurse({menus, role, bearer}) {
 
     return (
-       <Menu menu={menu}/>
+        <MenuList menus={menus} role={role} bearer={bearer}/>
     )
 }
 
-export default MenuNurse;
+export default MenuListNurse;
 
 export async function getServerSideProps(ctx) {
 
@@ -17,7 +17,7 @@ export async function getServerSideProps(ctx) {
 
     const authToken = new AuthToken(sessionCallBack.user.access_token);
 
-    const res = await fetch(process.env.BASE_URL + `menu/${sessionCallBack.user.id}`,
+    const res = await fetch(process.env.BASE_URL + `menu/${sessionCallBack.user.id}/list`,
         {
             method: 'GET',
             headers: {
@@ -25,12 +25,14 @@ export async function getServerSideProps(ctx) {
             }
         })
 
-    const menu = await res.json();
+    const menus = await res.json();
 
     return {
         props:
             {
-                menu
+                role: sessionCallBack.user.role,
+                menus,
+                bearer: authToken.authorizationString
             }
     }
 }
