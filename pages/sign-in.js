@@ -17,7 +17,6 @@ export default function SignIn() {
     const router = useRouter();
     const [errorMessage, setErrorMessage] = useState('');
     const [error, setError] = useState(false);
-
     const form = useForm({
         initialValues: {
             email: '',
@@ -58,11 +57,12 @@ export default function SignIn() {
                             password: form.values.password,
                             callbackUrl: `${window.location.origin}/dashboard/nurse`,
                         });
+
                         if (res?.error) {
-                            console.log(res)
-                            setError(res.error);
+                            setError(true);
+                            setErrorMessage(res.error)
                         } else {
-                            setError(null);
+                            setError(false)
                         }
                         if (res.url) {
                             await router.push(res.url);
