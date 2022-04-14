@@ -18,9 +18,9 @@ function AddGallery({bearer, userId}) {
     const [isLoading, setLoading] = useState(false)
     const [page, onChange] = useState(1);
     const [total, setTotal] = useState(1);
-    const pagination = usePagination({ total, page, onChange });
+    const pagination = usePagination({total, page, onChange});
 
-    useEffect( () => {
+    useEffect(() => {
         setLoading(true)
         fetch(process.env.BASE_URL + `gallery/nurse/${userId}?page=${page}`, {
             method: 'GET',
@@ -106,7 +106,7 @@ function AddGallery({bearer, userId}) {
 
     return (
         <div>
-            <LoadingOverlay visible={isLoading} />
+            <LoadingOverlay visible={isLoading}/>
             <Link href={'gallery/add'}>
                 <Button>Ajouter des photos</Button>
             </Link>
@@ -136,12 +136,18 @@ function AddGallery({bearer, userId}) {
                         </ModalGateway>
                     </>
             }
-            <Space h={"xl"}/>
-            <Center>
-                <Pagination total={total} onChange={onChange}/>
-            </Center>
-            <Space h={"xl"}/>
-
+            {
+                galleryPhoto && galleryPhoto.length === 0 ?
+                    ''
+                    :
+                    <>
+                        <Space h={"xl"}/>
+                        <Center>
+                            <Pagination total={total} onChange={onChange}/>
+                        </Center>
+                        <Space h={"xl"}/>
+                    </>
+            }
         </div>
     )
 }

@@ -68,13 +68,15 @@ const options = {
                     },
                 });
 
-                if (res) {
-                    return res;
-                } else {
+                if (res.status === 401) {
                     const user = await res.json();
                     if (!res.ok) {
                         throw new Error(user.message);
                     }
+                }
+
+                if (res) {
+                    return res;
                 }
 
                 return null;
@@ -98,10 +100,10 @@ const options = {
                     token.refresh_token = t.refresh_token,
                     token.role = decoded.roles[0]
                 ]
-                const authToken = new AuthToken(token.token);
-                if (authToken.isExpired) {
-                    return refreshAccessToken(token)
-                }
+            }
+            const authToken = new AuthToken(token.token);
+            if (authToken.isExpired) {
+                return refreshAccessToken(token)
             }
 
             return Promise.resolve(token);
