@@ -1,13 +1,11 @@
 import {useState} from 'react';
 import RichTextEditor from '/components/rte';
 import {Button, Select, Space} from "@mantine/core";
-import {useNotifications} from "@mantine/notifications";
-import {getSession} from "next-auth/react";
-import {AuthToken} from "../../../services/auth_token";
+import {showNotification} from "@mantine/notifications";
+import {getServerSideProps} from "./index";
 
 function Note({bearer, kids}) {
     const [value, onChange] = useState('');
-    const notifications = useNotifications();
     const [select, setSelect] = useState(null);
     let nurseKids = null;
     if (kids) {
@@ -33,7 +31,7 @@ function Note({bearer, kids}) {
             }).then(r => {
             if(r.status === 201) {
                 onChange('')
-                notifications.showNotification({
+                showNotification({
                     title: 'Note enregistrée',
                     message: 'Votre note a été enregistrée',
                     color: 'teal'
@@ -72,26 +70,4 @@ function Note({bearer, kids}) {
 
 export default Note;
 
-export async function getServerSideProps(ctx) {
-    const sessionCallBack = await getSession(ctx);
-
-    const authToken = new AuthToken(sessionCallBack.user.access_token);
-
-    const res = await fetch(process.env.BASE_URL + `kid/nurse/${authToken.decodedToken.id}`,
-        {
-            method: 'GET',
-            headers: {
-                'Content-type': 'application/json',
-                'Authorization': authToken.authorizationString
-            }
-        });
-    const kids = await res.json();
-
-    return {
-        props: {
-            userId: sessionCallBack.user.id,
-            bearer: authToken.authorizationString,
-            kids
-        }
-    }
-}
+export {getServerSideProps};

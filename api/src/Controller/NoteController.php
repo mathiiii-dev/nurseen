@@ -35,6 +35,7 @@ class NoteController extends AbstractController
         return $this->json([], Response::HTTP_CREATED);
     }
 
+    #[IsGranted('IS_AUTHENTICATED_FULLY', message: 'Vous ne pouvez pas faire ça')]
     #[Route('/note/kid/{kidId}/all', name: 'app_note_all', methods: 'GET')]
     public function getAll(int $kidId): Response
     {
@@ -44,6 +45,7 @@ class NoteController extends AbstractController
         return $this->json($notes, Response::HTTP_OK, [], ['groups' => 'note_list']);
     }
 
+    #[IsGranted('ROLE_PARENT', message: 'Vous ne pouvez pas faire ça')]
     #[Route('/note/{noteId}', name: 'app_note_get_one', methods: 'GET')]
     public function getOne(int $noteId): Response
     {

@@ -11,8 +11,7 @@ import {
     Title
 } from "@mantine/core";
 import {useState} from "react";
-import Link from 'next/link'
-import {useRouter} from "next/router";
+import Link from 'next/link';
 import {signIn, signOut, useSession} from "next-auth/react";
 
 const useStyles = createStyles((theme) => ({
@@ -30,8 +29,17 @@ const useStyles = createStyles((theme) => ({
 }));
 
 export default function CustomNavbar() {
-    const {data: session, status} = useSession()
-    const router = useRouter();
+    const {data: session, status} = useSession();
+    let dashboard = '/';
+
+    if (session) {
+        const role = session.user.role;
+        dashboard = 'dashboard/nurse';
+        if (role === 'ROLE_PARENT') {
+            dashboard = 'dashboard/family';
+        }
+    }
+
     const {classes} = useStyles();
     const [opened, setOpened] = useState(false);
 
@@ -54,8 +62,6 @@ export default function CustomNavbar() {
                 {
                     <Grid.Col md={10}>
                         <Group position={"right"}>
-                            <Button variant={"subtle"} size={"md"} color={"dark"}>A propos</Button>
-                            <Button variant={"subtle"} size={"md"} color={"dark"}>Contact</Button>
                             <Space w="xl"/>
                             {
                                 status === 'unauthenticated'
@@ -67,8 +73,13 @@ export default function CustomNavbar() {
                                         <Button color="dark" size="md" onClick={() => signIn()}>Connexion</Button>
                                     </>
                                     :
-                                    <Button color="dark" size="md" onClick={() => signOut({callbackUrl: '/'})}>Sign
-                                        out</Button>
+                                    <>
+                                        <Link href={'/' + dashboard}>
+                                            <Button variant={"subtle"} color="dark" size="md">Dashboard</Button>
+                                        </Link>
+                                        <Button color="dark" size="md" onClick={() => signOut({callbackUrl: '/'})}>Sign
+                                            out</Button>
+                                    </>
                             }
                         </Group>
                     </Grid.Col>

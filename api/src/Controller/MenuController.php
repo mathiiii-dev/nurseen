@@ -10,6 +10,7 @@ use App\Repository\MenuRepository;
 use App\Repository\NurseRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Exception;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -39,6 +40,7 @@ class MenuController extends AbstractController
     /**
      * @throws Exception
      */
+    #[IsGranted('ROLE_NURSE', message: 'Vous ne pouvez pas faire ça')]
     #[Route('/menu/add/{nurseId}', name: 'app_menu_add')]
     public function add(Request $request, int $nurseId): Response
     {
@@ -54,6 +56,7 @@ class MenuController extends AbstractController
         return $this->json([], Response::HTTP_CREATED);
     }
 
+    #[IsGranted('ROLE_NURSE', message: 'Vous ne pouvez pas faire ça')]
     #[Route('/menu/{nurseId}', name: 'app_menu_get', methods: 'GET')]
     public function get(int $nurseId): Response
     {
@@ -66,6 +69,7 @@ class MenuController extends AbstractController
         return $this->json($menu, Response::HTTP_OK, [], ['groups' => 'menu']);
     }
 
+    #[IsGranted('ROLE_NURSE', message: 'Vous ne pouvez pas faire ça')]
     #[Route('/menu/{nurseId}/list', name: 'app_menu_get_list', methods: 'GET')]
     public function getList(int $nurseId): Response
     {
@@ -76,6 +80,7 @@ class MenuController extends AbstractController
         return $this->json($menu, Response::HTTP_OK, [], ['groups' => 'menu']);
     }
 
+    #[IsGranted('ROLE_PARENT', message: 'Vous ne pouvez pas faire ça')]
     #[Route('/menu/family/{familyId}', name: 'app_menu_get_family', methods: 'GET')]
     public function getMenuFamily(int $familyId): Response
     {
@@ -91,6 +96,7 @@ class MenuController extends AbstractController
         return $this->json($menu, Response::HTTP_OK, [], ['groups' => 'menu']);
     }
 
+    #[IsGranted('ROLE_PARENT', message: 'Vous ne pouvez pas faire ça')]
     #[Route('/menu/family/{familyId}/list', name: 'app_menu_get_list_family', methods: 'GET')]
     public function getListMenuFamily(int $familyId): Response
     {
@@ -106,6 +112,7 @@ class MenuController extends AbstractController
     /**
      * @throws Exception
      */
+    #[IsGranted('ROLE_NURSE', message: 'Vous ne pouvez pas faire ça')]
     #[Route('/menu/{menuId}/edit', name: 'app_menu_edit', methods: 'PATCH')]
     public function edit(int $menuId, Request $request): Response
     {
