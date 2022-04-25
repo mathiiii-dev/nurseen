@@ -68,11 +68,18 @@ const options = {
                     },
                 });
 
+                if (res.status === 401) {
+                    const user = await res.json();
+                    if (!res.ok) {
+                        throw new Error(user.message);
+                    }
+                }
+
                 if (res) {
                     return res;
-                } else {
-                    return null;
                 }
+
+                return null;
             }
         })
     ],
@@ -98,6 +105,7 @@ const options = {
             if (authToken.isExpired) {
                 return refreshAccessToken(token)
             }
+
             return Promise.resolve(token);
         },
 
@@ -113,7 +121,7 @@ const options = {
         },
     },
     pages: {
-        signIn: '/sign-in',
+        signIn: '/sign-in'
     },
     secret: process.env.SECRET,
 }

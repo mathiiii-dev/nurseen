@@ -12,6 +12,7 @@ import {useState} from "react";
 import {useForm} from "@mantine/hooks";
 import { AiOutlineEye, AiOutlineEyeInvisible} from "react-icons/ai";
 import { useNotifications } from '@mantine/notifications';
+import {signIn} from "next-auth/react";
 
 export default function SignUp() {
     const notifications = useNotifications();
@@ -54,21 +55,27 @@ export default function SignUp() {
                 }
             }
         ).then(
-            res => {
+            async res => {
                 if (res.status !== 201) {
+                    const resp = await res.json()
                     setError(true)
-                    setErrorMessage('Une erreur est survenue pendant l\'envoie du formulaire. Veuillez contacter un administrateur.')
+                    setErrorMessage(resp.error_description ?? 'Une erreur est survenue pendant l\'envoie du formulaire. Veuillez contacter un administrateur.')
                 } else {
                     form.reset()
                     notifications.showNotification({
                         title: 'Inscription réussite',
-                        message: 'Vous pouvez désormais vous connecter',
+                        message: 'Vous allez être redirigé vers la page de connexion',
                         color: 'green',
-                        autoClose: 5000
+                        autoClose: 3000
                     })
+                    setTimeout(endOfSubmit, 4000)
                 }
             }
         );
+    }
+
+    const endOfSubmit = () => {
+        signIn()
     }
 
     return (

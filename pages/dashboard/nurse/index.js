@@ -55,26 +55,40 @@ export default function Page({userId, bearer}) {
                 onClose={() => setOpened(false)}
                 title="Création d'un code parent nécessaire à l'ajout d'un enfant"
             >
-                <Box sx={(theme) => ({
-                    backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[0],
-                    textAlign: 'center',
-                    padding: theme.spacing.xl,
-                    borderRadius: theme.radius.md,
-                    cursor: 'pointer',
 
-                    '&:hover': {
-                        backgroundColor:
-                            theme.colorScheme === 'dark' ? theme.colors.dark[5] : theme.colors.gray[1],
-                    },
-                })}
-                     onClick={() => copyToClipboard()}
-                >
-                    <Text>{link}</Text>
-                </Box>
-                <Space h={"xl"}/>
-                <Text>Cliquez sur le code pour le copier</Text>
-                <Button style={{backgroundColor: '#4ad4c6', float: 'right'}} onClick={() => linkParent()}>Créer un
-                    code</Button>
+                <Space h={"md"}/>
+                {
+                    link ? <>
+                        <Box sx={(theme) => ({
+                            backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[0],
+                            textAlign: 'center',
+                            padding: theme.spacing.xl,
+                            borderRadius: theme.radius.md,
+                            cursor: 'pointer',
+
+                            '&:hover': {
+                                backgroundColor:
+                                    theme.colorScheme === 'dark' ? theme.colors.dark[5] : theme.colors.gray[1],
+                            },
+                        })}
+                             onClick={() => {
+                                 if(link) {
+                                     setOpened(false)
+                                     copyToClipboard()
+                                     setLink(null)
+                                 }
+                             }}
+                        >
+                            <Text>{link}</Text>
+                        </Box>
+                        <Text>Cliquez sur le code pour le copier</Text>
+                        </>: <Button style={{backgroundColor: '#4ad4c6', float: 'right'}} onClick={() => {
+                            linkParent()
+                    }}>Créer un
+                        code</Button>
+
+                }
+
             </Modal>
             <Group position="center">
                 <Button onClick={() => setOpened(true)}>Liaison parent</Button>
