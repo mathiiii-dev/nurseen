@@ -1,0 +1,5 @@
+controllers:
+  resource: '../../src/Controller/'
+  type: annotation
+  prefix: '/api'
+  name_prefix: 'api_'
