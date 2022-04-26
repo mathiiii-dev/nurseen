@@ -11,7 +11,7 @@ import '../../../styles/globals.css'
 import DashboardCard from "../../../components/DashboardCard";
 
 export default function Page({userId, bearer, kids}) {
-
+    console.log(kids)
     const router = useRouter();
 
     const [archiveOpened, setArchiveOpened] = useState(false);

@@ -29,7 +29,9 @@ class KidController extends AbstractController
     public function index(int $nurseId): JsonResponse
     {
         $kids = $this->kidManager->getKidsByNurse($nurseId);
-        $this->denyAccessUnlessGranted('owner', $kids[0]);
+        if ($kids) {
+            $this->denyAccessUnlessGranted('owner', $kids[0]);
+        }
         return $this->json($kids, Response::HTTP_OK, [], ['groups' => 'kid_list']);
     }
 
@@ -65,7 +67,6 @@ class KidController extends AbstractController
     {
         $kid = $this->kidManager->getKid($kidId);
         $this->denyAccessUnlessGranted('owner', $kid);
-
         return $this->json($kid, Response::HTTP_OK, [], ['groups' => 'kid_list']);
     }
 
@@ -74,8 +75,9 @@ class KidController extends AbstractController
     public function getKidByFamily(int $familyId): JsonResponse
     {
         $kids = $this->kidManager->getKidsByFamily($familyId);
-        $this->denyAccessUnlessGranted('owner', $kids[0]);
-
+        if ($kids) {
+            $this->denyAccessUnlessGranted('owner', $kids[0]);
+        }
         return $this->json($kids, Response::HTTP_OK, [], ['groups' => 'kid_list']);
     }
 }
