@@ -38,7 +38,9 @@ class MessageController extends AbstractController
     #[Route('/message', name: 'app_message_get', methods: 'GET')]
     public function get(): Response
     {
-        return $this->json($this->messageRepository->findAll());
+        $messages = $this->messageRepository->findAll();
+
+        return $this->json($messages, Response::HTTP_OK, [], ['groups' => 'chat']);
     }
 
     #[Route('/message', name: 'app_message_post', methods: 'POST')]
@@ -56,6 +58,7 @@ class MessageController extends AbstractController
                 'http://localhost:8010/proxy/api/message',
                 $this->serializer->serialize($message, 'json', ['groups' => 'kid_list'])
             );
+            dd($update);
             $this->bus->dispatch($update);
             return new Response(Response::HTTP_OK);
         }
