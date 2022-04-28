@@ -15,16 +15,12 @@ function Chat({bearer, userId, messages}) {
     eventSource.onmessage = e => {
         // Will be called every time an update is published by the server
         let origin = JSON.parse(e.data)
-        let count = 0;
 
-        if (count === 0) {
-            setStateMessages(state => [...state, {
-                id: origin.id,
-                message: origin.data
-            }])
-        }
+        setStateMessages(state => [...state, {
+            id: origin.id,
+            message: origin.data
+        }])
 
-        count++;
     }
 
     const send = (event) => {
