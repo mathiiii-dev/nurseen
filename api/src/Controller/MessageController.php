@@ -56,9 +56,12 @@ class MessageController extends AbstractController
             $em->flush();
             $update = new Update(
                 'http://localhost:8010/proxy/api/message',
-                $this->serializer->serialize($message, 'json', ['groups' => 'kid_list'])
+                json_encode([
+                    'data' => $message->getMessage(),
+                    'id' => $message->getId()
+                ])
+
             );
-            dd($update);
             $this->bus->dispatch($update);
             return new Response(Response::HTTP_OK);
         }
@@ -69,7 +72,7 @@ class MessageController extends AbstractController
     public function ping(): Response
     {
         $update = new Update(
-            'http://localhost:8010/proxy/api/message/ping',
+            'http://localhost:8010/proxy/api/message',
             json_encode(['data' => 'ping'])
         );
         $this->bus->dispatch($update);
