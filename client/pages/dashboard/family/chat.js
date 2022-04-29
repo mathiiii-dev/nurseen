@@ -8,20 +8,22 @@ function Chat({bearer, userId, messages}) {
     const [stateMessages, setStateMessages] = useState(messages);
     const [value, setValue] = useState('');
 
-    const url = new URL('http://localhost:9090/.well-known/mercure')
-    url.searchParams.append('topic', 'http://localhost:8010/proxy/api/message')
-    url.searchParams.append('topic', 'http://localhost:8010/proxy/api/message/ping')
-    const eventSource = new EventSource(url.toString())
-    eventSource.onmessage = e => {
-        // Will be called every time an update is published by the server
-        let origin = JSON.parse(e.data)
+    useEffect(() => {
+        const url = new URL('http://localhost:9090/.well-known/mercure')
+        url.searchParams.append('topic', 'http://localhost:8010/proxy/api/message')
+        url.searchParams.append('topic', 'http://localhost:8010/proxy/api/message/ping')
+        const eventSource = new EventSource(url.toString())
+        eventSource.onmessage = e => {
+            // Will be called every time an update is published by the server
+            let origin = JSON.parse(e.data)
 
-        setStateMessages(state => [...state, {
-            id: origin.id,
-            message: origin.data
-        }])
+            setStateMessages(state => [...state, {
+                id: origin.id,
+                message: origin.data
+            }])
 
-    }
+        }
+    }, [])
 
     const send = (event) => {
         event.preventDefault()
