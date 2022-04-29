@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Message;
+use App\Repository\ChatRepository;
 use App\Repository\MessageRepository;
 use App\Repository\UserRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -24,8 +25,9 @@ class MessageController extends AbstractController
     private ValidatorInterface $validator;
     private ManagerRegistry $doctrine;
     private UserRepository $userRepository;
+    private ChatRepository $chatRepository;
 
-    public function __construct(UserRepository $userRepository, MessageRepository $messageRepository, MessageBusInterface $bus, SerializerInterface $serializer, ValidatorInterface $validator, ManagerRegistry $doctrine)
+    public function __construct(ChatRepository $chatRepository, UserRepository $userRepository, MessageRepository $messageRepository, MessageBusInterface $bus, SerializerInterface $serializer, ValidatorInterface $validator, ManagerRegistry $doctrine)
     {
         $this->messageRepository = $messageRepository;
         $this->bus = $bus;
@@ -33,34 +35,35 @@ class MessageController extends AbstractController
         $this->validator = $validator;
         $this->doctrine = $doctrine;
         $this->userRepository = $userRepository;
+        $this->chatRepository = $chatRepository;
     }
 
-    #[Route('/message', name: 'app_message_get', methods: 'GET')]
-    public function get(): Response
+    #[Route('/message/{chatId}', name: 'app_message_get', methods: 'GET')]
+    public function get(int $chatId): Response
     {
-        $messages = $this->messageRepository->findAll();
+        $messages = $this->messageRepository->findBy(['chat' => $chatId]);
 
         return $this->json($messages, Response::HTTP_OK, [], ['groups' => 'chat']);
     }
 
-    #[Route('/message', name: 'app_message_post', methods: 'POST')]
-    public function post(Request $request): Response
+    #[Route('/message/{chatId}', name: 'app_message_post', methods: 'POST')]
+    public function post(Request $request, int $chatId): Response
     {
         $data = $request->toArray();
         $user = $this->userRepository->findOneBy(['id' => $data['user']]);
-        $message = (new Message())->setUser($user)->setMessage($data['message']);
+        $chat = $this->chatRepository->findOneBy(['id' => $chatId]);
+        $message = (new Message())->setUser($user)->setMessage($data['message'])->setChat($chat);
         $errors = $this->validator->validate($message);
-        if(count($errors) === 0){
+        if (count($errors) === 0) {
             $em = $this->doctrine->getManager();
             $em->persist($message);
             $em->flush();
             $update = new Update(
-                'http://localhost:8010/proxy/api/message',
+                'http://localhost:8010/proxy/api/message/' . $chatId,
                 json_encode([
                     'data' => $message->getMessage(),
                     'id' => $message->getId()
                 ])
-
             );
             $this->bus->dispatch($update);
             return new Response(Response::HTTP_OK);

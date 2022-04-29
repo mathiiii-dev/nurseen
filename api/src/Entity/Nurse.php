@@ -14,6 +14,7 @@ class Nurse
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
+    #[Groups(['chat_list'])]
     private $id;
 
     #[ORM\OneToOne(targetEntity: User::class, cascade: ['persist', 'remove'])]
@@ -30,11 +31,15 @@ class Nurse
     #[ORM\OneToMany(mappedBy: 'nurse', targetEntity: Menu::class)]
     private $menus;
 
+    #[ORM\OneToMany(mappedBy: 'nurse', targetEntity: Chat::class)]
+    private $chats;
+
     public function __construct()
     {
         $this->kids = new ArrayCollection();
         $this->galleries = new ArrayCollection();
         $this->menus = new ArrayCollection();
+        $this->chats = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -138,6 +143,36 @@ class Nurse
             // set the owning side to null (unless already changed)
             if ($menu->getNurse() === $this) {
                 $menu->setNurse(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Chat>
+     */
+    public function getChats(): Collection
+    {
+        return $this->chats;
+    }
+
+    public function addChat(Chat $chat): self
+    {
+        if (!$this->chats->contains($chat)) {
+            $this->chats[] = $chat;
+            $chat->setNurse($this);
+        }
+
+        return $this;
+    }
+
+    public function removeChat(Chat $chat): self
+    {
+        if ($this->chats->removeElement($chat)) {
+            // set the owning side to null (unless already changed)
+            if ($chat->getNurse() === $this) {
+                $chat->setNurse(null);
             }
         }
 

@@ -22,6 +22,9 @@ class Message
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'messages')]
     private $user;
 
+    #[ORM\ManyToOne(targetEntity: Chat::class, inversedBy: 'messages')]
+    private $chat;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -47,6 +50,18 @@ class Message
     public function setUser(?User $user): self
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    public function getChat(): ?Chat
+    {
+        return $this->chat;
+    }
+
+    public function setChat(?Chat $chat): self
+    {
+        $this->chat = $chat;
 
         return $this;
     }

@@ -1,21 +1,24 @@
 import {Button, Textarea} from "@mantine/core";
-import {getServerSideProps} from "./index";
 import {useEffect, useState} from "react";
 import EventSource from 'eventsource';
+import {getSession} from "next-auth/react";
+import {AuthToken} from "../../../../services/auth_token";
+import {useRouter} from "next/router";
 
-function Chat({bearer, userId, messages}) {
+function Message({bearer, userId, messages}) {
 
     const [stateMessages, setStateMessages] = useState(messages);
     const [value, setValue] = useState('');
+    const router = useRouter()
+    const { cid } = router.query
+
     useEffect(() => {
         const url = new URL('http://localhost:9090/.well-known/mercure')
-        url.searchParams.append('topic', 'http://localhost:8010/proxy/api/message')
-        url.searchParams.append('topic', 'http://localhost:8010/proxy/api/message/ping')
+        url.searchParams.append('topic', `http://localhost:8010/proxy/api/message/${cid}`)
         const eventSource = new EventSource(url.toString())
         eventSource.onmessage = e => {
-            // Will be called every time an update is published by the server
-            let origin = JSON.parse(e.data)
 
+            let origin = JSON.parse(e.data)
             setStateMessages(state => [...state, {
                 id: origin.id,
                 message: origin.data
@@ -24,10 +27,9 @@ function Chat({bearer, userId, messages}) {
         }
     }, [])
 
-
     const send = (event) => {
         event.preventDefault()
-        fetch(process.env.BASE_URL + `message`,
+        fetch(process.env.BASE_URL + `message/${cid}`,
             {
                 method: 'POST',
                 body: JSON.stringify({
@@ -45,23 +47,10 @@ function Chat({bearer, userId, messages}) {
             })
     }
 
-    const ping = (event) => {
-        event.preventDefault()
-        fetch(process.env.BASE_URL + `message/ping`,
-            {
-                method: 'POST',
-                headers: {
-                    'Content-type': 'application/json',
-                    'Authorization': bearer
-                }
-            }).then(r => r.json())
-            .then(res => console.log(res))
-    }
-
     return (
         <>
             <p>prout</p>
-            {stateMessages ? stateMessages.map(function (d, idx) {
+            {!stateMessages.error ? stateMessages.map(function (d, idx) {
                 return (<li key={idx}>{d.message}</li>)
             }) : ''}
             <form onSubmit={send}>
@@ -73,11 +62,34 @@ function Chat({bearer, userId, messages}) {
                 />
                 <Button type="submit">Submit</Button>
             </form>
-            <Button onClick={ping}>Ping</Button>
         </>
     );
 }
 
-export default Chat;
+export default Message;
 
-export {getServerSideProps};
+export async function getServerSideProps(ctx) {
+    const sessionCallBack = await getSession(ctx);
+
+    const authToken = new AuthToken(sessionCallBack.user.access_token);
+    const cid = ctx.params.cid
+
+    const res = await fetch(process.env.BASE_URL + `message/${cid}`,
+        {
+            method: 'GET',
+            headers: {
+                'Content-type': 'application/json',
+                'Authorization': authToken.authorizationString
+            }
+        });
+    const messages = await res.json();
+
+    return {
+        props: {
+            userId: sessionCallBack.user.id,
+            bearer: authToken.authorizationString,
+            messages
+        }
+    }
+}
+
