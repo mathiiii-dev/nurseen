@@ -20,6 +20,7 @@ class Message
     private $message;
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'messages')]
+    #[Groups(['chat'])]
     private $user;
 
     #[ORM\ManyToOne(targetEntity: Chat::class, inversedBy: 'messages')]

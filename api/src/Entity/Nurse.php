@@ -19,7 +19,7 @@ class Nurse
 
     #[ORM\OneToOne(targetEntity: User::class, cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['gallery'])]
+    #[Groups(['gallery', 'chat_list'])]
     private $nurse;
 
     #[ORM\OneToMany(mappedBy: 'nurse', targetEntity: Kid::class, orphanRemoval: true)]

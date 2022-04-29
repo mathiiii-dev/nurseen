@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Chat;
 use App\Repository\ChatRepository;
 use App\Repository\FamilyRepository;
+use App\Repository\MessageRepository;
 use App\Repository\NurseRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -18,13 +19,15 @@ class ChatController extends AbstractController
     private FamilyRepository $familyRepository;
     private ManagerRegistry $doctrine;
     private ChatRepository $chatRepository;
+    private MessageRepository $messageRepository;
 
-    public function __construct(NurseRepository $nurseRepository, FamilyRepository $familyRepository, ManagerRegistry $doctrine, ChatRepository $chatRepository)
+    public function __construct(NurseRepository $nurseRepository, FamilyRepository $familyRepository, ManagerRegistry $doctrine, ChatRepository $chatRepository, MessageRepository $messageRepository)
     {
         $this->nurseRepository = $nurseRepository;
         $this->familyRepository = $familyRepository;
         $this->doctrine = $doctrine;
         $this->chatRepository = $chatRepository;
+        $this->messageRepository = $messageRepository;
     }
 
     #[Route('/chat', name: 'app_chat')]
@@ -45,6 +48,24 @@ class ChatController extends AbstractController
     {
         $nurse = $this->nurseRepository->findOneBy(['nurse' => $nurseId]);
         $chat = $this->chatRepository->findBy(['nurse' => $nurse->getId()]);
-        return $this->json($chat, Response::HTTP_CREATED, [], ['groups' => 'chat_list']);
+        $response = [];
+
+        foreach ($chat as $key => $value) {
+            $lastMessage = $this->messageRepository->findOneBy(['chat' => $value->getId()], ['id' => 'DESC']);
+            array_push($response, [
+                'chatId' => $value->getId(),
+                'nurse' => [
+                    'id' => $value->getNurse()->getId(),
+                    'email' => $value->getNurse()->getNurse()->getEmail()
+                ],
+                'family' => [
+                    'id' => $value->getFamily()->getId(),
+                    'email' => $value->getFamily()->getParent()->getEmail()
+                ],
+                'lastMessage' => $lastMessage->getMessage()
+            ]);
+        }
+
+        return $this->json($response, Response::HTTP_CREATED);
     }
 }

@@ -19,6 +19,7 @@ class Family
 
     #[ORM\OneToOne(targetEntity: User::class, cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['chat_list'])]
     private $parent;
 
     #[ORM\OneToMany(mappedBy: 'family', targetEntity: Kid::class, orphanRemoval: true)]

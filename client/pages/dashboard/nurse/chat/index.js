@@ -1,11 +1,11 @@
-import {Button, Select} from "@mantine/core";
+import {Button, Card, Select, Space, Text} from "@mantine/core";
 import {useState} from "react";
 import {getSession} from "next-auth/react";
 import {AuthToken} from "../../../../services/auth_token";
 import Link from 'next/link'
 
 function Chat({bearer, userId, family, chat}) {
-
+    console.log(chat)
     const [select, setSelect] = useState(null);
     let parents = null;
     if (family) {
@@ -43,23 +43,35 @@ function Chat({bearer, userId, family, chat}) {
                     data={parents}
                     label="Enfant"
                     placeholder="Choisir un enfant"/>
-                <Button type="submit" size={"lg"}
-                        style={{backgroundColor: '#4ad4c6', float: 'right'}}>Ouvrir un chat</Button>
+                <Button type="submit" style={{backgroundColor: '#4ad4c6', float: 'right'}}>Ouvrir un chat</Button>
             </form>
+            <Space h={"xl"}/>
             {chat ? chat.map(function (d, idx) {
-
                 return (
-                    <li key={idx}>
+                    <>
                         <Link
                             href={{
                                 pathname: '/dashboard/nurse/chat/[cid]',
-                                query: { cid: d.id },
+                                query: {cid: d.chatId},
                             }}
                         >
-                            <p>{d.id}</p>
-                        </Link>
+                            <Card
+                                key={idx}
+                                shadow="sm"
+                                p="xl"
+                            >
+                                <Text weight={500} size="lg">
+                                    {d.family.email}
+                                </Text>
 
-                    </li>)
+                                <Text size="sm">
+                                    {d.lastMessage}
+                                </Text>
+                            </Card>
+                        </Link>
+                        <Space h={"xl"}/>
+                    </>
+                )
             }) : ''}
         </>
     );

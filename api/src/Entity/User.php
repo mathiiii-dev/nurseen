@@ -20,13 +20,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
     #[Groups(['gallery', 'chat'])]
-
     private int $id;
 
     #[ORM\Column(type: 'string', length: 180, unique: true)]
     #[Assert\NotBlank]
     #[Assert\Email(message: 'This value is not a valid email address.')]
-    #[Groups(['chat'])]
+
+    #[Groups(['chat', 'chat_list'])]
     private string $email;
 
     #[ORM\Column(type: 'json')]
