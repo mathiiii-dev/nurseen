@@ -7,6 +7,7 @@ use App\Repository\ChatRepository;
 use App\Repository\MessageRepository;
 use App\Repository\UserRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -27,7 +28,14 @@ class MessageController extends AbstractController
     private UserRepository $userRepository;
     private ChatRepository $chatRepository;
 
-    public function __construct(ChatRepository $chatRepository, UserRepository $userRepository, MessageRepository $messageRepository, MessageBusInterface $bus, SerializerInterface $serializer, ValidatorInterface $validator, ManagerRegistry $doctrine)
+    public function __construct(ChatRepository      $chatRepository,
+                                UserRepository      $userRepository,
+                                MessageRepository   $messageRepository,
+                                MessageBusInterface $bus,
+                                SerializerInterface $serializer,
+                                ValidatorInterface  $validator,
+                                ManagerRegistry     $doctrine
+    )
     {
         $this->messageRepository = $messageRepository;
         $this->bus = $bus;
@@ -46,13 +54,16 @@ class MessageController extends AbstractController
         return $this->json($messages, Response::HTTP_OK, [], ['groups' => 'chat']);
     }
 
+    /**
+     * @throws Exception
+     */
     #[Route('/message/{chatId}', name: 'app_message_post', methods: 'POST')]
     public function post(Request $request, int $chatId): Response
     {
         $data = $request->toArray();
         $user = $this->userRepository->findOneBy(['id' => $data['user']]);
         $chat = $this->chatRepository->findOneBy(['id' => $chatId]);
-        $message = (new Message())->setUser($user)->setMessage($data['message'])->setChat($chat);
+        $message = (new Message())->setUser($user)->setMessage($data['message'])->setChat($chat)->setSendDate(new \DateTime($data['sendDate']));
         $errors = $this->validator->validate($message);
         if (count($errors) === 0) {
             $em = $this->doctrine->getManager();
@@ -62,7 +73,10 @@ class MessageController extends AbstractController
                 'http://localhost:8010/proxy/api/message/' . $chatId,
                 json_encode([
                     'data' => $message->getMessage(),
-                    'id' => $message->getId()
+                    'id' => $message->getId(),
+                    'sendDate' => $message->getSendDate(),
+                    'lastname' => $user->getLastname(),
+                    'firstname' => $user->getFirstname()
                 ])
             );
             $this->bus->dispatch($update);

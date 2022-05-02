@@ -1,16 +1,22 @@
-import {Button, ScrollArea, Text, Textarea} from "@mantine/core";
-import {useEffect, useRef, useState} from "react";
-import EventSource from 'eventsource';
+import Chat from "../../../../components/Chat";
 import {getSession} from "next-auth/react";
 import {AuthToken} from "../../../../services/auth_token";
+import EventSource from "eventsource";
+import {useEffect, useRef, useState} from "react";
 import {useRouter} from "next/router";
+import {Button, Textarea} from "@mantine/core";
+import dayjs from "dayjs";
 
-function MessageNurse({bearer, userId, messages}) {
+function MessageNurse({messages, userId, bearer}) {
 
-    const [stateMessages, setStateMessages] = useState(messages);
-    const [value, setValue] = useState('');
+    const viewport = useRef();
     const router = useRouter()
     const { cid } = router.query
+    const [stateMessages, setStateMessages] = useState(messages);
+    const [value, setValue] = useState('');
+
+    const scrollToBottom = () =>
+        viewport.current.scrollTo({ top: viewport.current.scrollHeight, behavior: 'smooth' });
 
     useEffect(() => {
         scrollToBottom()
@@ -25,17 +31,14 @@ function MessageNurse({bearer, userId, messages}) {
                 message: origin.data,
                 user: {
                     id: userId,
-                    email: ''
-                }
+                    lastname: origin.lastname,
+                    firstname: origin.firstname
+                },
+                sendDate: dayjs().toString()
             }])
             scrollToBottom()
         }
     }, [])
-
-    const viewport = useRef();
-
-    const scrollToBottom = () =>
-        viewport.current.scrollTo({ top: viewport.current.scrollHeight, behavior: 'smooth' });
 
     const send = (event) => {
         event.preventDefault()
@@ -44,7 +47,8 @@ function MessageNurse({bearer, userId, messages}) {
                 method: 'POST',
                 body: JSON.stringify({
                     message: value,
-                    user: userId
+                    user: userId,
+                    sendDate: dayjs().toString()
                 }),
                 headers: {
                     'Content-type': 'application/json',
@@ -58,34 +62,19 @@ function MessageNurse({bearer, userId, messages}) {
             })
     }
 
-    return (
-        <>
-            <ScrollArea viewportRef={viewport} style={{ height: 250 }}>
-                {!stateMessages.error ? stateMessages.map(function (d, idx) {
-                    console.log(d)
-                    if(d.user.id === userId) {
-                        return (
-                            <Text key={idx}>{d.message}</Text>
-                        )
-                    }
-                    return <Text key={idx} style={{
-                        color: 'pink',
-                    }
-                    }>{d.message}</Text>
-                }) : ''}
-            </ScrollArea>
+    return (<>
+        <Chat messages={stateMessages} viewport={viewport} userId={userId}/>
+        <form onSubmit={send}>
+            <Textarea
+                required
+                label="Message"
+                placeholder="Howdy!"
+                value={value} onChange={(event) => setValue(event.currentTarget.value)}
+            />
+            <Button type="submit">Submit</Button>
+        </form>
+    </>)
 
-            <form onSubmit={send}>
-                <Textarea
-                    required
-                    label="Message"
-                    placeholder="Howdy!"
-                    value={value} onChange={(event) => setValue(event.currentTarget.value)}
-                />
-                <Button type="submit">Submit</Button>
-            </form>
-        </>
-    );
 }
 
 export default MessageNurse;
@@ -104,6 +93,7 @@ export async function getServerSideProps(ctx) {
                 'Authorization': authToken.authorizationString
             }
         });
+
     const messages = await res.json();
 
     return {
@@ -114,4 +104,3 @@ export async function getServerSideProps(ctx) {
         }
     }
 }
-

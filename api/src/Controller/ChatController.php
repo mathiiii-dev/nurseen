@@ -21,7 +21,11 @@ class ChatController extends AbstractController
     private ChatRepository $chatRepository;
     private MessageRepository $messageRepository;
 
-    public function __construct(NurseRepository $nurseRepository, FamilyRepository $familyRepository, ManagerRegistry $doctrine, ChatRepository $chatRepository, MessageRepository $messageRepository)
+    public function __construct(NurseRepository   $nurseRepository,
+                                FamilyRepository  $familyRepository,
+                                ManagerRegistry   $doctrine,
+                                ChatRepository    $chatRepository,
+                                MessageRepository $messageRepository)
     {
         $this->nurseRepository = $nurseRepository;
         $this->familyRepository = $familyRepository;
@@ -43,29 +47,44 @@ class ChatController extends AbstractController
         return $this->json([], Response::HTTP_CREATED);
     }
 
-    #[Route('/chat/{nurseId}', name: 'app_chat_nurse')]
-    public function getNurseChat(int $nurseId): Response
+    #[Route('/chat/{userId}/{user}', name: 'app_chat_nurse')]
+    public function getChat(int $userId, string $user): Response
     {
-        $nurse = $this->nurseRepository->findOneBy(['nurse' => $nurseId]);
-        $chat = $this->chatRepository->findBy(['nurse' => $nurse->getId()]);
-        $response = [];
-
-        foreach ($chat as $key => $value) {
-            $lastMessage = $this->messageRepository->findOneBy(['chat' => $value->getId()], ['id' => 'DESC']);
-            array_push($response, [
-                'chatId' => $value->getId(),
-                'nurse' => [
-                    'id' => $value->getNurse()->getId(),
-                    'email' => $value->getNurse()->getNurse()->getEmail()
-                ],
-                'family' => [
-                    'id' => $value->getFamily()->getId(),
-                    'email' => $value->getFamily()->getParent()->getEmail()
-                ],
-                'lastMessage' => $lastMessage->getMessage()
-            ]);
+        $chat = null;
+        if ($user === 'nurse') {
+            $nurse = $this->nurseRepository->findOneBy(['nurse' => $userId]);
+            $chat = $this->chatRepository->findBy(['nurse' => $nurse->getId()]);
         }
 
-        return $this->json($response, Response::HTTP_CREATED);
+        if ($user === 'family') {
+            $family = $this->familyRepository->findOneBy(['parent' => $userId]);
+            $chat = $this->chatRepository->findBy(['family' => $family->getId()]);
+        }
+
+        $response = [];
+
+        if ($chat) {
+            foreach ($chat as $value) {
+                $lastMessage = $this->messageRepository->findOneBy(['chat' => $value->getId()], ['id' => 'DESC']);
+                array_push($response, [
+                    'chatId' => $value->getId(),
+                    'nurse' => [
+                        'id' => $value->getNurse()->getId(),
+                        'name' => $value->getNurse()->getNurse()->getFirstname() . ' ' . $value->getNurse()->getNurse()->getLastname()
+                    ],
+                    'family' => [
+                        'id' => $value->getFamily()->getId(),
+                        'name' => $value->getFamily()->getParent()->getFirstname() . ' ' . $value->getFamily()->getParent()->getLastname()
+                    ],
+                    'lastMessage' => [
+                        'message' => $lastMessage->getMessage(),
+                        'sendDate' => $lastMessage->getSendDate()
+                    ]
+                ]);
+            }
+        }
+
+
+        return $this->json($response, Response::HTTP_OK);
     }
 }

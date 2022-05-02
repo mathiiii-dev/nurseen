@@ -26,6 +26,10 @@ class Message
     #[ORM\ManyToOne(targetEntity: Chat::class, inversedBy: 'messages')]
     private $chat;
 
+    #[ORM\Column(type: 'datetime')]
+    #[Groups(['chat'])]
+    private $sendDate;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -63,6 +67,18 @@ class Message
     public function setChat(?Chat $chat): self
     {
         $this->chat = $chat;
+
+        return $this;
+    }
+
+    public function getSendDate(): ?\DateTimeInterface
+    {
+        return $this->sendDate;
+    }
+
+    public function setSendDate(\DateTimeInterface $sendDate): self
+    {
+        $this->sendDate = $sendDate;
 
         return $this;
     }

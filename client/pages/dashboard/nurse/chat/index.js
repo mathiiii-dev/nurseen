@@ -4,7 +4,7 @@ import {getSession} from "next-auth/react";
 import {AuthToken} from "../../../../services/auth_token";
 import Link from 'next/link'
 
-function Chat({bearer, userId, family, chat}) {
+function NurseChat({bearer, userId, family, chat}) {
     console.log(chat)
     const [select, setSelect] = useState(null);
     let parents = null;
@@ -45,8 +45,12 @@ function Chat({bearer, userId, family, chat}) {
                     placeholder="Choisir un enfant"/>
                 <Button type="submit" style={{backgroundColor: '#4ad4c6', float: 'right'}}>Ouvrir un chat</Button>
             </form>
+
             <Space h={"xl"}/>
-            {chat ? chat.map(function (d, idx) {
+            <Space h={"xl"}/>
+            <Space h={"xl"}/>
+
+            {!chat.error ? chat.map(function (d, idx) {
                 return (
                     <>
                         <Link
@@ -61,11 +65,11 @@ function Chat({bearer, userId, family, chat}) {
                                 p="xl"
                             >
                                 <Text weight={500} size="lg">
-                                    {d.family.email}
+                                    {d.family.name}
                                 </Text>
 
                                 <Text size="sm">
-                                    {d.lastMessage}
+                                    {d.lastMessage.message}
                                 </Text>
                             </Card>
                         </Link>
@@ -77,7 +81,7 @@ function Chat({bearer, userId, family, chat}) {
     );
 }
 
-export default Chat;
+export default NurseChat;
 
 export async function getServerSideProps(ctx) {
     const sessionCallBack = await getSession(ctx);
@@ -95,7 +99,7 @@ export async function getServerSideProps(ctx) {
 
     const family = await res.json();
 
-    const res1 = await fetch(process.env.BASE_URL + `chat/${authToken.decodedToken.id}`,
+    const res1 = await fetch(process.env.BASE_URL + `chat/${authToken.decodedToken.id}/nurse`,
         {
             method: 'GET',
             headers: {

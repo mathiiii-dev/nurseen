@@ -1,18 +1,25 @@
-import {Button, Textarea} from "@mantine/core";
-import {useEffect, useState} from "react";
-import EventSource from 'eventsource';
+import Chat from "../../../../components/Chat";
 import {getSession} from "next-auth/react";
 import {AuthToken} from "../../../../services/auth_token";
+import EventSource from "eventsource";
+import {useEffect, useRef, useState} from "react";
 import {useRouter} from "next/router";
+import {Button, Textarea} from "@mantine/core";
+import dayjs from "dayjs";
 
-function Message({bearer, userId, messages}) {
+function MessageFamily({messages, userId, bearer}) {
 
-    const [stateMessages, setStateMessages] = useState(messages);
-    const [value, setValue] = useState('');
+    const viewport = useRef();
     const router = useRouter()
     const { cid } = router.query
+    const [stateMessages, setStateMessages] = useState(messages);
+    const [value, setValue] = useState('');
+
+    const scrollToBottom = () =>
+        viewport.current.scrollTo({ top: viewport.current.scrollHeight, behavior: 'smooth' });
 
     useEffect(() => {
+        scrollToBottom()
         const url = new URL('http://localhost:9090/.well-known/mercure')
         url.searchParams.append('topic', `http://localhost:8010/proxy/api/message/${cid}`)
         const eventSource = new EventSource(url.toString())
@@ -21,9 +28,16 @@ function Message({bearer, userId, messages}) {
             let origin = JSON.parse(e.data)
             setStateMessages(state => [...state, {
                 id: origin.id,
-                message: origin.data
+                message: origin.data,
+                user: {
+                    id: userId,
+                    firstname: origin.firstname,
+                    lastname: origin.lastname
+                },
+                sendDate: dayjs().toString()
             }])
 
+            scrollToBottom()
         }
     }, [])
 
@@ -34,7 +48,8 @@ function Message({bearer, userId, messages}) {
                 method: 'POST',
                 body: JSON.stringify({
                     message: value,
-                    user: userId
+                    user: userId,
+                    sendDate: dayjs()
                 }),
                 headers: {
                     'Content-type': 'application/json',
@@ -44,29 +59,26 @@ function Message({bearer, userId, messages}) {
             .then(res => {
                 setValue('')
                 console.log(res)
+                scrollToBottom()
             })
     }
 
-    return (
-        <>
-            <p>prout</p>
-            {!stateMessages.error ? stateMessages.map(function (d, idx) {
-                return (<li key={idx}>{d.message}</li>)
-            }) : ''}
-            <form onSubmit={send}>
-                <Textarea
-                    required
-                    label="Message"
-                    placeholder="Howdy!"
-                    value={value} onChange={(event) => setValue(event.currentTarget.value)}
-                />
-                <Button type="submit">Submit</Button>
-            </form>
-        </>
-    );
+    return (<>
+        <Chat messages={stateMessages} viewport={viewport} userId={userId}/>
+        <form onSubmit={send}>
+            <Textarea
+                required
+                label="Message"
+                placeholder="Howdy!"
+                value={value} onChange={(event) => setValue(event.currentTarget.value)}
+            />
+            <Button type="submit">Submit</Button>
+        </form>
+    </>)
+
 }
 
-export default Message;
+export default MessageFamily;
 
 export async function getServerSideProps(ctx) {
     const sessionCallBack = await getSession(ctx);
@@ -82,6 +94,7 @@ export async function getServerSideProps(ctx) {
                 'Authorization': authToken.authorizationString
             }
         });
+
     const messages = await res.json();
 
     return {
@@ -92,4 +105,3 @@ export async function getServerSideProps(ctx) {
         }
     }
 }
-
