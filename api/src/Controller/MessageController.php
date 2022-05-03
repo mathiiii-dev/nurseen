@@ -74,7 +74,7 @@ class MessageController extends AbstractController
                 json_encode([
                     'data' => $message->getMessage(),
                     'id' => $message->getId(),
-                    'sendDate' => $message->getSendDate(),
+                    'sendDate' => $message->getSendDate()->format("Y-m-d\TH:i:s+00:00"),
                     'lastname' => $user->getLastname(),
                     'firstname' => $user->getFirstname()
                 ])

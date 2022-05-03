@@ -1,18 +1,17 @@
-import {Button, Card, Select, Space, Text} from "@mantine/core";
+import {Button, Card, Grid, Select, Space, Text} from "@mantine/core";
 import {useState} from "react";
 import {getSession} from "next-auth/react";
 import {AuthToken} from "../../../../services/auth_token";
 import Link from 'next/link'
 
 function NurseChat({bearer, userId, family, chat}) {
-    console.log(chat)
     const [select, setSelect] = useState(null);
     let parents = null;
-    if (family) {
+    if (family.length !== 0) {
         parents = family.map((element) => (
             {
                 value: element.id.toString(),
-                label: element.email
+                label: element.name
             }
         ))
     }
@@ -36,15 +35,24 @@ function NurseChat({bearer, userId, family, chat}) {
     }
     return (
         <>
-            <form onSubmit={open}>
-                <Select
-                    value={select}
-                    onChange={setSelect}
-                    data={parents}
-                    label="Enfant"
-                    placeholder="Choisir un enfant"/>
-                <Button type="submit" style={{backgroundColor: '#4ad4c6', float: 'right'}}>Ouvrir un chat</Button>
-            </form>
+            {
+                parents ? <form onSubmit={open}>
+                    <Grid columns={18}>
+                        <Grid.Col span={12}>
+                            <Select
+                                value={select}
+                                onChange={setSelect}
+                                data={parents}
+                                label="Enfant"
+                                placeholder="Choisir un enfant"/>
+                        </Grid.Col>
+                        <Grid.Col span={6}>
+                            <Button type="submit" style={{backgroundColor: '#4ad4c6',marginTop: 27}}>Ouvrir un chat</Button>
+                        </Grid.Col>
+                    </Grid>
+                </form> : ''
+            }
+
 
             <Space h={"xl"}/>
             <Space h={"xl"}/>

@@ -26,6 +26,7 @@ function MessageNurse({messages, userId, bearer}) {
         eventSource.onmessage = e => {
 
             let origin = JSON.parse(e.data)
+
             setStateMessages(state => [...state, {
                 id: origin.id,
                 message: origin.data,
@@ -34,7 +35,7 @@ function MessageNurse({messages, userId, bearer}) {
                     lastname: origin.lastname,
                     firstname: origin.firstname
                 },
-                sendDate: dayjs().toString()
+                sendDate: origin.sendDate
             }])
             scrollToBottom()
         }
@@ -57,7 +58,6 @@ function MessageNurse({messages, userId, bearer}) {
             }).then(r => r.json())
             .then(res => {
                 setValue('')
-                console.log(res)
                 scrollToBottom()
             })
     }
@@ -95,6 +95,7 @@ export async function getServerSideProps(ctx) {
         });
 
     const messages = await res.json();
+    console.log(messages)
 
     return {
         props: {

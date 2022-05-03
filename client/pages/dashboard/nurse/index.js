@@ -119,7 +119,7 @@ export default function Page({userId, bearer, kids}) {
                                 linkHref={"nurse/calendar"}
                                 userId={userId}
                                 bearer={bearer}
-                                modal={true}
+                                modal
                             />
                         </div>
                         <div className="embla__slide">
@@ -128,9 +128,6 @@ export default function Page({userId, bearer, kids}) {
                                 buttonText={"Ouvrir le calendrier"}
                                 text={"Gérez votre emploie du temps grace au calendrier et les jours de présence des enfants"}
                                 linkHref={"nurse/calendar"}
-                                userId={userId}
-                                bearer={bearer}
-                                modal={false}
                             />
                         </div>
                         <div className="embla__slide">
@@ -139,9 +136,6 @@ export default function Page({userId, bearer, kids}) {
                                 buttonText={"Ajouter une note"}
                                 text={"Ajouter une note sur la journée de l'enfant. Elle sera ensuite visible par ses parents"}
                                 linkHref={"nurse/note"}
-                                userId={userId}
-                                bearer={bearer}
-                                modal={false}
                             />
                         </div>
                         <div className="embla__slide">
@@ -150,11 +144,25 @@ export default function Page({userId, bearer, kids}) {
                                 buttonText={"Ajouter des photos"}
                                 text={"Ajouter des photos des enfants en vrac. Elles serront visibles par les parents"}
                                 linkHref={"nurse/gallery"}
-                                userId={userId}
-                                bearer={bearer}
-                                modal={false}
                             />
                         </div>
+                        <div className="embla__slide">
+                            <DashboardCard
+                                title={"Menu du jour"}
+                                buttonText={"Voir / Ajouter un menu"}
+                                text={"Ajouter un menu du jour. Il sera visible par les parents"}
+                                linkHref={"nurse/menu"}
+                            />
+                        </div>
+                        <div className="embla__slide">
+                            <DashboardCard
+                                title={"Chat en direct"}
+                                buttonText={"Chat"}
+                                text={"Engagez des discutions avec les parents, Répondez a leurs messages"}
+                                linkHref={"nurse/chat"}
+                            />
+                        </div>
+
                     </div>
                 </div>
                 <Space h={"xl"}/>

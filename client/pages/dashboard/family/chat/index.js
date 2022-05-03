@@ -1,14 +1,29 @@
-import {Card, Space, Text} from "@mantine/core";
+import {Button, Card, Space, Text} from "@mantine/core";
 import {getSession} from "next-auth/react";
 import {AuthToken} from "../../../../services/auth_token";
 import Link from 'next/link'
 
 function FamilyChat({bearer, userId, chat}) {
-
+    const open = (event) => {
+        event.preventDefault()
+        fetch(process.env.BASE_URL + `chat/family`,
+            {
+                method: 'POST',
+                body: JSON.stringify({
+                    family: userId,
+                }),
+                headers: {
+                    'Content-type': 'application/json',
+                    'Authorization': bearer
+                }
+            }).then(r => {
+            console.log(r)
+        })
+    }
     return (
         <>
             <Space h={"xl"}/>
-            {chat ? chat.map(function (d, idx) {
+            {chat.length !== 0 ? chat.map(function (d, idx) {
                 return (
                     <>
                         <Link
@@ -27,14 +42,21 @@ function FamilyChat({bearer, userId, chat}) {
                                 </Text>
 
                                 <Text size="sm">
-                                    {d.lastMessage.message}
+                                    {d.lastMessage ? d.lastMessage.message : 'Cliquez ici pour envoyer le premier message'}
                                 </Text>
                             </Card>
                         </Link>
                         <Space h={"xl"}/>
                     </>
                 )
-            }) : ''}
+            }) :
+            <>
+                <Text>Vous souhaitez discuter en direct avec votre nourrice ? C'est possible ici !</Text>
+                <Text>Cliquez sur ouvrir un chat, vous serez ensuite redirigé vers un espace de chat en direct.</Text>
+                <Button onClick={open} style={{backgroundColor: '#4ad4c6'}}>Ouvrir un chat</Button>
+
+            </>
+            }
         </>
     );
 }

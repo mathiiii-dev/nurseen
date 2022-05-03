@@ -57,12 +57,14 @@ class FamilyController extends AbstractController
          * @var $kid Kid
          */
         foreach ($nurse->getKids()->toArray() as $kid) {
-            $parents[] = [
-                'email' => $kid->getFamily()->getParent()->getEmail(),
-                'id' => $kid->getFamily()->getParent()->getId()
-            ];
+            if ($kid->getFamily()->getChats()->count() === 0) {
+                $parents[] = [
+                    'name' => $kid->getFamily()->getParent()->getFirstname() . ' ' . $kid->getFamily()->getParent()->getLastname(),
+                    'id' => $kid->getFamily()->getParent()->getId(),
+                ];
+            }
         }
 
-        return new JsonResponse($parents, Response::HTTP_CREATED);
+        return new JsonResponse(array_values(array_unique($parents, SORT_REGULAR)), Response::HTTP_CREATED);
     }
 }
