@@ -122,6 +122,9 @@
     "psr/event-dispatcher": {
         "version": "1.0.0"
     },
+    "psr/link": {
+        "version": "2.0.1"
+    },
     "psr/log": {
         "version": "3.0.0"
     },
@@ -216,6 +219,12 @@
             "src/Kernel.php"
         ]
     },
+    "symfony/http-client": {
+        "version": "v6.0.7"
+    },
+    "symfony/http-client-contracts": {
+        "version": "v3.0.1"
+    },
     "symfony/http-foundation": {
         "version": "v6.0.3"
     },
@@ -230,6 +239,33 @@
             "version": "1.0",
             "ref": "fadbfe33303a76e25cb63401050439aa9b1a9c7f"
         }
+    },
+    "symfony/mercure": {
+        "version": "v0.6.1"
+    },
+    "symfony/mercure-bundle": {
+        "version": "0.3",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "master",
+            "version": "0.3",
+            "ref": "e0a854b5439186e04b28fb8887b42c54f24a0d32"
+        },
+        "files": [
+            "./config/packages/mercure.yaml"
+        ]
+    },
+    "symfony/messenger": {
+        "version": "6.0",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "master",
+            "version": "4.3",
+            "ref": "25e3c964d3aee480b3acc3114ffb7940c89edfed"
+        },
+        "files": [
+            "./config/packages/messenger.yaml"
+        ]
     },
     "symfony/mime": {
         "version": "v6.0.7"
@@ -332,6 +368,9 @@
         "version": "v6.0.3"
     },
     "symfony/var-exporter": {
+        "version": "v6.0.3"
+    },
+    "symfony/web-link": {
         "version": "v6.0.3"
     },
     "symfony/yaml": {

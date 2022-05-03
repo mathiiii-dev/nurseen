@@ -133,11 +133,22 @@ export async function getServerSideProps(ctx) {
         });
     const kids = await res.json()
 
+    const res1 = await fetch(process.env.BASE_URL + `message`,
+        {
+            method: 'GET',
+            headers: {
+                'Content-type': 'application/json',
+                'Authorization': authToken.authorizationString
+            }
+        });
+    const messages = await res1.json()
+
     return {
         props: {
             userId: sessionCallBack.user.id,
             bearer: authToken.authorizationString,
             kids,
+            messages
         }
     }
 }

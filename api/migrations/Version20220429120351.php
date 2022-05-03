@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20220411150646 extends AbstractMigration
+final class Version20220429120351 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -20,16 +20,16 @@ final class Version20220411150646 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE menu ADD nurse_id INT DEFAULT NULL');
-        $this->addSql('ALTER TABLE menu ADD CONSTRAINT FK_7D053A937373BFAA FOREIGN KEY (nurse_id) REFERENCES nurse (id)');
-        $this->addSql('CREATE INDEX IDX_7D053A937373BFAA ON menu (nurse_id)');
+        $this->addSql('ALTER TABLE message ADD chat_id INT DEFAULT NULL');
+        $this->addSql('ALTER TABLE message ADD CONSTRAINT FK_B6BD307F1A9A7125 FOREIGN KEY (chat_id) REFERENCES chat (id)');
+        $this->addSql('CREATE INDEX IDX_B6BD307F1A9A7125 ON message (chat_id)');
     }
 
     public function down(Schema $schema): void
     {
         // this down() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE menu DROP FOREIGN KEY FK_7D053A937373BFAA');
-        $this->addSql('DROP INDEX IDX_7D053A937373BFAA ON menu');
-        $this->addSql('ALTER TABLE menu DROP nurse_id');
+        $this->addSql('ALTER TABLE message DROP FOREIGN KEY FK_B6BD307F1A9A7125');
+        $this->addSql('DROP INDEX IDX_B6BD307F1A9A7125 ON message');
+        $this->addSql('ALTER TABLE message DROP chat_id');
     }
 }
