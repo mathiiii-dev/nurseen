@@ -10,8 +10,8 @@ import {
 } from "@mantine/core";
 import {useState} from "react";
 import {useForm} from "@mantine/hooks";
-import { AiOutlineEye, AiOutlineEyeInvisible} from "react-icons/ai";
-import { useNotifications } from '@mantine/notifications';
+import {AiOutlineEye, AiOutlineEyeInvisible} from "react-icons/ai";
+import {useNotifications} from '@mantine/notifications';
 import {signIn} from "next-auth/react";
 
 export default function SignUp() {
@@ -21,6 +21,8 @@ export default function SignUp() {
 
     const form = useForm({
         initialValues: {
+            firstname: '',
+            lastname: '',
             email: '',
             password: '',
             roles: ''
@@ -29,13 +31,17 @@ export default function SignUp() {
         validationRules: {
             email: (value) => /^\S+@\S+$/.test(value),
             password: (password) => password.trim().length >= 8,
+            firstname: (firstname) => firstname !== '',
+            lastname: (lastname) => lastname !== '',
             roles: (roles) => roles !== ''
         },
 
         errorMessages: {
             email: 'Email invalide',
             password: 'Mot de passe trop court. Minimum 8 charactères',
-            roles: 'Vous devez sélectionner un role'
+            roles: 'Vous devez sélectionner un role',
+            lastname: 'Vueillez saisir votre nom',
+            firstname: 'Vueillez saisir votre prénom',
         }
     });
 
@@ -47,7 +53,9 @@ export default function SignUp() {
                 body: JSON.stringify({
                         email: form.values.email,
                         password: form.values.password,
-                        roles: [form.values.roles]
+                        roles: [form.values.roles],
+                        lastname: form.values.lastname,
+                        firstname: form.values.firstname,
                     }
                 ),
                 headers: {
@@ -96,6 +104,22 @@ export default function SignUp() {
                     <form onSubmit={form.onSubmit(signUpUser)}>
                         <TextInput
                             required
+                            label="Prénom"
+                            placeholder="Jasmine"
+                            {...form.getInputProps('firstname')}
+                            size={"xl"}
+                        />
+                        <Space h={"xl"}/>
+                        <TextInput
+                            required
+                            label="Nom"
+                            placeholder="Doe"
+                            {...form.getInputProps('lastname')}
+                            size={"xl"}
+                        />
+                        <Space h={"xl"}/>
+                        <TextInput
+                            required
                             label="Email"
                             placeholder="your@email.com"
                             {...form.getInputProps('email')}
@@ -106,8 +130,8 @@ export default function SignUp() {
                             required
                             label="Mot de passe"
                             placeholder="********"
-                            visibilityToggleIcon={({ reveal, size }) =>
-                                reveal ? <AiOutlineEyeInvisible size={size} /> : <AiOutlineEye size={size} />
+                            visibilityToggleIcon={({reveal, size}) =>
+                                reveal ? <AiOutlineEyeInvisible size={size}/> : <AiOutlineEye size={size}/>
                             }
                             {...form.getInputProps('password')}
                             size={"xl"}

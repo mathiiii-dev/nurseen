@@ -2,31 +2,30 @@
 
 namespace App\Repository;
 
-use App\Entity\Family;
+use App\Entity\Chat;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\DBAL\Exception;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @method Family|null find($id, $lockMode = null, $lockVersion = null)
- * @method Family|null findOneBy(array $criteria, array $orderBy = null)
- * @method Family[]    findAll()
- * @method Family[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Chat|null find($id, $lockMode = null, $lockVersion = null)
+ * @method Chat|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Chat[]    findAll()
+ * @method Chat[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class FamilyRepository extends ServiceEntityRepository
+class ChatRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Family::class);
+        parent::__construct($registry, Chat::class);
     }
 
     /**
      * @throws ORMException
      * @throws OptimisticLockException
      */
-    public function add(Family $entity, bool $flush = true): void
+    public function add(Chat $entity, bool $flush = true): void
     {
         $this->_em->persist($entity);
         if ($flush) {
@@ -38,7 +37,7 @@ class FamilyRepository extends ServiceEntityRepository
      * @throws ORMException
      * @throws OptimisticLockException
      */
-    public function remove(Family $entity, bool $flush = true): void
+    public function remove(Chat $entity, bool $flush = true): void
     {
         $this->_em->remove($entity);
         if ($flush) {
@@ -47,15 +46,15 @@ class FamilyRepository extends ServiceEntityRepository
     }
 
     // /**
-    //  * @return Family[] Returns an array of Family objects
+    //  * @return Chat[] Returns an array of Chat objects
     //  */
     /*
     public function findByExampleField($value)
     {
-        return $this->createQueryBuilder('f')
-            ->andWhere('f.exampleField = :val')
+        return $this->createQueryBuilder('c')
+            ->andWhere('c.exampleField = :val')
             ->setParameter('val', $value)
-            ->orderBy('f.id', 'ASC')
+            ->orderBy('c.id', 'ASC')
             ->setMaxResults(10)
             ->getQuery()
             ->getResult()
@@ -64,10 +63,10 @@ class FamilyRepository extends ServiceEntityRepository
     */
 
     /*
-    public function findOneBySomeField($value): ?Family
+    public function findOneBySomeField($value): ?Chat
     {
-        return $this->createQueryBuilder('f')
-            ->andWhere('f.exampleField = :val')
+        return $this->createQueryBuilder('c')
+            ->andWhere('c.exampleField = :val')
             ->setParameter('val', $value)
             ->getQuery()
             ->getOneOrNullResult()
