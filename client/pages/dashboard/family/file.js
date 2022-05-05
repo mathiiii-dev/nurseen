@@ -3,16 +3,14 @@ import {AuthToken} from "../../../services/auth_token";
 import {
     Accordion,
     Button,
-    Card, Grid, Group,
-    InputWrapper, List,
-    Select,
+    InputWrapper,
     Space,
     Text,
     TextInput
 } from "@mantine/core";
 import {Dropzone, MIME_TYPES} from "@mantine/dropzone";
 import {useState} from "react";
-import FileManager from '../../../components/FileManager'
+import FileManager from '../../../components/FileManager';
 
 export const dropzoneChildrenUploaded = () => (
     <Text>Votre fichier à bien été ajouté</Text>
@@ -27,35 +25,25 @@ export const dropzoneChildren = (rejected) => (
 
 );
 
-export default function Page({userId, bearer, family, files}) {
+export default function Page({userId, bearer, nurse, files}) {
 
-    const [select, setSelect] = useState(null);
     const [file, setFile] = useState();
     const [uploaded, setUploaded] = useState(false);
     const [rejected, setRejected] = useState(false);
 
     let style = null;
 
-    if(rejected) {
+    console.log(files)
+
+    if (rejected) {
         style = {
             border: '2px dashed red',
             color: 'red'
         }
     }
 
-    if(!rejected) {
+    if (!rejected) {
         style = null
-    }
-
-    let parents = null;
-    console.log(family)
-    if (family.length !== 0) {
-        parents = family.map((element) => (
-            {
-                value: element.id.toString(),
-                label: element.name
-            }
-        ))
     }
 
     const send = (event) => {
@@ -63,7 +51,7 @@ export default function Page({userId, bearer, family, files}) {
         const data = new FormData()
         data.append('file', file[0])
         data.append('sender', userId)
-        data.append('recipient', select)
+        data.append('recipient', nurse.userId)
         fetch(process.env.BASE_URL + `file/${userId}/send`, {
             body: data,
             method: 'POST',
@@ -78,18 +66,18 @@ export default function Page({userId, bearer, family, files}) {
             })
     }
 
+    const download = (url) => {
+        if (typeof window !== "undefined") {
+            window.location.href = url
+        }
+    }
+
     return (
         <>
             <Accordion initialItem={0} multiple>
                 <Accordion.Item label="Formulaire d'envoie de fichier">
+                    <Text>Envoyé un fichier à votre nourrice {nurse.firstname + ' ' + nurse.lastname}</Text>
                     <form onSubmit={send}>
-                        <Select
-                            label="Destinataire"
-                            placeholder="Nurseen Test"
-                            data={parents}
-                            value={select}
-                            onChange={setSelect}
-                        />
                         <Space h={"md"}/>
                         <TextInput
                             placeholder="Contrat du mois"
@@ -125,7 +113,6 @@ export default function Page({userId, bearer, family, files}) {
                         </Button>
                     </form>
                 </Accordion.Item>
-
                 <Accordion.Item label="Mes fichiers reçus">
                     <FileManager files={files} userId={userId}/>
                 </Accordion.Item>
@@ -139,7 +126,7 @@ export async function getServerSideProps(ctx) {
 
     const authToken = new AuthToken(sessionCallBack.user.access_token);
 
-    const res = await fetch(process.env.BASE_URL + `family/${authToken.decodedToken.id}/list`,
+    const res = await fetch(process.env.BASE_URL + `family/${authToken.decodedToken.id}/nurse`,
         {
             method: 'GET',
             headers: {
@@ -148,7 +135,7 @@ export async function getServerSideProps(ctx) {
             }
         });
 
-    const family = await res.json();
+    const nurse = await res.json();
 
     const res1 = await fetch(process.env.BASE_URL + `file/${authToken.decodedToken.id}`,
         {
@@ -165,7 +152,7 @@ export async function getServerSideProps(ctx) {
         props: {
             userId: sessionCallBack.user.id,
             bearer: authToken.authorizationString,
-            family,
+            nurse,
             files
         }
     }

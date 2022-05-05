@@ -19,7 +19,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(['gallery', 'chat'])]
+    #[Groups(['gallery', 'chat', 'file'])]
     private int $id;
 
     #[ORM\Column(type: 'string', length: 180, unique: true)]
@@ -44,11 +44,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Message::class)]
     private $messages;
 
-    #[Groups(['chat', 'chat_list'])]
+    #[Groups(['chat', 'chat_list', 'file'])]
     #[ORM\Column(type: 'string', length: 255)]
     private $firstname;
 
-    #[Groups(['chat', 'chat_list'])]
+    #[Groups(['chat', 'chat_list', 'file'])]
     #[ORM\Column(type: 'string', length: 255)]
     private $lastname;
 

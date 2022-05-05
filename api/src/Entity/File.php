@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\FileRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: FileRepository::class)]
 class File
@@ -11,15 +12,19 @@ class File
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
+    #[Groups(['file'])]
     private $id;
 
     #[ORM\Column(type: 'text')]
+    #[Groups(['file'])]
     private $url;
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'files')]
+    #[Groups(['file'])]
     private $sender;
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'files')]
+    #[Groups(['file'])]
     private $recipient;
 
     public function getId(): ?int
