@@ -4,6 +4,7 @@ import {
     Card, Grid, List,
     Text,
 } from "@mantine/core";
+import dayjs from "dayjs";
 
 
 export default function Page({files, userId}) {
@@ -22,11 +23,10 @@ export default function Page({files, userId}) {
                         files.map((file) => (
                             <Grid.Col span={4} key={file.id}>
                                 <Card shadow="sm" p="lg">
-                                    <Text weight={500}>{file.url}</Text>
+                                    <Text weight={500}>{file.name}</Text>
                                     <List>
                                         <List.Item>Envoyé par : {file.sender.firstname}</List.Item>
-                                        <List.Item>Reçu le 24/04/2022</List.Item>
-                                        <List.Item>Taille : 1.4 Mb</List.Item>
+                                        <List.Item>Reçu le {dayjs(file.sendDate).format('DD/MM/YYYY')}</List.Item>
                                     </List>
                                     <Button style={{marginTop: 14}} variant="light" color="blue" fullWidth
                                             onClick={() => download(`${process.env.MEDIA_URL}file/${userId}/${file.url}`)}>Télécharger</Button>

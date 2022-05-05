@@ -27,6 +27,14 @@ class File
     #[Groups(['file'])]
     private $recipient;
 
+    #[ORM\Column(type: 'string', length: 255)]
+    #[Groups(['file'])]
+    private $name;
+
+    #[ORM\Column(type: 'date')]
+    #[Groups(['file'])]
+    private $sendDate;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -64,6 +72,30 @@ class File
     public function setRecipient(?User $recipient): self
     {
         $this->recipient = $recipient;
+
+        return $this;
+    }
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name): self
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    public function getSendDate(): ?\DateTimeInterface
+    {
+        return $this->sendDate;
+    }
+
+    public function setSendDate(\DateTimeInterface $sendDate): self
+    {
+        $this->sendDate = $sendDate;
 
         return $this;
     }

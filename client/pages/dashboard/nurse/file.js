@@ -33,7 +33,7 @@ export default function Page({userId, bearer, family, files}) {
     const [file, setFile] = useState();
     const [uploaded, setUploaded] = useState(false);
     const [rejected, setRejected] = useState(false);
-
+    const [title, setTitle] = useState()
     let style = null;
 
     if(rejected) {
@@ -64,6 +64,7 @@ export default function Page({userId, bearer, family, files}) {
         data.append('file', file[0])
         data.append('sender', userId)
         data.append('recipient', select)
+        data.append('name', title)
         fetch(process.env.BASE_URL + `file/${userId}/send`, {
             body: data,
             method: 'POST',
@@ -94,6 +95,8 @@ export default function Page({userId, bearer, family, files}) {
                         <TextInput
                             placeholder="Contrat du mois"
                             label="Nom du fichier"
+                            value={title}
+                            onChange={(e) => setTitle(e.currentTarget.value)}
                             required
                         />
                         <Space h={"md"}/>
