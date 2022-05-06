@@ -21,7 +21,7 @@ export default function Page({files, userId}) {
                 <>
                     {
                         files.map((file) => (
-                            <Grid.Col span={4} key={file.id}>
+                            <Grid.Col md={6} lg={3} key={file.id}>
                                 <Card shadow="sm" p="lg">
                                     <Text weight={500}>{file.name}</Text>
                                     <List>
