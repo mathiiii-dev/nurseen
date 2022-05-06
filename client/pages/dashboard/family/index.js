@@ -66,9 +66,6 @@ function Family({userId, bearer, kids}) {
                                 buttonText={"Ajouter un enfant"}
                                 text={"Ajouter vos enfant pour qu'ils soient liés à leur nourrice. Code nourrice nécessaire"}
                                 linkHref={"family/create-kid"}
-                                userId={userId}
-                                bearer={bearer}
-                                modal={false}
                             />
                         </div>
                         <div className="embla__slide">
@@ -77,9 +74,30 @@ function Family({userId, bearer, kids}) {
                                 buttonText={"Voir les photos"}
                                 text={"Votre nourrice peut ajouter ici des photos en vrac de tout les enfants"}
                                 linkHref={"family/gallery"}
-                                userId={userId}
-                                bearer={bearer}
-                                modal={false}
+                            />
+                        </div>
+                        <div className="embla__slide">
+                            <DashboardCard
+                                title={"Menu du jour"}
+                                buttonText={"Voir le menu"}
+                                text={"Votre nourrice peut ajouter ici le menu du jour"}
+                                linkHref={"family/menu"}
+                            />
+                        </div>
+                        <div className="embla__slide">
+                            <DashboardCard
+                                title={"Chat en direct"}
+                                buttonText={"Chat"}
+                                text={"Voir les messages envoyez par votre nourrice. Envoyez des messages"}
+                                linkHref={"family/chat"}
+                            />
+                        </div>
+                        <div className="embla__slide">
+                            <DashboardCard
+                                title={"Gestionnaire de fichiers"}
+                                buttonText={"Mes fichiers"}
+                                text={"Envoyez des fichiers à votre nourrice. Voir vos fichiers"}
+                                linkHref={"family/file"}
                             />
                         </div>
                     </div>

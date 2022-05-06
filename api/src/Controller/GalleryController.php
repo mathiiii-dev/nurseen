@@ -37,7 +37,8 @@ class GalleryController extends AbstractController
                                 GalleryRepository $galleryRepository,
                                 Filesystem        $filesystem,
                                 KidRepository     $kidRepository,
-                                FamilyRepository $familyRepository)
+                                FamilyRepository  $familyRepository
+    )
     {
         $this->slugger = $slugger;
         $this->nurseRepository = $nurseRepository;
@@ -65,7 +66,7 @@ class GalleryController extends AbstractController
             $entityManager->persist($photo);
             $entityManager->flush();
             try {
-                $file->move($this->getParameter('gallery_directory').'/'.$nurseId, $fileName);
+                $file->move($this->getParameter('gallery_directory') . '/' . $nurseId, $fileName);
             } catch (FileException $e) {
                 throw new \Exception($e->getMessage());
             }
@@ -113,7 +114,7 @@ class GalleryController extends AbstractController
     {
         $entityManager = $this->doctrine->getManager();
         $photo = $this->galleryRepository->findOneBy(['id' => $galleryId]);
-        $this->filesystem->remove($this->getParameter('gallery_directory').'/'.$photo->getNurse()->getNurse()->getId().'/'.$photo->getUrl());
+        $this->filesystem->remove($this->getParameter('gallery_directory') . '/' . $photo->getNurse()->getNurse()->getId() . '/' . $photo->getUrl());
         $entityManager->remove($photo);
         $entityManager->flush();
         return $this->json([], Response::HTTP_NO_CONTENT);

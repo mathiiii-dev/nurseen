@@ -11,7 +11,7 @@ import '../../../styles/globals.css'
 import DashboardCard from "../../../components/DashboardCard";
 
 export default function Page({userId, bearer, kids}) {
-    console.log(kids)
+
     const router = useRouter();
 
     const [archiveOpened, setArchiveOpened] = useState(false);
@@ -162,7 +162,14 @@ export default function Page({userId, bearer, kids}) {
                                 linkHref={"nurse/chat"}
                             />
                         </div>
-
+                        <div className="embla__slide">
+                            <DashboardCard
+                                title={"Gestionnaire de fichier"}
+                                buttonText={"Mes Fichiers"}
+                                text={"Envoyez des fichiers au parents. Voir les fichiers envoyez par les parents"}
+                                linkHref={"nurse/file"}
+                            />
+                        </div>
                     </div>
                 </div>
                 <Space h={"xl"}/>

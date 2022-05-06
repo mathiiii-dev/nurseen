@@ -67,4 +67,38 @@ class FamilyController extends AbstractController
 
         return new JsonResponse(array_values(array_unique($parents, SORT_REGULAR)), Response::HTTP_CREATED);
     }
+
+    #[Route('/family/{nurseId}/list', name: 'app_family_nurse_list', methods: 'GET')]
+    public function getFamilyNurseList(int $nurseId): Response
+    {
+        $nurse = $this->nurseRepository->findOneBy(['id' => $nurseId]);
+        $parents = [];
+        /**
+         * @var $kid Kid
+         */
+        foreach ($nurse->getKids()->toArray() as $kid) {
+            $parents[] = [
+                'name' => $kid->getFamily()->getParent()->getFirstname() . ' ' . $kid->getFamily()->getParent()->getLastname(),
+                'id' => $kid->getFamily()->getParent()->getId(),
+            ];
+        }
+
+        return new JsonResponse(array_values(array_unique($parents, SORT_REGULAR)), Response::HTTP_CREATED);
+    }
+
+    #[Route('/family/{familyId}/nurse', name: 'app_family_nurse_get', methods: 'GET')]
+    public function getNurse(int $familyId): Response
+    {
+        $familyId = $this->familyRepository->findOneBy(['id' => $familyId]);
+        $kid = $this->kidRepository->findOneBy(['id' => $familyId->getKids()->get(0)]);
+        $nurse = $this->nurseRepository->findOneBy(['id' => $kid->getNurse()->getId()]);
+
+        $array = [
+            'userId' => $nurse->getNurse()->getId(),
+            'lastname' => $nurse->getNurse()->getLastname(),
+            'firstname' => $nurse->getNurse()->getFirstname()
+        ];
+
+        return new JsonResponse($array, Response::HTTP_OK);
+    }
 }
