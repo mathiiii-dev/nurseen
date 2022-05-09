@@ -14,12 +14,12 @@ class Nurse
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(['chat_list'])]
+    #[Groups(['chat_list', 'feed'])]
     private $id;
 
     #[ORM\OneToOne(targetEntity: User::class, cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['gallery', 'chat_list'])]
+    #[Groups(['gallery', 'chat_list', 'feed'])]
     private $nurse;
 
     #[ORM\OneToMany(mappedBy: 'nurse', targetEntity: Kid::class, orphanRemoval: true)]
@@ -34,12 +34,16 @@ class Nurse
     #[ORM\OneToMany(mappedBy: 'nurse', targetEntity: Chat::class)]
     private $chats;
 
+    #[ORM\OneToMany(mappedBy: 'nurse', targetEntity: Feed::class)]
+    private $feeds;
+
     public function __construct()
     {
         $this->kids = new ArrayCollection();
         $this->galleries = new ArrayCollection();
         $this->menus = new ArrayCollection();
         $this->chats = new ArrayCollection();
+        $this->feeds = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -173,6 +177,36 @@ class Nurse
             // set the owning side to null (unless already changed)
             if ($chat->getNurse() === $this) {
                 $chat->setNurse(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Feed>
+     */
+    public function getFeeds(): Collection
+    {
+        return $this->feeds;
+    }
+
+    public function addFeed(Feed $feed): self
+    {
+        if (!$this->feeds->contains($feed)) {
+            $this->feeds[] = $feed;
+            $feed->setNurse($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFeed(Feed $feed): self
+    {
+        if ($this->feeds->removeElement($feed)) {
+            // set the owning side to null (unless already changed)
+            if ($feed->getNurse() === $this) {
+                $feed->setNurse(null);
             }
         }
 
