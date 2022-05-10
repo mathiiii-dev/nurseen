@@ -6,6 +6,7 @@
 parameters:
     gallery_directory: '%kernel.project_dir%/public/uploads/gallery'
     file_directory: '%kernel.project_dir%/public/uploads/file'
+    feed_directory: '%kernel.project_dir%/public/uploads/feed'
 
 services:
     # default configuration for services in *this* file

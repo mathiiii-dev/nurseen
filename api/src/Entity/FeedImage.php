@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\FeedImageRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: FeedImageRepository::class)]
 class FeedImage
@@ -11,9 +12,11 @@ class FeedImage
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
+    #[Groups(['feed'])]
     private $id;
 
     #[ORM\Column(type: 'string', length: 255)]
+    #[Groups(['feed'])]
     private $url;
 
     #[ORM\ManyToOne(targetEntity: Feed::class, inversedBy: 'feedImages')]

@@ -30,6 +30,7 @@ class Feed
     private $nurse;
 
     #[ORM\OneToMany(mappedBy: 'feed', targetEntity: FeedImage::class)]
+    #[Groups(['feed'])]
     private $feedImages;
 
     public function __construct()
