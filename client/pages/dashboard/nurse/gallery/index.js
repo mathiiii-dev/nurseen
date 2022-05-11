@@ -43,7 +43,7 @@ function AddGallery({bearer, userId}) {
             (element) => (
                 {
                     id: element.id,
-                    src: process.env.MEDIA_URL + userId + '/' + element.url,
+                    src: process.env.MEDIA_URL + 'gallery/' + userId + '/' + element.url,
                     width: 4,
                     height: 3,
                 }

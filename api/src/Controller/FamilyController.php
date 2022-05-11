@@ -89,7 +89,7 @@ class FamilyController extends AbstractController
     #[Route('/family/{familyId}/nurse', name: 'app_family_nurse_get', methods: 'GET')]
     public function getNurse(int $familyId): Response
     {
-        $familyId = $this->familyRepository->findOneBy(['id' => $familyId]);
+        $familyId = $this->familyRepository->findOneBy(['parent' => $familyId]);
         $kid = $this->kidRepository->findOneBy(['id' => $familyId->getKids()->get(0)]);
         $nurse = $this->nurseRepository->findOneBy(['id' => $kid->getNurse()->getId()]);
 

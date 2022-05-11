@@ -32,9 +32,9 @@ export default function Page({userId, bearer, nurse, files}) {
     const [rejected, setRejected] = useState(false);
     const [title, setTitle] = useState()
 
-    let style = null;
+    console.log(nurse)
 
-    console.log(files)
+    let style = null;
 
     if (rejected) {
         style = {

@@ -77,7 +77,7 @@ function NurseChat({bearer, userId, family, chat}) {
                                 </Text>
 
                                 <Text size="sm">
-                                    {d.lastMessage.message}
+                                    {d.lastMessage ? d.lastMessage.message : ''}
                                 </Text>
                             </Card>
                         </Link>

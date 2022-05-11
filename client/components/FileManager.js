@@ -9,10 +9,19 @@ import dayjs from "dayjs";
 
 export default function Page({files, userId}) {
 
-    const download = (url) => {
-        if (typeof window !== "undefined") {
-            window.location.href = url
-        }
+    async function downloadUsingFetch(url, filename) {
+        const file = await fetch(url);
+        const fileBlob = await file.blob();
+        const fileURL = URL.createObjectURL(fileBlob);
+
+        const anchor = document.createElement("a");
+        anchor.href = fileURL;
+        anchor.download = filename;
+
+        document.body.appendChild(anchor);
+        anchor.click();
+        document.body.removeChild(anchor);
+        URL.revokeObjectURL(fileURL);
     }
 
     return (
@@ -29,7 +38,7 @@ export default function Page({files, userId}) {
                                         <List.Item>Reçu le {dayjs(file.sendDate).format('DD/MM/YYYY')}</List.Item>
                                     </List>
                                     <Button style={{marginTop: 14}} variant="light" color="blue" fullWidth
-                                            onClick={() => download(`${process.env.MEDIA_URL}file/${userId}/${file.url}`)}>Télécharger</Button>
+                                            onClick={() => downloadUsingFetch(`${process.env.MEDIA_URL}file/${userId}/${file.url}`, file.url)}>Télécharger</Button>
                                 </Card>
                             </Grid.Col>
                         ))
