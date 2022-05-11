@@ -19,14 +19,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(['gallery', 'chat', 'file'])]
+    #[Groups(['gallery', 'chat', 'file', 'feed'])]
     private int $id;
 
     #[ORM\Column(type: 'string', length: 180, unique: true)]
     #[Assert\NotBlank]
     #[Assert\Email(message: 'This value is not a valid email address.')]
-
-    #[Groups(['chat', 'chat_list'])]
+    #[Groups(['chat', 'chat_list', 'feed'])]
     private string $email;
 
     #[ORM\Column(type: 'json')]
@@ -44,11 +43,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Message::class)]
     private $messages;
 
-    #[Groups(['chat', 'chat_list', 'file'])]
+    #[Groups(['chat', 'chat_list', 'file', 'feed'])]
     #[ORM\Column(type: 'string', length: 255)]
     private $firstname;
 
-    #[Groups(['chat', 'chat_list', 'file'])]
+    #[Groups(['chat', 'chat_list', 'file', 'feed'])]
     #[ORM\Column(type: 'string', length: 255)]
     private $lastname;
 
