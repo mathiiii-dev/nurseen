@@ -10,7 +10,6 @@ use App\Repository\NurseRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -23,12 +22,14 @@ class FeedController extends AbstractController
     private FeedImageRepository $feedImageRepository;
     private ManagerRegistry $doctrine;
     private SluggerInterface $slugger;
+    private ManagerRegistry $managerRegistry;
 
     public function __construct(NurseRepository     $nurseRepository,
                                 FeedRepository      $feedRepository,
                                 FeedImageRepository $feedImageRepository,
                                 ManagerRegistry     $doctrine,
-                                SluggerInterface    $slugger
+                                SluggerInterface    $slugger,
+                                ManagerRegistry     $managerRegistry
     )
     {
         $this->nurseRepository = $nurseRepository;
@@ -36,6 +37,7 @@ class FeedController extends AbstractController
         $this->feedImageRepository = $feedImageRepository;
         $this->doctrine = $doctrine;
         $this->slugger = $slugger;
+        $this->managerRegistry = $managerRegistry;
     }
 
     #[Route('/feed/{nurseId}', name: 'app_feed_get', methods: 'GET')]
@@ -75,5 +77,33 @@ class FeedController extends AbstractController
         }
 
         return $this->json([], Response::HTTP_CREATED);
+    }
+
+    #[Route('/feed/{feed}', name: 'app_feed_delete', methods: 'DELETE')]
+    public function delete(Feed $feed): Response
+    {
+        $em = $this->managerRegistry->getManager();
+
+        foreach ($feed->getFeedImages() as $feedImage) {
+            $feed->removeFeedImage($feedImage);
+            $em->remove($feedImage);
+            $em->flush();
+        }
+
+        $em->remove($feed);
+        $em->flush();
+
+        return $this->json([], Response::HTTP_NO_CONTENT);
+    }
+
+    #[Route('/feed/{feed}', name: 'app_feed_patch', methods: 'PATCH')]
+    public function patch(Feed $feed, Request $request): Response
+    {
+        $data = $request->toArray();
+        $feed->setText($data['text']);
+        $em = $this->doctrine->getManager();
+        $em->flush();
+
+        return $this->json([], Response::HTTP_NO_CONTENT);
     }
 }
