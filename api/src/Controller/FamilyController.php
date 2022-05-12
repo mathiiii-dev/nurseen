@@ -26,12 +26,13 @@ class FamilyController extends AbstractController
     private NurseRepository $nurseRepository;
     private LinkCodeRepository $linkCodeRepository;
 
-    public function __construct(FamilyHandler      $familyHandler,
-                                FamilyRepository   $familyRepository,
-                                KidRepository      $kidRepository,
-                                NurseRepository    $nurseRepository,
-                                LinkCodeRepository $linkCodeRepository)
-    {
+    public function __construct(
+        FamilyHandler      $familyHandler,
+        FamilyRepository   $familyRepository,
+        KidRepository      $kidRepository,
+        NurseRepository    $nurseRepository,
+        LinkCodeRepository $linkCodeRepository
+    ) {
         $this->familyHandler = $familyHandler;
         $this->familyRepository = $familyRepository;
         $this->kidRepository = $kidRepository;
@@ -60,7 +61,7 @@ class FamilyController extends AbstractController
     #[Route('/family/{nurseId}', name: 'app_family_nurse', methods: 'GET')]
     public function getFamilyNurse(int $nurseId): Response
     {
-        $nurse = $this->nurseRepository->findOneBy(['id' => $nurseId]);
+        $nurse = $this->nurseRepository->findOneBy(['nurse' => $nurseId]);
         $parents = [];
         /**
          * @var $kid Kid
@@ -80,7 +81,7 @@ class FamilyController extends AbstractController
     #[Route('/family/{nurseId}/list', name: 'app_family_nurse_list', methods: 'GET')]
     public function getFamilyNurseList(int $nurseId): Response
     {
-        $nurse = $this->nurseRepository->findOneBy(['id' => $nurseId]);
+        $nurse = $this->nurseRepository->findOneBy(['nurse' => $nurseId]);
         $parents = [];
         /**
          * @var $kid Kid

@@ -19,7 +19,6 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class MessageController extends AbstractController
 {
-
     private MessageRepository $messageRepository;
     private MessageBusInterface $bus;
     private SerializerInterface $serializer;
@@ -28,15 +27,15 @@ class MessageController extends AbstractController
     private UserRepository $userRepository;
     private ChatRepository $chatRepository;
 
-    public function __construct(ChatRepository      $chatRepository,
-                                UserRepository      $userRepository,
-                                MessageRepository   $messageRepository,
-                                MessageBusInterface $bus,
-                                SerializerInterface $serializer,
-                                ValidatorInterface  $validator,
-                                ManagerRegistry     $doctrine
-    )
-    {
+    public function __construct(
+        ChatRepository      $chatRepository,
+        UserRepository      $userRepository,
+        MessageRepository   $messageRepository,
+        MessageBusInterface $bus,
+        SerializerInterface $serializer,
+        ValidatorInterface  $validator,
+        ManagerRegistry     $doctrine
+    ) {
         $this->messageRepository = $messageRepository;
         $this->bus = $bus;
         $this->serializer = $serializer;

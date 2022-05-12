@@ -58,3 +58,7 @@
 ###< lexik/jwt-authentication-bundle ###
 
 /public/uploads
+
+/tools
+
+.php-cs-fixer.cache

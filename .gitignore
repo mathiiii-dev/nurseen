@@ -97,3 +97,5 @@ yarn-error.log*
 ###< lexik/jwt-authentication-bundle ###
 
 /public/uploads
+
+.php-cs-fixer.cache

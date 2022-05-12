@@ -59,5 +59,4 @@ class CalendarRepository extends ServiceEntityRepository
 
         return $this->connection->fetchAllAssociative($sql);
     }
-
 }

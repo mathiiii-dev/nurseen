@@ -10,7 +10,7 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
 class NurseVoter extends Voter
 {
-    const OWNER = 'owner';
+    public const OWNER = 'owner';
 
     protected function supports(string $attribute, $subject): bool
     {

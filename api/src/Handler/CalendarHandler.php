@@ -25,7 +25,7 @@ class CalendarHandler
     {
         $data = $request->toArray();
 
-        if(!$data['timeRanges'][0] or !$data['timeRanges'][1] or !$data['day']) {
+        if (!$data['timeRanges'][0] or !$data['timeRanges'][1] or !$data['day']) {
             throw new BadRequestHttpException('Informations manquantes! Veuillez remplir tout les champs.');
         }
 

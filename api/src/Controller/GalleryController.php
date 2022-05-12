@@ -31,15 +31,15 @@ class GalleryController extends AbstractController
     private KidRepository $kidRepository;
     private FamilyRepository $familyRepository;
 
-    public function __construct(SluggerInterface  $slugger,
-                                NurseRepository   $nurseRepository,
-                                ManagerRegistry   $doctrine,
-                                GalleryRepository $galleryRepository,
-                                Filesystem        $filesystem,
-                                KidRepository     $kidRepository,
-                                FamilyRepository  $familyRepository
-    )
-    {
+    public function __construct(
+        SluggerInterface  $slugger,
+        NurseRepository   $nurseRepository,
+        ManagerRegistry   $doctrine,
+        GalleryRepository $galleryRepository,
+        Filesystem        $filesystem,
+        KidRepository     $kidRepository,
+        FamilyRepository  $familyRepository
+    ) {
         $this->slugger = $slugger;
         $this->nurseRepository = $nurseRepository;
         $this->doctrine = $doctrine;
@@ -119,5 +119,4 @@ class GalleryController extends AbstractController
         $entityManager->flush();
         return $this->json([], Response::HTTP_NO_CONTENT);
     }
-
 }

@@ -59,5 +59,4 @@ class KidManager
 
         return $this->kidRepository->findBy(['family' => $family->getId()]);
     }
-
 }

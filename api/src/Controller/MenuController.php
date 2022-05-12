@@ -24,11 +24,13 @@ class MenuController extends AbstractController
     private FamilyRepository $familyRepository;
     private KidRepository $kidRepository;
 
-    public function __construct(ManagerRegistry  $doctrine,
-                                NurseRepository  $nurseRepository,
-                                MenuRepository   $menuRepository,
-                                FamilyRepository $familyRepository,
-                                KidRepository    $kidRepository)
+    public function __construct(
+        ManagerRegistry  $doctrine,
+        NurseRepository  $nurseRepository,
+        MenuRepository   $menuRepository,
+        FamilyRepository $familyRepository,
+        KidRepository    $kidRepository
+    )
     {
         $this->doctrine = $doctrine;
         $this->nurseRepository = $nurseRepository;

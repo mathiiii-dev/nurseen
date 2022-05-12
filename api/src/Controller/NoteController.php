@@ -13,7 +13,6 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class NoteController extends AbstractController
 {
-
     private NoteHandler $noteHandler;
     private KidManager $kidManager;
     private NoteRepository $noteRepository;

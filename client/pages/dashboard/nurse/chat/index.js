@@ -7,6 +7,7 @@ import Link from 'next/link'
 function NurseChat({bearer, userId, family, chat}) {
     const [select, setSelect] = useState(null);
     let parents = null;
+    console.log(family)
     if (family.length !== 0) {
         parents = family.map((element) => (
             {

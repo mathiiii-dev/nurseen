@@ -28,15 +28,15 @@ class FeedController extends AbstractController
     private ManagerRegistry $managerRegistry;
     private FamilyRepository $familyRepository;
 
-    public function __construct(NurseRepository     $nurseRepository,
-                                FeedRepository      $feedRepository,
-                                FeedImageRepository $feedImageRepository,
-                                ManagerRegistry     $doctrine,
-                                SluggerInterface    $slugger,
-                                ManagerRegistry     $managerRegistry,
-                                FamilyRepository    $familyRepository
-    )
-    {
+    public function __construct(
+        NurseRepository     $nurseRepository,
+        FeedRepository      $feedRepository,
+        FeedImageRepository $feedImageRepository,
+        ManagerRegistry     $doctrine,
+        SluggerInterface    $slugger,
+        ManagerRegistry     $managerRegistry,
+        FamilyRepository    $familyRepository
+    ) {
         $this->nurseRepository = $nurseRepository;
         $this->feedRepository = $feedRepository;
         $this->feedImageRepository = $feedImageRepository;
@@ -92,7 +92,6 @@ class FeedController extends AbstractController
                     throw new \Exception($e->getMessage());
                 }
             }
-
         }
 
         return $this->json([], Response::HTTP_CREATED);
