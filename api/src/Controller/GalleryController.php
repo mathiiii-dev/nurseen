@@ -8,6 +8,7 @@ use App\Repository\GalleryRepository;
 use App\Repository\KidRepository;
 use App\Repository\NurseRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Pagerfanta\Adapter;
 use Pagerfanta\Pagerfanta;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -18,7 +19,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Pagerfanta\Adapter;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
 class GalleryController extends AbstractController
@@ -32,13 +32,13 @@ class GalleryController extends AbstractController
     private FamilyRepository $familyRepository;
 
     public function __construct(
-        SluggerInterface  $slugger,
-        NurseRepository   $nurseRepository,
-        ManagerRegistry   $doctrine,
+        SluggerInterface $slugger,
+        NurseRepository $nurseRepository,
+        ManagerRegistry $doctrine,
         GalleryRepository $galleryRepository,
-        Filesystem        $filesystem,
-        KidRepository     $kidRepository,
-        FamilyRepository  $familyRepository
+        Filesystem $filesystem,
+        KidRepository $kidRepository,
+        FamilyRepository $familyRepository
     ) {
         $this->slugger = $slugger;
         $this->nurseRepository = $nurseRepository;
@@ -60,13 +60,13 @@ class GalleryController extends AbstractController
         /* @var UploadedFile $file */
         foreach ($files as $file) {
             $safeFilename = $this->slugger->slug($file->getClientOriginalName());
-            $fileName = $safeFilename . '-' . uniqid() . '.' . $file->guessExtension();
+            $fileName = $safeFilename.'-'.uniqid().'.'.$file->guessExtension();
 
             $photo = (new Gallery())->setUrl($fileName)->setNurse($nurse);
             $entityManager->persist($photo);
             $entityManager->flush();
             try {
-                $file->move($this->getParameter('gallery_directory') . '/' . $nurseId, $fileName);
+                $file->move($this->getParameter('gallery_directory').'/'.$nurseId, $fileName);
             } catch (FileException $e) {
                 throw new \Exception($e->getMessage());
             }
@@ -114,9 +114,10 @@ class GalleryController extends AbstractController
     {
         $entityManager = $this->doctrine->getManager();
         $photo = $this->galleryRepository->findOneBy(['id' => $galleryId]);
-        $this->filesystem->remove($this->getParameter('gallery_directory') . '/' . $photo->getNurse()->getNurse()->getId() . '/' . $photo->getUrl());
+        $this->filesystem->remove($this->getParameter('gallery_directory').'/'.$photo->getNurse()->getNurse()->getId().'/'.$photo->getUrl());
         $entityManager->remove($photo);
         $entityManager->flush();
+
         return $this->json([], Response::HTTP_NO_CONTENT);
     }
 }

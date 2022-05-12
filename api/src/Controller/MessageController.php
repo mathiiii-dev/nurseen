@@ -28,13 +28,13 @@ class MessageController extends AbstractController
     private ChatRepository $chatRepository;
 
     public function __construct(
-        ChatRepository      $chatRepository,
-        UserRepository      $userRepository,
-        MessageRepository   $messageRepository,
+        ChatRepository $chatRepository,
+        UserRepository $userRepository,
+        MessageRepository $messageRepository,
         MessageBusInterface $bus,
         SerializerInterface $serializer,
-        ValidatorInterface  $validator,
-        ManagerRegistry     $doctrine
+        ValidatorInterface $validator,
+        ManagerRegistry $doctrine
     ) {
         $this->messageRepository = $messageRepository;
         $this->bus = $bus;
@@ -64,23 +64,25 @@ class MessageController extends AbstractController
         $chat = $this->chatRepository->findOneBy(['id' => $chatId]);
         $message = (new Message())->setUser($user)->setMessage($data['message'])->setChat($chat)->setSendDate(new \DateTime($data['sendDate']));
         $errors = $this->validator->validate($message);
-        if (count($errors) === 0) {
+        if (0 === count($errors)) {
             $em = $this->doctrine->getManager();
             $em->persist($message);
             $em->flush();
             $update = new Update(
-                'http://localhost:8010/proxy/api/message/' . $chatId,
+                'http://localhost:8010/proxy/api/message/'.$chatId,
                 json_encode([
                     'data' => $message->getMessage(),
                     'id' => $message->getId(),
                     'sendDate' => $message->getSendDate()->format("Y-m-d\TH:i:s+00:00"),
                     'lastname' => $user->getLastname(),
-                    'firstname' => $user->getFirstname()
+                    'firstname' => $user->getFirstname(),
                 ])
             );
             $this->bus->dispatch($update);
+
             return new Response(Response::HTTP_OK);
         }
+
         return new Response(Response::HTTP_BAD_REQUEST);
     }
 
@@ -92,6 +94,7 @@ class MessageController extends AbstractController
             json_encode(['data' => 'ping'])
         );
         $this->bus->dispatch($update);
+
         return new Response(Response::HTTP_OK);
     }
 }

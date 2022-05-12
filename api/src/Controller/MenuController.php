@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Entity\Menu;
-use App\Entity\Nurse;
 use App\Repository\FamilyRepository;
 use App\Repository\KidRepository;
 use App\Repository\MenuRepository;
@@ -25,13 +24,12 @@ class MenuController extends AbstractController
     private KidRepository $kidRepository;
 
     public function __construct(
-        ManagerRegistry  $doctrine,
-        NurseRepository  $nurseRepository,
-        MenuRepository   $menuRepository,
+        ManagerRegistry $doctrine,
+        NurseRepository $nurseRepository,
+        MenuRepository $menuRepository,
         FamilyRepository $familyRepository,
-        KidRepository    $kidRepository
-    )
-    {
+        KidRepository $kidRepository
+    ) {
         $this->doctrine = $doctrine;
         $this->nurseRepository = $nurseRepository;
         $this->menuRepository = $menuRepository;
@@ -65,7 +63,7 @@ class MenuController extends AbstractController
         $nurse = $this->nurseRepository->findOneBy(['nurse' => $nurseId]);
         $menu = $this->menuRepository->findOneBy([
             'date' => (new \DateTime())->modify('-1 day'),
-            'nurse' => $nurse->getId()
+            'nurse' => $nurse->getId(),
         ]);
 
         return $this->json($menu, Response::HTTP_OK, [], ['groups' => 'menu']);
@@ -91,9 +89,8 @@ class MenuController extends AbstractController
         $nurse = $this->nurseRepository->findOneBy(['nurse' => $kid->getNurse()->getNurse()->getId()]);
         $menu = $this->menuRepository->findOneBy([
             'date' => (new \DateTime())->modify('-1 day'),
-            'nurse' => $nurse->getId()
+            'nurse' => $nurse->getId(),
         ]);
-
 
         return $this->json($menu, Response::HTTP_OK, [], ['groups' => 'menu']);
     }

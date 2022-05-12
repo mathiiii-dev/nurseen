@@ -51,6 +51,7 @@ class CalendarHandler
     public function handleEditCalendar(Request $request, Calendar $event, Kid $kid)
     {
         $data = $request->toArray();
+
         $date = (new \DateTime($data['day']))->setTimezone(new \DateTimeZone('Europe/Paris'));
         $arrival = (new \DateTime($data['timeRanges'][0]))->setTimezone(new \DateTimeZone('Europe/Paris'));
         $departure = (new \DateTime($data['timeRanges'][1]))->setTimezone(new \DateTimeZone('Europe/Paris'));

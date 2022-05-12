@@ -3,12 +3,9 @@
 namespace App\Handler;
 
 use App\Entity\LinkCode;
-use App\Entity\Nurse;
 use App\Repository\LinkCodeRepository;
 use App\Repository\NurseRepository;
 use Doctrine\Persistence\ManagerRegistry;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Uid\Uuid;
 
 class LinkCodeHandler
 {
@@ -45,6 +42,7 @@ class LinkCodeHandler
         if ($code) {
             $linkCode = $code->getCode();
         }
+
         return $linkCode;
     }
 }

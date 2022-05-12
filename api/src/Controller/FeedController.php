@@ -2,55 +2,51 @@
 
 namespace App\Controller;
 
-use App\Entity\Family;
 use App\Entity\Feed;
-use App\Entity\FeedImage;
 use App\Entity\Kid;
+use App\Handler\FeedHandler;
+use App\Handler\FeedImageHandler;
 use App\Repository\FamilyRepository;
-use App\Repository\FeedImageRepository;
 use App\Repository\FeedRepository;
 use App\Repository\NurseRepository;
-use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\String\Slugger\SluggerInterface;
 
 class FeedController extends AbstractController
 {
     private NurseRepository $nurseRepository;
     private FeedRepository $feedRepository;
-    private FeedImageRepository $feedImageRepository;
-    private ManagerRegistry $doctrine;
-    private SluggerInterface $slugger;
-    private ManagerRegistry $managerRegistry;
     private FamilyRepository $familyRepository;
+    private FeedHandler $feedHandler;
+    private FeedImageHandler $feedImageHandler;
 
     public function __construct(
-        NurseRepository     $nurseRepository,
-        FeedRepository      $feedRepository,
-        FeedImageRepository $feedImageRepository,
-        ManagerRegistry     $doctrine,
-        SluggerInterface    $slugger,
-        ManagerRegistry     $managerRegistry,
-        FamilyRepository    $familyRepository
+        NurseRepository $nurseRepository,
+        FeedRepository $feedRepository,
+        FamilyRepository $familyRepository,
+        FeedHandler $feedHandler,
+        FeedImageHandler $feedImageHandler
     ) {
         $this->nurseRepository = $nurseRepository;
         $this->feedRepository = $feedRepository;
-        $this->feedImageRepository = $feedImageRepository;
-        $this->doctrine = $doctrine;
-        $this->slugger = $slugger;
-        $this->managerRegistry = $managerRegistry;
         $this->familyRepository = $familyRepository;
+        $this->feedHandler = $feedHandler;
+        $this->feedImageHandler = $feedImageHandler;
     }
 
     #[Route('/feed/{nurseId}', name: 'app_feed_get', methods: 'GET')]
     public function get(int $nurseId): Response
     {
         $nurse = $this->nurseRepository->findOneBy(['nurse' => $nurseId]);
-        return $this->json($this->feedRepository->findBy(['nurse' => $nurse->getId()], ['id' => 'DESC']), Response::HTTP_OK, [], ['groups' => 'feed']);
+
+        return $this->json(
+            $this->feedRepository->findBy(['nurse' => $nurse->getId()], ['id' => 'DESC']),
+            Response::HTTP_OK,
+            [],
+            ['groups' => 'feed']
+        );
     }
 
     #[Route('/feed/family/{familyId}', name: 'app_feed_get_family', methods: 'GET')]
@@ -62,6 +58,7 @@ class FeedController extends AbstractController
          */
         $kid = $family->getKids()->get(0);
         $nurseId = $kid->getNurse()->getId();
+
         return $this->json($this->feedRepository->findBy(['nurse' => $nurseId], ['id' => 'DESC']), Response::HTTP_OK, [], ['groups' => 'feed']);
     }
 
@@ -69,29 +66,11 @@ class FeedController extends AbstractController
     public function post(Request $request, int $nurseId): Response
     {
         $text = $request->get('text');
+        $feed = $this->feedHandler->handleFeedCreate($text, $nurseId);
         $files = $request->files;
-        $nurse = $this->nurseRepository->findOneBy(['nurse' => $nurseId]);
-        $feed = (new Feed())->setCreationDate(new \DateTime())->setText($text)->setNurse($nurse);
-        $em = $this->doctrine->getManager();
-        $em->persist($feed);
-        $em->flush();
 
         if ($files) {
-            foreach ($files as $file) {
-                $safeFilename = $this->slugger->slug($file->getClientOriginalName());
-                $fileName = $safeFilename . '-' . uniqid() . '.' . $file->guessExtension();
-
-                $feedImage = (new FeedImage())->setUrl($fileName)->setFeed($feed);
-
-                $em->persist($feedImage);
-                $em->flush();
-
-                try {
-                    $file->move($this->getParameter('feed_directory') . '/' . $feed->getId(), $fileName);
-                } catch (FileException $e) {
-                    throw new \Exception($e->getMessage());
-                }
-            }
+            $this->feedImageHandler->handleFeedImageCreate($files, $feed);
         }
 
         return $this->json([], Response::HTTP_CREATED);
@@ -100,16 +79,7 @@ class FeedController extends AbstractController
     #[Route('/feed/{feed}', name: 'app_feed_delete', methods: 'DELETE')]
     public function delete(Feed $feed): Response
     {
-        $em = $this->managerRegistry->getManager();
-
-        foreach ($feed->getFeedImages() as $feedImage) {
-            $feed->removeFeedImage($feedImage);
-            $em->remove($feedImage);
-            $em->flush();
-        }
-
-        $em->remove($feed);
-        $em->flush();
+        $this->feedHandler->handleFeedDelete($feed);
 
         return $this->json([], Response::HTTP_NO_CONTENT);
     }
@@ -117,10 +87,7 @@ class FeedController extends AbstractController
     #[Route('/feed/{feed}', name: 'app_feed_patch', methods: 'PATCH')]
     public function patch(Feed $feed, Request $request): Response
     {
-        $data = $request->toArray();
-        $feed->setText($data['text']);
-        $em = $this->doctrine->getManager();
-        $em->flush();
+        $this->feedHandler->handleFeedUpdate($request, $feed);
 
         return $this->json([], Response::HTTP_NO_CONTENT);
     }

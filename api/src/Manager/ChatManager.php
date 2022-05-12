@@ -27,12 +27,12 @@ class ChatManager
     public function getChat(User $user, string $role): array
     {
         $chat = null;
-        if ($role === 'nurse') {
+        if ('nurse' === $role) {
             $nurse = $this->nurseRepository->findOneBy(['nurse' => $user->getId()]);
             $chat = $this->chatRepository->findBy(['nurse' => $nurse->getId()]);
         }
 
-        if ($role === 'family') {
+        if ('family' === $role) {
             $family = $this->familyRepository->findOneBy(['parent' => $user->getId()]);
             $chat = $this->chatRepository->findBy(['family' => $family->getId()]);
         }
@@ -56,39 +56,39 @@ class ChatManager
         return $response;
     }
 
-    #[ArrayShape(['chatId' => "", 'nurse' => 'array', 'family' => 'array'])]
+    #[ArrayShape(['chatId' => '', 'nurse' => 'array', 'family' => 'array'])]
     private function chatArray($value): array
     {
         return [
             'chatId' => $value->getId(),
             'nurse' => [
                 'id' => $value->getNurse()->getId(),
-                'name' => $value->getNurse()->getNurse()->getFirstname() . ' ' . $value->getNurse()->getNurse()->getLastname()
+                'name' => $value->getNurse()->getNurse()->getFirstname().' '.$value->getNurse()->getNurse()->getLastname(),
             ],
             'family' => [
                 'id' => $value->getFamily()->getId(),
-                'name' => $value->getFamily()->getParent()->getFirstname() . ' ' . $value->getFamily()->getParent()->getLastname()
-            ]
+                'name' => $value->getFamily()->getParent()->getFirstname().' '.$value->getFamily()->getParent()->getLastname(),
+            ],
         ];
     }
 
-    #[ArrayShape(['chatId' => "", 'nurse' => 'array', 'family' => 'array', 'lastMessage' => 'array'])]
+    #[ArrayShape(['chatId' => '', 'nurse' => 'array', 'family' => 'array', 'lastMessage' => 'array'])]
     private function lastMessageChatArray($value, $lastMessage): array
     {
         return [
             'chatId' => $value->getId(),
             'nurse' => [
                 'id' => $value->getNurse()->getId(),
-                'name' => $value->getNurse()->getNurse()->getFirstname() . ' ' . $value->getNurse()->getNurse()->getLastname()
+                'name' => $value->getNurse()->getNurse()->getFirstname().' '.$value->getNurse()->getNurse()->getLastname(),
             ],
             'family' => [
                 'id' => $value->getFamily()->getId(),
-                'name' => $value->getFamily()->getParent()->getFirstname() . ' ' . $value->getFamily()->getParent()->getLastname()
+                'name' => $value->getFamily()->getParent()->getFirstname().' '.$value->getFamily()->getParent()->getLastname(),
             ],
             'lastMessage' => [
                 'message' => $lastMessage->getMessage(),
-                'sendDate' => $lastMessage->getSendDate()->format('Y-m-d H:i:s')
-            ]
+                'sendDate' => $lastMessage->getSendDate()->format('Y-m-d H:i:s'),
+            ],
         ];
     }
 }

@@ -5,7 +5,6 @@ namespace App\Controller;
 use App\Entity\Calendar;
 use App\Entity\Kid;
 use App\Handler\CalendarHandler;
-use App\Manager\KidManager;
 use App\Repository\CalendarRepository;
 use Exception;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -39,6 +38,7 @@ class CalendarController extends AbstractController
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
         }
+
         return $this->json([], Response::HTTP_CREATED);
     }
 
