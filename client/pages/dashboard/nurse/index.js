@@ -10,9 +10,11 @@ import useEmblaCarousel from 'embla-carousel-react'
 import '../../../styles/globals.css'
 import DashboardCard from "../../../components/DashboardCard";
 
-export default function Page({userId, bearer, kids}) {
+export default function Page({userId, bearer, kids, code}) {
 
     const router = useRouter();
+
+    console.log(code)
 
     const [archiveOpened, setArchiveOpened] = useState(false);
     const [kidId, setKidId] = useState(false);
@@ -119,6 +121,7 @@ export default function Page({userId, bearer, kids}) {
                                 linkHref={"nurse/calendar"}
                                 userId={userId}
                                 bearer={bearer}
+                                code={code}
                                 modal
                             />
                         </div>
@@ -238,11 +241,22 @@ export async function getServerSideProps(ctx) {
         });
     const kids = await res.json();
 
+    const res1 = await fetch(process.env.BASE_URL + `link_code/${authToken.decodedToken.id}`,
+        {
+            method: 'GET',
+            headers: {
+                'Content-type': 'application/json',
+                'Authorization': authToken.authorizationString
+            }
+        });
+    const code = await res1.json();
+
     return {
         props: {
             userId: sessionCallBack.user.id,
             bearer: authToken.authorizationString,
-            kids
+            kids,
+            code: code.code
         }
     }
 }

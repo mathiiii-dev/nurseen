@@ -7,6 +7,7 @@ use App\Entity\Nurse;
 use App\Handler\FamilyHandler;
 use App\Repository\FamilyRepository;
 use App\Repository\KidRepository;
+use App\Repository\LinkCodeRepository;
 use App\Repository\NurseRepository;
 use App\Service\LinkCodeService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -23,14 +24,19 @@ class FamilyController extends AbstractController
     private FamilyRepository $familyRepository;
     private KidRepository $kidRepository;
     private NurseRepository $nurseRepository;
+    private LinkCodeRepository $linkCodeRepository;
 
-    public function __construct(LinkCodeService $codeService, FamilyHandler $familyHandler, FamilyRepository $familyRepository, KidRepository $kidRepository, NurseRepository $nurseRepository)
+    public function __construct(FamilyHandler      $familyHandler,
+                                FamilyRepository   $familyRepository,
+                                KidRepository      $kidRepository,
+                                NurseRepository    $nurseRepository,
+                                LinkCodeRepository $linkCodeRepository)
     {
-        $this->codeService = $codeService;
         $this->familyHandler = $familyHandler;
         $this->familyRepository = $familyRepository;
         $this->kidRepository = $kidRepository;
         $this->nurseRepository = $nurseRepository;
+        $this->linkCodeRepository = $linkCodeRepository;
     }
 
     #[IsGranted('ROLE_PARENT', message: 'Vous ne pouvez pas faire ça')]
@@ -39,8 +45,11 @@ class FamilyController extends AbstractController
     {
         try {
             $data = $request->toArray();
-            $nurse = $this->codeService->validate($data['code']);
             $family = $this->familyRepository->findOneBy(['parent' => $familyId]);
+
+            $code = $this->linkCodeRepository->findOneBy(['code' => $data['code']]);
+            $nurse = $this->nurseRepository->findOneBy(['id' => $code->getNurse()->getId()]);
+
             $this->familyHandler->handleFamilyKidCreate($data, $nurse, $family);
             return new JsonResponse([], Response::HTTP_CREATED);
         } catch (\Exception $exception) {

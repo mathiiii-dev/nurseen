@@ -3,25 +3,20 @@ import Link from 'next/link';
 import {useNotifications} from "@mantine/notifications";
 import {useState} from "react";
 
-export default function DashboardCard({title, text, buttonText, linkHref, bearer, userId, modal}) {
+export default function DashboardCard({title, text, buttonText, linkHref, bearer, userId, modal, code}) {
 
+    let linkCode = '';
+    if(code) {
+        linkCode = code
+    }
     const [opened, setOpened] = useState(false);
-    const [link, setLink] = useState('');
+    const [link, setLink] = useState(linkCode);
     const notifications = useNotifications();
     const linkParent = () => {
-        const code = Math.floor(1000 + Math.random() * 9000);
-        const today = new Date()
-        let tomorrow = new Date()
-        tomorrow.setDate(today.getDate() + 1)
-        const expiration = tomorrow
         fetch(
             process.env.BASE_URL + `link_code/${userId}`,
             {
                 method: 'POST',
-                body: JSON.stringify({
-                    code,
-                    expiration
-                }),
                 headers: {
                     'Content-type': 'application/json',
                     'Authorization': bearer
@@ -30,7 +25,7 @@ export default function DashboardCard({title, text, buttonText, linkHref, bearer
         )
             .then(response => response.json())
             .then(response => {
-                setLink(code)
+                setLink(response.code)
             })
     }
 
@@ -49,8 +44,6 @@ export default function DashboardCard({title, text, buttonText, linkHref, bearer
                 onClose={() => setOpened(false)}
                 title="Création d'un code parent nécessaire à l'ajout d'un enfant"
             >
-
-                <Space h={"md"}/>
                 {
                     link ? <>
                         <Box sx={(theme) => ({

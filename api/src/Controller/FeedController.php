@@ -2,8 +2,11 @@
 
 namespace App\Controller;
 
+use App\Entity\Family;
 use App\Entity\Feed;
 use App\Entity\FeedImage;
+use App\Entity\Kid;
+use App\Repository\FamilyRepository;
 use App\Repository\FeedImageRepository;
 use App\Repository\FeedRepository;
 use App\Repository\NurseRepository;
@@ -23,13 +26,15 @@ class FeedController extends AbstractController
     private ManagerRegistry $doctrine;
     private SluggerInterface $slugger;
     private ManagerRegistry $managerRegistry;
+    private FamilyRepository $familyRepository;
 
     public function __construct(NurseRepository     $nurseRepository,
                                 FeedRepository      $feedRepository,
                                 FeedImageRepository $feedImageRepository,
                                 ManagerRegistry     $doctrine,
                                 SluggerInterface    $slugger,
-                                ManagerRegistry     $managerRegistry
+                                ManagerRegistry     $managerRegistry,
+                                FamilyRepository    $familyRepository
     )
     {
         $this->nurseRepository = $nurseRepository;
@@ -38,11 +43,25 @@ class FeedController extends AbstractController
         $this->doctrine = $doctrine;
         $this->slugger = $slugger;
         $this->managerRegistry = $managerRegistry;
+        $this->familyRepository = $familyRepository;
     }
 
     #[Route('/feed/{nurseId}', name: 'app_feed_get', methods: 'GET')]
     public function get(int $nurseId): Response
     {
+        $nurse = $this->nurseRepository->findOneBy(['nurse' => $nurseId]);
+        return $this->json($this->feedRepository->findBy(['nurse' => $nurse->getId()], ['id' => 'DESC']), Response::HTTP_OK, [], ['groups' => 'feed']);
+    }
+
+    #[Route('/feed/family/{familyId}', name: 'app_feed_get_family', methods: 'GET')]
+    public function getFamily(int $familyId): Response
+    {
+        $family = $this->familyRepository->findOneBy(['parent' => $familyId]);
+        /**
+         * @var Kid $kid
+         */
+        $kid = $family->getKids()->get(0);
+        $nurseId = $kid->getNurse()->getId();
         return $this->json($this->feedRepository->findBy(['nurse' => $nurseId], ['id' => 'DESC']), Response::HTTP_OK, [], ['groups' => 'feed']);
     }
 
