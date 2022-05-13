@@ -38,7 +38,7 @@ function AddGallery({bearer, userId}) {
         galleryPhoto = photos.map(
             (element) => (
                 {
-                    src: process.env.MEDIA_URL + element.nurse.nurse.id + '/' + element.url,
+                    src: process.env.MEDIA_URL + 'gallery/' + element.nurse.nurse.id + '/' + element.url,
                     width: 4,
                     height: 3,
                 }

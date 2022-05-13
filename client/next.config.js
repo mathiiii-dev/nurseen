@@ -4,7 +4,7 @@ const nextConfig = {
   env: {
     SECRET: 'CQPkxYTh9LEp+CiC42wrZDa4jVMf/JRwP84pAd07G5o=',
     BASE_URL: 'http://localhost:8010/proxy/api/',
-    MEDIA_URL: 'http://127.0.0.1:8887/',
+    MEDIA_URL: 'http://localhost:8020/proxy/',
   },
 }
 

@@ -35,7 +35,7 @@ class FamilyHandler
         $kid = (new Kid())
             ->setNurse($nurse)
             ->setFamily($family)
-            ->setBirthday(New \DateTime($data['birthday']))
+            ->setBirthday(new \DateTime($data['birthday']))
             ->setFirstname($data['firstname'])
             ->setLastname($data['lastname'])
             ->setActivated(false)

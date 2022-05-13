@@ -22,15 +22,15 @@ class UserRoleCreationListener
     {
         $entity = $args->getObject();
 
-        if(!$entity instanceof User) {
+        if (!$entity instanceof User) {
             return;
         }
 
         $role = $entity->getRoles();
 
-        if($role[0] === 'ROLE_NURSE') {
+        if ($role[0] === 'ROLE_NURSE') {
             $this->nurseHandler->handleNurseCreate($entity);
-        } elseif($role[0] === 'ROLE_PARENT') {
+        } elseif ($role[0] === 'ROLE_PARENT') {
             $this->familyHandler->handleFamilyCreate($entity);
         }
     }

@@ -25,9 +25,7 @@ class KidManager
     {
         $kid = $this->kidRepository->findOneBy(['id' => $kidId]);
         if (!$kid) {
-            throw new NotFoundHttpException(
-                'No kid found'
-            );
+            throw new NotFoundHttpException('No kid found');
         }
 
         return $kid;
@@ -38,9 +36,7 @@ class KidManager
         $nurse = $this->nurseRepository->findOneBy(['nurse' => $nurseId]);
 
         if (!$nurse) {
-            throw new NotFoundHttpException(
-                'No nurse found'
-            );
+            throw new NotFoundHttpException('No nurse found');
         }
 
         return $this->kidRepository->findKidsByNurseNonArchived($nurse->getId());
@@ -51,13 +47,9 @@ class KidManager
         $family = $this->familyRepository->findOneBy(['parent' => $familyId]);
 
         if (!$family) {
-            throw new \Exception(
-                'No family found',
-                404
-            );
+            throw new \Exception('No family found', 404);
         }
 
         return $this->kidRepository->findBy(['family' => $family->getId()]);
     }
-
 }

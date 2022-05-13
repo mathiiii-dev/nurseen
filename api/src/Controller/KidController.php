@@ -2,26 +2,24 @@
 
 namespace App\Controller;
 
+use App\Entity\Kid;
+use App\Handler\KidHandler;
 use App\Manager\KidManager;
-use Doctrine\Persistence\ManagerRegistry;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Core\Security;
 
 class KidController extends AbstractController
 {
-    private ManagerRegistry $doctrine;
     private KidManager $kidManager;
-    private Security $security;
+    private KidHandler $kidHandler;
 
-    public function __construct(KidManager $kidManager, ManagerRegistry $doctrine, Security $security)
+    public function __construct(KidManager $kidManager, KidHandler $kidHandler)
     {
-        $this->doctrine = $doctrine;
         $this->kidManager = $kidManager;
-        $this->security = $security;
+        $this->kidHandler = $kidHandler;
     }
 
     #[IsGranted('ROLE_NURSE', message: 'Vous ne pouvez pas faire ça')]
@@ -36,28 +34,23 @@ class KidController extends AbstractController
     }
 
     #[IsGranted('ROLE_NURSE', message: 'Vous ne pouvez pas faire ça')]
-    #[Route('/kid/{kidId}/activate', name: 'app_kid_nurse_activate', methods: 'POST')]
-    public function activate(int $kidId): JsonResponse
+    #[Route('/kid/{kid}/activate', name: 'app_kid_nurse_activate', methods: 'POST')]
+    public function activate(Kid $kid): JsonResponse
     {
-        $kid = $this->kidManager->getKid($kidId);
         $this->denyAccessUnlessGranted('owner', $kid);
-        $activated = $kid->getActivated();
-        $kid->setActivated(!$activated);
-        $entityManager = $this->doctrine->getManager();
-        $entityManager->flush();
+
+        $this->kidHandler->handleKidActivation($kid);
 
         return $this->json($kid, Response::HTTP_OK, [], ['groups' => 'kid_list']);
     }
 
     #[IsGranted('ROLE_NURSE', message: 'Vous ne pouvez pas faire ça')]
-    #[Route('/kid/{kidId}/archive', name: 'app_kid_nurse_achive', methods: 'POST')]
-    public function archive(int $kidId): JsonResponse
+    #[Route('/kid/{kid}/archive', name: 'app_kid_nurse_achive', methods: 'POST')]
+    public function archive(Kid $kid): JsonResponse
     {
-        $kid = $this->kidManager->getKid($kidId);
         $this->denyAccessUnlessGranted('owner', $kid);
-        $kid->setArchived(true);
-        $entityManager = $this->doctrine->getManager();
-        $entityManager->flush();
+
+        $this->kidHandler->handleKidArchivation($kid);
 
         return $this->json($kid, Response::HTTP_OK, [], ['groups' => 'kid_list']);
     }

@@ -78,6 +78,7 @@ export async function getServerSideProps(ctx) {
         });
 
     const chat = await res1.json();
+    console.log(chat)
 
     return {
         props: {

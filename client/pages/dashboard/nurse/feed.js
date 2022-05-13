@@ -297,8 +297,9 @@ export async function getServerSideProps(ctx) {
                 'Authorization': authToken.authorizationString
             }
         });
+    console.log(res)
     const feed = await res.json();
-
+    console.log(feed)
     return {
         props: {
             userId: sessionCallBack.user.id,

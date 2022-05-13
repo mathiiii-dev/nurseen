@@ -16,12 +16,9 @@ class LinkCode
     #[ORM\Column(type: 'integer')]
     private $code;
 
-    #[ORM\Column(type: 'datetime')]
-    private $expiration;
-
-    #[ORM\ManyToOne(targetEntity: Nurse::class)]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\OneToOne(targetEntity: Nurse::class, cascade: ['persist', 'remove'])]
     private $nurse;
+
 
     public function getId(): ?int
     {
@@ -36,18 +33,6 @@ class LinkCode
     public function setCode(int $code): self
     {
         $this->code = $code;
-
-        return $this;
-    }
-
-    public function getExpiration(): ?\DateTimeInterface
-    {
-        return $this->expiration;
-    }
-
-    public function setExpiration(\DateTimeInterface $expiration): self
-    {
-        $this->expiration = $expiration;
 
         return $this;
     }
