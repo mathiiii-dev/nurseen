@@ -3,73 +3,71 @@
 namespace App\Controller;
 
 use App\Entity\Gallery;
+use App\Handler\GalleryHandler;
 use App\Repository\FamilyRepository;
 use App\Repository\GalleryRepository;
 use App\Repository\KidRepository;
 use App\Repository\NurseRepository;
-use Doctrine\Persistence\ManagerRegistry;
-use Pagerfanta\Adapter;
-use Pagerfanta\Pagerfanta;
+use App\Service\PaginationService;
+use App\Service\UploadService;
+use Exception;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\String\Slugger\SluggerInterface;
 
 class GalleryController extends AbstractController
 {
-    private SluggerInterface $slugger;
     private NurseRepository $nurseRepository;
-    private ManagerRegistry $doctrine;
     private GalleryRepository $galleryRepository;
-    private Filesystem $filesystem;
     private KidRepository $kidRepository;
     private FamilyRepository $familyRepository;
+    private UploadService $uploadService;
+    private GalleryHandler $galleryHandler;
+    private PaginationService $paginationService;
 
     public function __construct(
-        SluggerInterface $slugger,
         NurseRepository $nurseRepository,
-        ManagerRegistry $doctrine,
         GalleryRepository $galleryRepository,
-        Filesystem $filesystem,
         KidRepository $kidRepository,
-        FamilyRepository $familyRepository
+        FamilyRepository $familyRepository,
+        UploadService $uploadService,
+        GalleryHandler $galleryHandler,
+        PaginationService $paginationService
     ) {
-        $this->slugger = $slugger;
         $this->nurseRepository = $nurseRepository;
-        $this->doctrine = $doctrine;
         $this->galleryRepository = $galleryRepository;
-        $this->filesystem = $filesystem;
         $this->kidRepository = $kidRepository;
         $this->familyRepository = $familyRepository;
+        $this->uploadService = $uploadService;
+        $this->galleryHandler = $galleryHandler;
+        $this->paginationService = $paginationService;
     }
 
+    /**
+     * @throws Exception
+     */
     #[IsGranted('ROLE_NURSE', message: 'Vous ne pouvez pas faire ça')]
     #[Route('/gallery/{nurseId}', name: 'app_gallery', methods: 'POST')]
     public function index(Request $request, int $nurseId): JsonResponse
     {
         $files = $request->files;
         $nurse = $this->nurseRepository->findOneBy(['nurse' => $nurseId]);
-        $entityManager = $this->doctrine->getManager();
 
         /* @var UploadedFile $file */
         foreach ($files as $file) {
-            $safeFilename = $this->slugger->slug($file->getClientOriginalName());
-            $fileName = $safeFilename.'-'.uniqid().'.'.$file->guessExtension();
+            $fileName = $this->uploadService->getFileName($file);
 
-            $photo = (new Gallery())->setUrl($fileName)->setNurse($nurse);
-            $entityManager->persist($photo);
-            $entityManager->flush();
-            try {
-                $file->move($this->getParameter('gallery_directory').'/'.$nurseId, $fileName);
-            } catch (FileException $e) {
-                throw new \Exception($e->getMessage());
-            }
+            $this->galleryHandler->handleGalleryCreate($fileName, $nurse);
+
+            $this->uploadService->uploadFile(
+                $file,
+                $this->getParameter('gallery_directory').'/'.$nurseId,
+                $fileName
+            );
         }
 
         return $this->json([], Response::HTTP_CREATED);
@@ -82,13 +80,12 @@ class GalleryController extends AbstractController
         $nurse = $this->nurseRepository->findOneBy(['nurse' => $nurseId]);
         $photos = $this->galleryRepository->findBy(['nurse' => $nurse->getId()]);
 
-        $pagerfanta = new Pagerfanta(
-            new Adapter\ArrayAdapter($photos)
+        return $this->json(
+            $this->paginationService->getPagination($request, $photos),
+            Response::HTTP_CREATED,
+            [],
+            ['groups' => 'gallery']
         );
-
-        $pagerfanta->setCurrentPage($request->query->get('page'));
-
-        return $this->json($pagerfanta, Response::HTTP_CREATED, [], ['groups' => 'gallery']);
     }
 
     #[IsGranted('ROLE_PARENT', message: 'Vous ne pouvez pas faire ça')]
@@ -99,24 +96,20 @@ class GalleryController extends AbstractController
         $kid = $this->kidRepository->findOneBy(['family' => $family->getId()]);
         $photos = $this->galleryRepository->findBy(['nurse' => $kid->getNurse()->getId()]);
 
-        $pagerfanta = new Pagerfanta(
-            new Adapter\ArrayAdapter($photos)
+
+        return $this->json(
+            $this->paginationService->getPagination($request, $photos),
+            Response::HTTP_CREATED,
+            [],
+            ['groups' => 'gallery']
         );
-
-        $pagerfanta->setCurrentPage($request->query->get('page'));
-
-        return $this->json($pagerfanta, Response::HTTP_CREATED, [], ['groups' => 'gallery']);
     }
 
     #[IsGranted('ROLE_NURSE', message: 'Vous ne pouvez pas faire ça')]
-    #[Route('/gallery/{galleryId}', name: 'app_gallery_delete', methods: 'DELETE')]
-    public function delete(int $galleryId): JsonResponse
+    #[Route('/gallery/{gallery}', name: 'app_gallery_delete', methods: 'DELETE')]
+    public function delete(Gallery $gallery): JsonResponse
     {
-        $entityManager = $this->doctrine->getManager();
-        $photo = $this->galleryRepository->findOneBy(['id' => $galleryId]);
-        $this->filesystem->remove($this->getParameter('gallery_directory').'/'.$photo->getNurse()->getNurse()->getId().'/'.$photo->getUrl());
-        $entityManager->remove($photo);
-        $entityManager->flush();
+        $this->galleryHandler->handleGalleryDelete($gallery);
 
         return $this->json([], Response::HTTP_NO_CONTENT);
     }
