@@ -7,27 +7,43 @@ import {
     Space,
     Text,
     Title,
-    SimpleGrid
-} from "@mantine/core";
+    SimpleGrid,
+} from '@mantine/core';
 
-function Home()  {
+function Home() {
     return (
         <>
-            <Grid style={{backgroundColor: '#f4fdfc', padding: 50, borderRadius: 11}}>
+            <Grid
+                style={{
+                    backgroundColor: '#f4fdfc',
+                    padding: 50,
+                    borderRadius: 11,
+                }}
+            >
                 <Grid.Col md={6}>
                     <Center>
-                        <Title style={{fontSize: 80}}>
-                            Nurseen
-                        </Title>
+                        <Title style={{ fontSize: 80 }}>Nurseen</Title>
                     </Center>
-                    <Space h={"xl"}/>
-                    <Text size={"xl"} style={{paddingLeft: 45, paddingRight: 45}} align={"left"}>
-                        Nous aidons les nourrices dans leur travail au quotidien. Et nous permettons aux parents de
-                        suivre la croissance de leur(s) enfant(s)
+                    <Space h={'xl'} />
+                    <Text
+                        size={'xl'}
+                        style={{ paddingLeft: 45, paddingRight: 45 }}
+                        align={'left'}
+                    >
+                        Nous aidons les nourrices dans leur travail au
+                        quotidien. Et nous permettons aux parents de suivre la
+                        croissance de leur(s) enfant(s)
                     </Text>
-                    <Space h={"xl"}/>
+                    <Space h={'xl'} />
                     <Center>
-                        <Button style={{marginTop: 25, backgroundColor: '#4ad4c6'}} radius={"xl"} size={"xl"}>
+                        <Button
+                            style={{
+                                marginTop: 25,
+                                backgroundColor: '#4ad4c6',
+                            }}
+                            radius={'xl'}
+                            size={'xl'}
+                        >
                             Essayer
                         </Button>
                     </Center>
@@ -40,21 +56,27 @@ function Home()  {
                     />
                 </Grid.Col>
             </Grid>
-            <Grid style={{marginTop: 200, marginBottom: 200}}>
+            <Grid style={{ marginTop: 200, marginBottom: 200 }}>
                 <Grid.Col md={6}>
                     <Title>Nourrice</Title>
-                    <SimpleGrid cols={2} spacing="xl" style={{marginTop: 50}}>
+                    <SimpleGrid cols={2} spacing="xl" style={{ marginTop: 50 }}>
                         <div>
                             <Title order={2}>01.</Title>
-                            <Title order={3}>Emploie du temps des enfants</Title>
+                            <Title order={3}>
+                                Emploie du temps des enfants
+                            </Title>
                         </div>
                         <div>
                             <Title order={2}>02. </Title>
-                            <Title order={3}>Répertorier les activités effectué</Title>
+                            <Title order={3}>
+                                Répertorier les activités effectué
+                            </Title>
                         </div>
                         <div>
                             <Title order={2}>03.</Title>
-                            <Title order={3}>Enregistrement du menu de midi</Title>
+                            <Title order={3}>
+                                Enregistrement du menu de midi
+                            </Title>
                         </div>
                         <div>
                             <Title order={2}>04.</Title>
@@ -72,7 +94,7 @@ function Home()  {
                     </Center>
                 </Grid.Col>
             </Grid>
-            <Grid style={{backgroundColor: '#f4fdfc', padding: 100}}>
+            <Grid style={{ backgroundColor: '#f4fdfc', padding: 100 }}>
                 <Grid.Col md={12}>
                     <Center>
                         <Image
@@ -83,7 +105,7 @@ function Home()  {
                     </Center>
                 </Grid.Col>
             </Grid>
-            <Grid style={{marginTop: 200, marginBottom: 200}}>
+            <Grid style={{ marginTop: 200, marginBottom: 200 }}>
                 <Grid.Col md={6}>
                     <Center>
                         <Image
@@ -95,18 +117,24 @@ function Home()  {
                 </Grid.Col>
                 <Grid.Col md={6}>
                     <Title>Parent</Title>
-                    <SimpleGrid cols={2} spacing="xl" style={{marginTop: 50}}>
+                    <SimpleGrid cols={2} spacing="xl" style={{ marginTop: 50 }}>
                         <div>
                             <Title order={2}>01.</Title>
-                            <Title order={3}>Modifié les heures de précense d'un enfant</Title>
+                            <Title order={3}>
+                                Modifié les heures de précense d'un enfant
+                            </Title>
                         </div>
                         <div>
                             <Title order={2}>02. </Title>
-                            <Title order={3}>Voir les activités effectuées</Title>
+                            <Title order={3}>
+                                Voir les activités effectuées
+                            </Title>
                         </div>
                         <div>
                             <Title order={2}>03.</Title>
-                            <Title order={3}>Envoyer un message à la nourrice</Title>
+                            <Title order={3}>
+                                Envoyer un message à la nourrice
+                            </Title>
                         </div>
                         <div>
                             <Title order={2}>04.</Title>
@@ -116,7 +144,7 @@ function Home()  {
                 </Grid.Col>
             </Grid>
         </>
-    )
+    );
 }
 
 export default Home;

@@ -8,28 +8,28 @@ import {
     MediaQuery,
     Navbar,
     Space,
-    Title
-} from "@mantine/core";
-import {useState} from "react";
+    Title,
+} from '@mantine/core';
+import { useState } from 'react';
 import Link from 'next/link';
-import {signIn, signOut, useSession} from "next-auth/react";
+import { signIn, signOut, useSession } from 'next-auth/react';
 
 const useStyles = createStyles((theme) => ({
     navbar: {
-        [theme.fn.largerThan("sm")]: {
-            display: "none"
-        }
+        [theme.fn.largerThan('sm')]: {
+            display: 'none',
+        },
     },
 
     links: {
-        [theme.fn.smallerThan("sm")]: {
-            display: "none"
-        }
-    }
+        [theme.fn.smallerThan('sm')]: {
+            display: 'none',
+        },
+    },
 }));
 
 export default function CustomNavbar() {
-    const {data: session, status} = useSession();
+    const { data: session, status } = useSession();
     let dashboard = '/';
 
     if (session) {
@@ -40,12 +40,12 @@ export default function CustomNavbar() {
         }
     }
 
-    const {classes} = useStyles();
+    const { classes } = useStyles();
     const [opened, setOpened] = useState(false);
 
     return (
-        <Header height={60} padding="xs" style={{marginBottom: 50}}>
-            <MediaQuery largerThan="sm" styles={{display: "none"}}>
+        <Header height={60} padding="xs" style={{ marginBottom: 50 }}>
+            <MediaQuery largerThan="sm" styles={{ display: 'none' }}>
                 <Burger
                     opened={opened}
                     onClick={() => setOpened((o) => !o)}
@@ -61,69 +61,113 @@ export default function CustomNavbar() {
                 </Grid.Col>
                 {
                     <Grid.Col md={10}>
-                        <Group position={"right"}>
-                            <Space w="xl"/>
-                            {
-                                status === 'unauthenticated'
-                                    ?
-                                    <>
-                                        <Link href="/sign-up">
-                                            <Button color="dark" size="md">Inscription</Button>
-                                        </Link>
-                                        <Button color="dark" size="md" onClick={() => signIn()}>Connexion</Button>
-                                    </>
-                                    :
-                                    <>
-                                        <Link href={'/' + dashboard}>
-                                            <Button variant={"subtle"} color="dark" size="md">Dashboard</Button>
-                                        </Link>
-                                        <Button color="dark" size="md" onClick={() => signOut({callbackUrl: '/'})}>Sign
-                                            out</Button>
-                                    </>
-                            }
+                        <Group position={'right'}>
+                            <Space w="xl" />
+                            {status === 'unauthenticated' ? (
+                                <>
+                                    <Link href="/sign-up">
+                                        <Button color="dark" size="md">
+                                            Inscription
+                                        </Button>
+                                    </Link>
+                                    <Button
+                                        color="dark"
+                                        size="md"
+                                        onClick={() => signIn()}
+                                    >
+                                        Connexion
+                                    </Button>
+                                </>
+                            ) : (
+                                <>
+                                    <Link href={'/' + dashboard}>
+                                        <Button
+                                            variant={'subtle'}
+                                            color="dark"
+                                            size="md"
+                                        >
+                                            Dashboard
+                                        </Button>
+                                    </Link>
+                                    <Button
+                                        color="dark"
+                                        size="md"
+                                        onClick={() =>
+                                            signOut({ callbackUrl: '/' })
+                                        }
+                                    >
+                                        Sign out
+                                    </Button>
+                                </>
+                            )}
                         </Group>
                     </Grid.Col>
                 }
-            </Grid>{
-            <Navbar
-                className={classes.navbar}
-                style={{
-                    backgroundColor: '#f4fdfc',
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    marginTop: 70,
-                    flexDirection: 'column',
-                    width: '100%',
-                    justifyContent: 'center',
-                    alignItems: 'center'
-                }}
-                hidden={!opened}
-            >
-                <Button variant={"subtle"} size={"xl"} color={"dark"} onClick={() => setOpened((o) => !o)}>A
-                    propos</Button>
-                <Button variant={"subtle"} size={"xl"} color={"dark"}
-                        onClick={() => setOpened((o) => !o)}>Contact</Button>
-                {
-                    status === 'unauthenticated'
-                        ?
+            </Grid>
+            {
+                <Navbar
+                    className={classes.navbar}
+                    style={{
+                        backgroundColor: '#f4fdfc',
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        marginTop: 70,
+                        flexDirection: 'column',
+                        width: '100%',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                    }}
+                    hidden={!opened}
+                >
+                    <Button
+                        variant={'subtle'}
+                        size={'xl'}
+                        color={'dark'}
+                        onClick={() => setOpened((o) => !o)}
+                    >
+                        A propos
+                    </Button>
+                    <Button
+                        variant={'subtle'}
+                        size={'xl'}
+                        color={'dark'}
+                        onClick={() => setOpened((o) => !o)}
+                    >
+                        Contact
+                    </Button>
+                    {status === 'unauthenticated' ? (
                         <>
                             <Link href="/sign-up">
-                                <Button color="dark" size="md">Inscription</Button>
+                                <Button color="dark" size="md">
+                                    Inscription
+                                </Button>
                             </Link>
-                            <Button color="dark" size="md" onClick={() => {
-                                signIn()
-                                setOpened((o) => !o)
-                            }}>Connexion</Button>
+                            <Button
+                                color="dark"
+                                size="md"
+                                onClick={() => {
+                                    signIn();
+                                    setOpened((o) => !o);
+                                }}
+                            >
+                                Connexion
+                            </Button>
                         </>
-                        :
-                        <Button color="dark" size="md" onClick={() => {
-                            signOut({callbackUrl: '/'})
-                            setOpened((o) => !o)
-                        }}>Sign out</Button>
-                }
-            </Navbar>
-        }
+                    ) : (
+                        <Button
+                            color="dark"
+                            size="md"
+                            onClick={() => {
+                                signOut({ callbackUrl: '/' });
+                                setOpened((o) => !o);
+                            }}
+                        >
+                            Sign out
+                        </Button>
+                    )}
+                </Navbar>
+            }
         </Header>
-    )
+    );
 }

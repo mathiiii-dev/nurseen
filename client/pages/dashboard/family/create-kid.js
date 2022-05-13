@@ -1,12 +1,20 @@
-import {Alert, Button, Grid, NumberInput, Space, TextInput, Title} from "@mantine/core";
-import {DatePicker} from "@mantine/dates";
-import {useForm} from "@mantine/hooks";
-import {useState} from "react";
-import {useNotifications} from "@mantine/notifications";
+import {
+    Alert,
+    Button,
+    Grid,
+    NumberInput,
+    Space,
+    TextInput,
+    Title,
+} from '@mantine/core';
+import { DatePicker } from '@mantine/dates';
+import { useForm } from '@mantine/hooks';
+import { useState } from 'react';
+import { useNotifications } from '@mantine/notifications';
 import 'dayjs/locale/fr';
-import { getServerSideProps } from "./index";
+import { getServerSideProps } from './index';
 
-function CreateKid({userId, bearer}) {
+function CreateKid({ userId, bearer }) {
     const [errorMessage, setErrorMessage] = useState('');
     const [error, setError] = useState(false);
     const notifications = useNotifications();
@@ -15,7 +23,7 @@ function CreateKid({userId, bearer}) {
             code: '',
             firstname: '',
             lastname: '',
-            birthday: ''
+            birthday: '',
         },
 
         validationRules: {
@@ -28,58 +36,69 @@ function CreateKid({userId, bearer}) {
             code: 'Veuillez saisir un code',
             firstname: 'Veuillez saisir un prénom',
             lastname: 'Veuillez saisir un nom',
-        }
+        },
     });
 
     const create = async (event) => {
-        event.preventDefault()
-        await fetch(
-            process.env.BASE_URL + `family/${userId}/kid`,
-            {
-                method: 'POST',
-                body: JSON.stringify({
-                    lastname: form.values.lastname,
-                    firstname: form.values.firstname,
-                    code: form.values.code,
-                    birthday: form.values.birthday
-                }),
-                headers: {
-                    'Content-type': 'application/json',
-                    'Authorization': bearer
-                }
+        event.preventDefault();
+        await fetch(process.env.BASE_URL + `family/${userId}/kid`, {
+            method: 'POST',
+            body: JSON.stringify({
+                lastname: form.values.lastname,
+                firstname: form.values.firstname,
+                code: form.values.code,
+                birthday: form.values.birthday,
+            }),
+            headers: {
+                'Content-type': 'application/json',
+                Authorization: bearer,
+            },
+        }).then((response) => {
+            response.json();
+            if (response.status && response.status !== 201) {
+                setError(true);
+                let message =
+                    response.message ??
+                    "Une erreur est survenue pendant l'envoie du formulaire. Veuillez contacter un administrateur.";
+                setErrorMessage(message);
+            } else {
+                notifications.showNotification({
+                    title: 'Enfant inscrit',
+                    message:
+                        'Votre nourrice va désormais pouvoir valider votre inscription',
+                });
+                form.reset();
             }
-        )
-            .then(response => {
-                response.json()
-                if (response.status && response.status !== 201) {
-                    setError(true)
-                    let message = response.message ?? 'Une erreur est survenue pendant l\'envoie du formulaire. Veuillez contacter un administrateur.'
-                    setErrorMessage(message)
-                } else {
-                    notifications.showNotification({
-                        title: 'Enfant inscrit',
-                        message: 'Votre nourrice va désormais pouvoir valider votre inscription',
-                    })
-                    form.reset()
-                }
-            })
-    }
+        });
+    };
 
     return (
         <>
-            <Grid style={{backgroundColor: '#f4fdfc', borderRadius: 11, padding: 25}}>
-                <Grid.Col md={12} style={{padding: 25}}>
+            <Grid
+                style={{
+                    backgroundColor: '#f4fdfc',
+                    borderRadius: 11,
+                    padding: 25,
+                }}
+            >
+                <Grid.Col md={12} style={{ padding: 25 }}>
                     <Title>Inscription de votre enfant</Title>
-                    {
-                        error ?
-                            <Alert title="Erreur!" color="red" withCloseButton closeButtonLabel="Close alert"
-                                   onClose={() => {
-                                       setError(false)
-                                   }}>
-                                {errorMessage}
-                            </Alert> : ''
-                    }
-                    <Space h={"xl"}/>
+                    {error ? (
+                        <Alert
+                            title="Erreur!"
+                            color="red"
+                            withCloseButton
+                            closeButtonLabel="Close alert"
+                            onClose={() => {
+                                setError(false);
+                            }}
+                        >
+                            {errorMessage}
+                        </Alert>
+                    ) : (
+                        ''
+                    )}
+                    <Space h={'xl'} />
                     <form onSubmit={create}>
                         <NumberInput
                             placeholder="1234"
@@ -91,38 +110,46 @@ function CreateKid({userId, bearer}) {
                             required
                             hideControls
                         />
-                        <Space h={"xl"}/>
+                        <Space h={'xl'} />
                         <TextInput
                             required
                             label="Prénom"
                             placeholder="John"
                             {...form.getInputProps('firstname')}
-                            size={"xl"}
+                            size={'xl'}
                         />
-                        <Space h={"xl"}/>
+                        <Space h={'xl'} />
                         <TextInput
                             required
                             label="Nom"
                             placeholder="Doe"
                             {...form.getInputProps('lastname')}
-                            size={"xl"}
+                            size={'xl'}
                         />
-                        <Space h={"xl"}/>
+                        <Space h={'xl'} />
                         <DatePicker
                             placeholder="17/08/1999"
                             label="Date d'anniversaire"
-                            size={"xl"}
+                            size={'xl'}
                             {...form.getInputProps('birthday')}
                             locale="fr"
                         />
-                        <Space h={"xl"}/>
-                        <Button type="submit" size={"xl"}
-                                style={{backgroundColor: '#4ad4c6', float: 'right'}}>Inscription</Button>
+                        <Space h={'xl'} />
+                        <Button
+                            type="submit"
+                            size={'xl'}
+                            style={{
+                                backgroundColor: '#4ad4c6',
+                                float: 'right',
+                            }}
+                        >
+                            Inscription
+                        </Button>
                     </form>
                 </Grid.Col>
             </Grid>
         </>
-    )
+    );
 }
 
 export default CreateKid;

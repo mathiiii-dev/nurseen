@@ -1,11 +1,10 @@
-import {Space, Button, Title, Textarea} from '@mantine/core';
-import {getServerSideProps} from "./../index";
-import {DatePicker} from "@mantine/dates";
-import {useForm} from "@mantine/hooks";
-import {useRouter} from "next/router";
+import { Space, Button, Title, Textarea } from '@mantine/core';
+import { getServerSideProps } from './../index';
+import { DatePicker } from '@mantine/dates';
+import { useForm } from '@mantine/hooks';
+import { useRouter } from 'next/router';
 
-function AddMenu({bearer, userId}) {
-
+function AddMenu({ bearer, userId }) {
     const router = useRouter();
 
     const form = useForm({
@@ -19,35 +18,34 @@ function AddMenu({bearer, userId}) {
         validate: {
             entry: (entry) => entry !== '',
             meal: (meal) => meal !== '',
-            dessert: (dessert) => dessert !== ''
+            dessert: (dessert) => dessert !== '',
         },
     });
 
     const add = (event) => {
-        event.preventDefault()
+        event.preventDefault();
         fetch(process.env.BASE_URL + `menu/add/${userId}`, {
             body: JSON.stringify({
                 date: form.values.date,
                 entry: form.values.entry,
                 meal: form.values.meal,
-                dessert: form.values.dessert
+                dessert: form.values.dessert,
             }),
             method: 'POST',
             headers: {
-                'Authorization': bearer
-            }
-
+                Authorization: bearer,
+            },
         })
             .then((response) => response.json())
-            .then(r => {
-                router.push('/dashboard/nurse/menu')
-            })
-    }
+            .then((r) => {
+                router.push('/dashboard/nurse/menu');
+            });
+    };
 
     return (
         <>
             <Title>Ajouter le menu du jour</Title>
-            <Space h={"xl"}/>
+            <Space h={'xl'} />
             <form onSubmit={add}>
                 <Textarea
                     placeholder="Carrote rapée"
@@ -55,29 +53,31 @@ function AddMenu({bearer, userId}) {
                     required
                     {...form.getInputProps('entry')}
                 />
-                <Space h={"xl"}/>
+                <Space h={'xl'} />
                 <Textarea
                     placeholder="Gratin de choufleur et rotis de veau"
                     label="Plat"
                     required
                     {...form.getInputProps('meal')}
                 />
-                <Space h={"xl"}/>
+                <Space h={'xl'} />
                 <Textarea
                     placeholder="Yaourt et gateau"
                     label="Dessert"
                     required
                     {...form.getInputProps('dessert')}
                 />
-                <Space h={"xl"}/>
+                <Space h={'xl'} />
                 <DatePicker
                     placeholder="Pick date"
                     label="Event date"
                     required
                     {...form.getInputProps('date')}
                 />
-                <Space h={"xl"}/>
-                <Button fullWidth type="submit">Ajouter</Button>
+                <Space h={'xl'} />
+                <Button fullWidth type="submit">
+                    Ajouter
+                </Button>
             </form>
         </>
     );
@@ -85,4 +85,4 @@ function AddMenu({bearer, userId}) {
 
 export default AddMenu;
 
-export {getServerSideProps};
+export { getServerSideProps };

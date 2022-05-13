@@ -1,19 +1,18 @@
-import {Button, Space, Spoiler, Table, Text, Title} from "@mantine/core";
-import {useRouter} from 'next/router'
-import dayjs from "dayjs";
+import { Button, Space, Spoiler, Table, Text, Title } from '@mantine/core';
+import { useRouter } from 'next/router';
+import dayjs from 'dayjs';
 import 'dayjs/locale/fr';
-import utc from "dayjs/plugin/utc";
+import utc from 'dayjs/plugin/utc';
 import Link from 'next/link';
-import {getSession} from "next-auth/react";
-import {AuthToken} from "../../../../../../services/auth_token";
+import { getSession } from 'next-auth/react';
+import { AuthToken } from '../../../../../../services/auth_token';
 
-function KidNotes({kid, notes}) {
-
+function KidNotes({ kid, notes }) {
     const router = useRouter();
 
-    dayjs.locale('fr')
-    dayjs.extend(utc)
-    dayjs.utc().format()
+    dayjs.locale('fr');
+    dayjs.extend(utc);
+    dayjs.utc().format();
 
     let rows = null;
     if (notes) {
@@ -21,14 +20,24 @@ function KidNotes({kid, notes}) {
             <tr key={element.id}>
                 <td>{dayjs(element.data).utc().format('DD MMMM YYYY')}</td>
                 <td>
-                    <Spoiler maxHeight={120} showLabel="Show more" hideLabel="Hide">
+                    <Spoiler
+                        maxHeight={120}
+                        showLabel="Show more"
+                        hideLabel="Hide"
+                    >
                         {
-                            <Text dangerouslySetInnerHTML={{__html: element.note}}/>
+                            <Text
+                                dangerouslySetInnerHTML={{
+                                    __html: element.note,
+                                }}
+                            />
                         }
                     </Spoiler>
                 </td>
                 <td>
-                    <Link href={`/dashboard/family/kid/${router.query.pid}/note/${element.id}`}>
+                    <Link
+                        href={`/dashboard/family/kid/${router.query.pid}/note/${element.id}`}
+                    >
                         <Button>Note</Button>
                     </Link>
                 </td>
@@ -38,23 +47,19 @@ function KidNotes({kid, notes}) {
 
     return (
         <>
-            {
-                kid ?
-                    <Title>Les notes de {kid.firstname} </Title>
-                    : ''
-            }
-            <Space h="xl"/>
+            {kid ? <Title>Les notes de {kid.firstname} </Title> : ''}
+            <Space h="xl" />
             <Table
                 horizontalSpacing="xl"
                 verticalSpacing="xl"
-                style={{marginTop: 10}}
+                style={{ marginTop: 10 }}
             >
                 <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Note</th>
-                    <th>Voir</th>
-                </tr>
+                    <tr>
+                        <th>Date</th>
+                        <th>Note</th>
+                        <th>Voir</th>
+                    </tr>
                 </thead>
                 <tbody>{rows}</tbody>
             </Table>
@@ -69,31 +74,32 @@ export async function getServerSideProps(ctx) {
 
     const authToken = new AuthToken(sessionCallBack.user.access_token);
 
-    const res = await fetch(process.env.BASE_URL + `kid/${ctx.params.pid}`,
-        {
-            method: 'GET',
-            headers: {
-                'Content-type': 'application/json',
-                'Authorization': authToken.authorizationString
-            }
-        });
-    const kid = await res.json()
+    const res = await fetch(process.env.BASE_URL + `kid/${ctx.params.pid}`, {
+        method: 'GET',
+        headers: {
+            'Content-type': 'application/json',
+            Authorization: authToken.authorizationString,
+        },
+    });
+    const kid = await res.json();
 
-    const res1 = await fetch(process.env.BASE_URL + `note/kid/${ctx.params.pid}/all`,
+    const res1 = await fetch(
+        process.env.BASE_URL + `note/kid/${ctx.params.pid}/all`,
         {
             method: 'GET',
             headers: {
                 'Content-type': 'application/json',
-                'Authorization': authToken.authorizationString
-            }
-        });
+                Authorization: authToken.authorizationString,
+            },
+        }
+    );
 
     const notes = await res1.json();
 
     return {
         props: {
             kid,
-            notes
-        }
-    }
+            notes,
+        },
+    };
 }
