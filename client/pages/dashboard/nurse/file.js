@@ -3,8 +3,7 @@ import {AuthToken} from "../../../services/auth_token";
 import {
     Accordion,
     Button,
-    Card, Grid, Group,
-    InputWrapper, List,
+    InputWrapper,
     Select,
     Space,
     Text,
