@@ -2,12 +2,11 @@
 
 namespace App\Controller;
 
-use App\Entity\Menu;
+use App\Handler\MenuHandler;
 use App\Repository\FamilyRepository;
 use App\Repository\KidRepository;
 use App\Repository\MenuRepository;
 use App\Repository\NurseRepository;
-use Doctrine\Persistence\ManagerRegistry;
 use Exception;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -17,24 +16,24 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class MenuController extends AbstractController
 {
-    private ManagerRegistry $doctrine;
     private NurseRepository $nurseRepository;
     private MenuRepository $menuRepository;
     private FamilyRepository $familyRepository;
     private KidRepository $kidRepository;
+    private MenuHandler $menuHandler;
 
     public function __construct(
-        ManagerRegistry $doctrine,
         NurseRepository $nurseRepository,
         MenuRepository $menuRepository,
         FamilyRepository $familyRepository,
-        KidRepository $kidRepository
+        KidRepository $kidRepository,
+        MenuHandler $menuHandler
     ) {
-        $this->doctrine = $doctrine;
         $this->nurseRepository = $nurseRepository;
         $this->menuRepository = $menuRepository;
         $this->familyRepository = $familyRepository;
         $this->kidRepository = $kidRepository;
+        $this->menuHandler = $menuHandler;
     }
 
     /**
@@ -46,12 +45,8 @@ class MenuController extends AbstractController
     {
         $data = $request->toArray();
         $nurse = $this->nurseRepository->findOneBy(['nurse' => $nurseId]);
-        $menu = (new Menu())->setDate(new \DateTime($data['date']))->setDessert($data['dessert'])->setEntry($data['entry'])->setMeal($data['meal'])->setNurse($nurse);
 
-        $entityManager = $this->doctrine->getManager();
-
-        $entityManager->persist($menu);
-        $entityManager->flush();
+        $this->menuHandler->handleMenuCreate($data, $nurse);
 
         return $this->json([], Response::HTTP_CREATED);
     }
@@ -74,7 +69,6 @@ class MenuController extends AbstractController
     public function getList(int $nurseId): Response
     {
         $nurse = $this->nurseRepository->findOneBy(['nurse' => $nurseId]);
-
         $menu = $this->menuRepository->findBy(['nurse' => $nurse->getId()]);
 
         return $this->json($menu, Response::HTTP_OK, [], ['groups' => 'menu']);
@@ -102,7 +96,6 @@ class MenuController extends AbstractController
         $family = $this->familyRepository->findOneBy(['parent' => $familyId]);
         $kid = $this->kidRepository->findOneBy(['family' => $family->getId()]);
         $nurse = $this->nurseRepository->findOneBy(['nurse' => $kid->getNurse()->getNurse()->getId()]);
-
         $menu = $this->menuRepository->findBy(['nurse' => $nurse->getId()]);
 
         return $this->json($menu, Response::HTTP_OK, [], ['groups' => 'menu']);
@@ -117,8 +110,8 @@ class MenuController extends AbstractController
     {
         $data = $request->toArray();
         $menu = $this->menuRepository->findOneBy(['id' => $menuId]);
-        $menu->setDate(new \DateTime($data['date']))->setDessert($data['dessert'])->setEntry($data['entry'])->setMeal($data['meal']);
-        $this->doctrine->getManager()->flush();
+
+        $this->menuHandler->handleMenuUpdate($menu, $data);
 
         return $this->json([], Response::HTTP_CREATED);
     }

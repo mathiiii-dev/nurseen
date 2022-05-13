@@ -19,7 +19,10 @@ class NoteHandler
     public function handleCreateNote(Request $request, Kid $kid): void
     {
         $data = $request->toArray();
-        $note = (new Note())->setKid($kid)->setNote($data['note'])->setDate(new \DateTime());
+        $note = (new Note())
+            ->setKid($kid)
+            ->setNote($data['note'])
+            ->setDate(new \DateTime());
         $entityManager = $this->doctrine->getManager();
         $entityManager->persist($note);
         $entityManager->flush();

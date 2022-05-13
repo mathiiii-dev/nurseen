@@ -4,6 +4,7 @@ namespace App\Handler;
 
 use App\Entity\Feed;
 use App\Entity\FeedImage;
+use App\Service\UploadService;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -14,12 +15,14 @@ class FeedImageHandler
     private SluggerInterface $slugger;
     private ManagerRegistry $doctrine;
     private ParameterBagInterface $bag;
+    private UploadService $uploadService;
 
-    public function __construct(SluggerInterface $slugger, ManagerRegistry $doctrine, ParameterBagInterface $bag)
+    public function __construct(SluggerInterface $slugger, ManagerRegistry $doctrine, ParameterBagInterface $bag, UploadService $uploadService)
     {
         $this->slugger = $slugger;
         $this->doctrine = $doctrine;
         $this->bag = $bag;
+        $this->uploadService = $uploadService;
     }
 
     public function handleFeedImageCreate($files, Feed $feed)
@@ -27,19 +30,14 @@ class FeedImageHandler
         $em = $this->doctrine->getManager();
 
         foreach ($files as $file) {
-            $safeFilename = $this->slugger->slug($file->getClientOriginalName());
-            $fileName = $safeFilename.'-'.uniqid().'.'.$file->guessExtension();
+            $fileName = $this->uploadService->getFileName($file);
 
             $feedImage = (new FeedImage())->setUrl($fileName)->setFeed($feed);
 
             $em->persist($feedImage);
             $em->flush();
 
-            try {
-                $file->move($this->bag->get('feed_directory').'/'.$feed->getId(), $fileName);
-            } catch (FileException $e) {
-                throw new \Exception($e->getMessage());
-            }
+            $this->uploadService->uploadFile($file, $this->bag->get('feed_directory').'/'.$feed->getId(), $fileName);
         }
     }
 }

@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Handler\LinkCodeHandler;
-use App\Repository\LinkCodeRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -13,12 +12,10 @@ use Symfony\Component\Routing\Annotation\Route;
 class LinkCodeController extends AbstractController
 {
     private LinkCodeHandler $codeHandler;
-    private LinkCodeRepository $linkCodeRepository;
 
-    public function __construct(LinkCodeHandler $codeHandler, LinkCodeRepository $linkCodeRepository)
+    public function __construct(LinkCodeHandler $codeHandler)
     {
         $this->codeHandler = $codeHandler;
-        $this->linkCodeRepository = $linkCodeRepository;
     }
 
     #[Route('/link_code/{nurse}', name: 'app_link_code', methods: 'POST')]
