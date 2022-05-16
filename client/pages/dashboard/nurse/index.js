@@ -19,6 +19,7 @@ import DashboardCard from '../../../components/DashboardCard';
 import { CalendarIcon } from 'react-calendar-icon';
 import { AiFillFile, AiFillWechat } from 'react-icons/ai';
 import { useNotifications } from '@mantine/notifications';
+import VerticalCard from '../../../components/VerticalCard';
 
 export default function Page({ bearer, kids, userId, code }) {
     const router = useRouter();
@@ -152,10 +153,10 @@ export default function Page({ bearer, kids, userId, code }) {
                 )}
             </Modal>
             <Grid>
-                <Grid.Col md={6}>
+                <Grid.Col>
                     <Title>Bonjour, John Doe ! </Title>
                 </Grid.Col>
-                <Grid.Col md={3} offset={3}>
+                <Grid.Col>
                     <Button onClick={() => setOpened(true)}>
                         Code de liaison
                     </Button>
@@ -291,73 +292,27 @@ export default function Page({ bearer, kids, userId, code }) {
                     </table>
                 </Grid.Col>
                 <Grid.Col md={4}>
-                    <Card>
-                        <Grid>
-                            <Grid.Col md={4}>
-                                <CalendarIcon date={new Date()} />
-                            </Grid.Col>
-                            <Grid.Col md={8}>
-                                <Text size="sm">
-                                    Enregitrer les heures de précense des
-                                    enfants
-                                </Text>
-                            </Grid.Col>
-                        </Grid>
-                        <Link href={'nurse/calendar'}>
-                            <Button
-                                variant="light"
-                                color="blue"
-                                fullWidth
-                                style={{ marginTop: 14 }}
-                            >
-                                Calendrier
-                            </Button>
-                        </Link>
-                    </Card>
-                    <Card>
-                        <Grid>
-                            <Grid.Col md={4}>
-                                <AiFillFile />
-                            </Grid.Col>
-                            <Grid.Col md={8}>
-                                <Text size="sm">
-                                    Gérez et envoyer des fichiers aux parents
-                                </Text>
-                            </Grid.Col>
-                        </Grid>
-                        <Link href={'nurse/file'}>
-                            <Button
-                                variant="light"
-                                color="blue"
-                                fullWidth
-                                style={{ marginTop: 14 }}
-                            >
-                                Gestionnaire de fichier
-                            </Button>
-                        </Link>
-                    </Card>
-                    <Card>
-                        <Grid>
-                            <Grid.Col md={4}>
-                                <AiFillWechat />
-                            </Grid.Col>
-                            <Grid.Col md={8}>
-                                <Text size="sm">
-                                    Echanger des messages avec les parents
-                                </Text>
-                            </Grid.Col>
-                        </Grid>
-                        <Link href={'nurse/chat'}>
-                            <Button
-                                variant="light"
-                                color="blue"
-                                fullWidth
-                                style={{ marginTop: 14 }}
-                            >
-                                Chat
-                            </Button>
-                        </Link>
-                    </Card>
+                    <VerticalCard
+                        text={'Enregitrer les heures de précense des enfants'}
+                        link={'nurse/calendar'}
+                        button={'Calendrier'}
+                    >
+                        <CalendarIcon date={new Date()} />
+                    </VerticalCard>
+                    <VerticalCard
+                        text={'Gérez et envoyer des fichiers aux parents'}
+                        link={'nurse/file'}
+                        button={'Gestionnaire de fichier'}
+                    >
+                        <AiFillFile size={64} />
+                    </VerticalCard>
+                    <VerticalCard
+                        text={' Echanger des messages avec les parents'}
+                        link={'nurse/chat'}
+                        button={'Chat'}
+                    >
+                        <AiFillWechat size={64} />
+                    </VerticalCard>
                 </Grid.Col>
             </Grid>
         </>
