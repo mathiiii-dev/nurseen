@@ -1,11 +1,25 @@
 import CustomNavbar from './customnavbar';
-import { Container } from '@mantine/core';
+import { Container, MantineProvider } from '@mantine/core';
 
 export default function Layout({ children }) {
     return (
         <>
             <CustomNavbar />
-            <Container>{children}</Container>
+            <MantineProvider
+                defaultProps={{
+                    Container: {
+                        sizes: {
+                            xs: 540,
+                            sm: 720,
+                            md: 960,
+                            lg: 1140,
+                            xl: 1320,
+                        },
+                    },
+                }}
+            >
+                <Container size={'xl'}>{children}</Container>
+            </MantineProvider>
         </>
     );
 }
