@@ -3,32 +3,58 @@ import {
     Alert,
     Box,
     Button,
-    Card,
+    Center,
     Grid,
     Modal,
+    Pagination,
     Space,
     Text,
     Title,
+    Popover,
+    LoadingOverlay,
 } from '@mantine/core';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AuthToken } from '../../../services/auth_token';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import '../../../styles/globals.css';
 import DashboardCard from '../../../components/DashboardCard';
-import { CalendarIcon } from 'react-calendar-icon';
-import { AiFillFile, AiFillWechat } from 'react-icons/ai';
 import { useNotifications } from '@mantine/notifications';
 import VerticalCard from '../../../components/VerticalCard';
+import { cards, verticalCards } from '../../../data/cards';
+import { usePagination } from '@mantine/hooks';
 
-export default function Page({ bearer, kids, userId, code }) {
+export default function Page({ bearer, userId, code }) {
     const router = useRouter();
 
     const [archiveOpened, setArchiveOpened] = useState(false);
     const [kidId, setKidId] = useState(false);
+    const [popOpen, setPopOpen] = useState(false);
     const [opened, setOpened] = useState(false);
+    const [kids, setKids] = useState();
     const [link, setLink] = useState(code);
     const notifications = useNotifications();
+    const [page, onChange] = useState(1);
+    const [total, setTotal] = useState(1);
+    const pagination = usePagination({ total, page, onChange });
+    const [visible, setVisible] = useState(false);
+
+    useEffect(() => {
+        setVisible(true);
+        fetch(`${process.env.BASE_URL}kid/nurse/${userId}?page=${page}`, {
+            method: 'GET',
+            headers: {
+                'Content-type': 'application/json',
+                Authorization: bearer,
+            },
+        })
+            .then((res) => res.json())
+            .then((data) => {
+                setKids(data.items);
+                setTotal(data.pagination.total_pages);
+                setVisible(false);
+            });
+    }, [page]);
 
     const activate = (kidId) => {
         fetch(process.env.BASE_URL + `kid/${kidId}/activate`, {
@@ -52,33 +78,6 @@ export default function Page({ bearer, kids, userId, code }) {
         }).then((r) => {
             router.reload();
         });
-    };
-
-    const cards = {
-        feed: {
-            title: "Fil d'actualité",
-            buttonText: 'Ajouter un post',
-            text: 'Montrer aux parents ce que font leurs enfants pendant la journée',
-            linkHref: 'nurse/calendar',
-        },
-        note: {
-            title: 'Note journalière',
-            buttonText: 'Ajouter une note',
-            text: "Ajouter une note sur la journée de l'enfant. Elle sera ensuite visible par ses parents",
-            linkHref: 'nurse/note',
-        },
-        gallery: {
-            title: 'Galerie photo',
-            buttonText: 'Ajouter des photos',
-            text: 'Ajouter des photos des enfants en vrac. Elles serront visibles par les parents',
-            linkHref: 'nurse/gallery',
-        },
-        menu: {
-            title: 'Menu du jour',
-            buttonText: 'Ajouter un menu',
-            text: 'Ajouter un menu du jour. Il sera visible par les parents',
-            linkHref: 'nurse/menu',
-        },
     };
 
     const linkParent = () => {
@@ -157,9 +156,34 @@ export default function Page({ bearer, kids, userId, code }) {
                     <Title>Bonjour, John Doe ! </Title>
                 </Grid.Col>
                 <Grid.Col>
-                    <Button onClick={() => setOpened(true)}>
-                        Code de liaison
-                    </Button>
+                    <Popover
+                        opened={popOpen}
+                        onClose={() => setPopOpen(false)}
+                        position="right"
+                        placement="center"
+                        withArrow
+                        trapFocus={false}
+                        closeOnEscape={false}
+                        transition="pop-top-left"
+                        width={260}
+                        styles={{ body: { pointerEvents: 'none' } }}
+                        target={
+                            <Button
+                                onClick={() => setOpened(true)}
+                                onMouseEnter={() => setPopOpen(true)}
+                                onMouseLeave={() => setPopOpen(false)}
+                            >
+                                Code de liaison
+                            </Button>
+                        }
+                    >
+                        <div style={{ display: 'flex' }}>
+                            <Text size="sm">
+                                Code nécessaire à l'ajout d'un enfant pour les
+                                parents
+                            </Text>
+                        </div>
+                    </Popover>
                 </Grid.Col>
             </Grid>
 
@@ -196,9 +220,9 @@ export default function Page({ bearer, kids, userId, code }) {
                 </Button>
             </Modal>
             <Space h={'xl'} />
-            <Space h={'xl'} />
             <Grid gutter="xl">
                 <Grid.Col md={8}>
+                    <LoadingOverlay visible={visible} />
                     <table>
                         <thead>
                             <tr>
@@ -290,29 +314,24 @@ export default function Page({ bearer, kids, userId, code }) {
                                 })}
                         </tbody>
                     </table>
+                    <Space h={'xl'} />
+                    <Center>
+                        <Pagination total={total} onChange={onChange} />
+                    </Center>
                 </Grid.Col>
                 <Grid.Col md={4}>
-                    <VerticalCard
-                        text={'Enregitrer les heures de précense des enfants'}
-                        link={'nurse/calendar'}
-                        button={'Calendrier'}
-                    >
-                        <CalendarIcon date={new Date()} />
-                    </VerticalCard>
-                    <VerticalCard
-                        text={'Gérez et envoyer des fichiers aux parents'}
-                        link={'nurse/file'}
-                        button={'Gestionnaire de fichier'}
-                    >
-                        <AiFillFile size={64} />
-                    </VerticalCard>
-                    <VerticalCard
-                        text={' Echanger des messages avec les parents'}
-                        link={'nurse/chat'}
-                        button={'Chat'}
-                    >
-                        <AiFillWechat size={64} />
-                    </VerticalCard>
+                    {verticalCards &&
+                        Object.values(verticalCards).map((card) => {
+                            return (
+                                <VerticalCard
+                                    text={card.text}
+                                    link={card.linkHref}
+                                    button={card.button}
+                                >
+                                    {card.children}
+                                </VerticalCard>
+                            );
+                        })}
                 </Grid.Col>
             </Grid>
         </>

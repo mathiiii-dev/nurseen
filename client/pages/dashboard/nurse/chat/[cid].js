@@ -4,24 +4,16 @@ import { AuthToken } from '../../../../services/auth_token';
 import EventSource from 'eventsource';
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
-import { Button, Textarea } from '@mantine/core';
-import dayjs from 'dayjs';
+import { scrollToBottom } from '../../../../services/scroll';
 
 export default function MessageNurse({ messages, userId, bearer }) {
     const viewport = useRef();
     const router = useRouter();
     const { cid } = router.query;
     const [stateMessages, setStateMessages] = useState(messages);
-    const [value, setValue] = useState('');
-
-    const scrollToBottom = () =>
-        viewport.current.scrollTo({
-            top: viewport.current.scrollHeight,
-            behavior: 'smooth',
-        });
 
     useEffect(() => {
-        scrollToBottom();
+        scrollToBottom(viewport);
         const url = new URL('http://localhost:9090/.well-known/mercure');
         url.searchParams.append(
             'topic',
@@ -44,30 +36,9 @@ export default function MessageNurse({ messages, userId, bearer }) {
                     sendDate: origin.sendDate,
                 },
             ]);
-            scrollToBottom();
+            scrollToBottom(viewport);
         };
     }, []);
-
-    const send = (event) => {
-        event.preventDefault();
-        fetch(`${process.env.BASE_URL}message/${cid}`, {
-            method: 'POST',
-            body: JSON.stringify({
-                message: value,
-                user: userId,
-                sendDate: dayjs().toString(),
-            }),
-            headers: {
-                'Content-type': 'application/json',
-                Authorization: bearer,
-            },
-        })
-            .then((r) => r.json())
-            .then((res) => {
-                setValue('');
-                scrollToBottom();
-            });
-    };
 
     return (
         <>
@@ -75,17 +46,9 @@ export default function MessageNurse({ messages, userId, bearer }) {
                 messages={stateMessages}
                 viewport={viewport}
                 userId={userId}
+                bearer={bearer}
+                cid={cid}
             />
-            <form onSubmit={send}>
-                <Textarea
-                    required
-                    label="Message"
-                    placeholder="Howdy!"
-                    value={value}
-                    onChange={(event) => setValue(event.currentTarget.value)}
-                />
-                <Button type="submit">Submit</Button>
-            </form>
         </>
     );
 }
@@ -105,7 +68,6 @@ export async function getServerSideProps(ctx) {
     });
 
     const messages = await res.json();
-    console.log(messages);
 
     return {
         props: {

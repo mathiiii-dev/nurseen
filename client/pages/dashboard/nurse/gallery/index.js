@@ -12,7 +12,6 @@ import {
     LoadingOverlay,
     Pagination,
     Space,
-    Text,
 } from '@mantine/core';
 import { AiOutlineClose, AiTwotoneDelete } from 'react-icons/ai';
 import { useRouter } from 'next/router';

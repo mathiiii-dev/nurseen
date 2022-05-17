@@ -1,6 +1,32 @@
-import { ScrollArea, Text } from '@mantine/core';
+import { Button, ScrollArea, Space, Text, Textarea } from '@mantine/core';
+import dayjs from 'dayjs';
+import { useState } from 'react';
+import { scrollToBottom } from '../services/scroll';
 
-function Chat({ userId, messages, viewport }) {
+function Chat({ userId, messages, viewport, bearer, cid }) {
+    const [value, setValue] = useState('');
+
+    const send = (event) => {
+        event.preventDefault();
+        fetch(process.env.BASE_URL + `message/${cid}`, {
+            method: 'POST',
+            body: JSON.stringify({
+                message: value,
+                user: userId,
+                sendDate: dayjs(),
+            }),
+            headers: {
+                'Content-type': 'application/json',
+                Authorization: bearer,
+            },
+        })
+            .then((r) => r.json())
+            .then((res) => {
+                setValue('');
+                console.log(res);
+                scrollToBottom(viewport);
+            });
+    };
     return (
         <>
             <ScrollArea viewportRef={viewport} style={{ height: 250 }}>
@@ -38,6 +64,24 @@ function Chat({ userId, messages, viewport }) {
                       })
                     : ''}
             </ScrollArea>
+            <form onSubmit={send}>
+                <Textarea
+                    required
+                    label="Message"
+                    placeholder="Howdy!"
+                    value={value}
+                    onChange={(event) => setValue(event.currentTarget.value)}
+                />
+                <Space h={'md'} />
+                <Button
+                    type="submit"
+                    style={{
+                        float: 'right',
+                    }}
+                >
+                    Submit
+                </Button>
+            </form>
         </>
     );
 }
