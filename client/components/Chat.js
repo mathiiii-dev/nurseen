@@ -1,9 +1,17 @@
-import { Button, ScrollArea, Space, Text, Textarea } from '@mantine/core';
+import {
+    Avatar,
+    Button,
+    Grid,
+    ScrollArea,
+    Space,
+    Text,
+    Textarea,
+} from '@mantine/core';
 import dayjs from 'dayjs';
 import { useState } from 'react';
 import { scrollToBottom } from '../services/scroll';
 
-function Chat({ userId, messages, viewport, bearer, cid }) {
+function Chat({ userId, messages, viewport, bearer, cid, height }) {
     const [value, setValue] = useState('');
 
     const send = (event) => {
@@ -27,39 +35,95 @@ function Chat({ userId, messages, viewport, bearer, cid }) {
                 scrollToBottom(viewport);
             });
     };
+
+    const getFirstChar = (str) => {
+        return str.substring(0, 1);
+    };
+
     return (
         <>
-            <ScrollArea viewportRef={viewport} style={{ height: 250 }}>
+            <ScrollArea viewportRef={viewport} style={{ height: height }}>
                 {!messages.error
-                    ? messages.map(function (d, idx) {
+                    ? messages.map(function (d, id) {
                           if (d.user.id === userId) {
                               return (
-                                  <Text key={idx}>
-                                      {d.sendDate +
-                                          ' ' +
-                                          d.user.lastname +
-                                          ' ' +
-                                          d.user.firstname +
-                                          ' ' +
-                                          d.message}
-                                  </Text>
+                                  <Grid
+                                      key={id}
+                                      style={{
+                                          marginRight: 'auto',
+                                          marginLeft: 0,
+                                          width: '340px',
+                                          marginTop: '10px',
+                                          marginBottom: '10px',
+                                      }}
+                                  >
+                                      <Grid.Col md={2} className={'hide'}>
+                                          <Avatar color="cyan" radius="xl">
+                                              {getFirstChar(d.user.firstname) +
+                                                  ' ' +
+                                                  getFirstChar(d.user.lastname)}
+                                          </Avatar>
+                                      </Grid.Col>
+                                      <Grid.Col
+                                          md={10}
+                                          className={'wordWrap'}
+                                          style={{
+                                              backgroundColor: '#E4E6EB',
+                                              borderRadius: '11px',
+                                          }}
+                                      >
+                                          <Text>{d.message}</Text>
+                                          <Text
+                                              size={'xs'}
+                                              style={{
+                                                  float: 'right',
+                                              }}
+                                          >
+                                              {dayjs(d.sendDate).format(
+                                                  'HH:mm'
+                                              )}
+                                          </Text>
+                                      </Grid.Col>
+                                  </Grid>
                               );
                           }
                           return (
-                              <Text
-                                  key={idx}
+                              <Grid
+                                  key={id}
                                   style={{
-                                      color: 'pink',
+                                      marginLeft: 'auto',
+                                      marginRight: 0,
+                                      width: '340px',
+                                      marginTop: '10px',
+                                      marginBottom: '10px',
                                   }}
                               >
-                                  {d.sendDate +
-                                      ' ' +
-                                      d.user.lastname +
-                                      ' ' +
-                                      d.user.firstname +
-                                      ' ' +
-                                      d.message}
-                              </Text>
+                                  <Grid.Col
+                                      className={'wordWrap'}
+                                      md={10}
+                                      style={{
+                                          backgroundColor: '#93FFD8',
+                                          borderRadius: '11px',
+                                      }}
+                                  >
+                                      <Text>{d.message}</Text>
+                                      <Text
+                                          size={'xs'}
+                                          style={{
+                                              float: 'right',
+                                          }}
+                                      >
+                                          {dayjs(d.sendDate).format('HH:mm')}
+                                      </Text>
+                                  </Grid.Col>
+                                  <Grid.Col md={2} className={'hide'}>
+                                      <Avatar color="cyan" radius="xl">
+                                          {getFirstChar(d.user.firstname) +
+                                              ' ' +
+                                              getFirstChar(d.user.lastname)}
+                                      </Avatar>
+                                  </Grid.Col>
+                              </Grid>
                           );
                       })
                     : ''}

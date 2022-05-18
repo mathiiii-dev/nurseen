@@ -5,6 +5,7 @@ import EventSource from 'eventsource';
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
 import { scrollToBottom } from '../../../../services/scroll';
+import { Space } from '@mantine/core';
 
 export default function MessageNurse({ messages, userId, bearer }) {
     const viewport = useRef();
@@ -29,7 +30,7 @@ export default function MessageNurse({ messages, userId, bearer }) {
                     id: origin.id,
                     message: origin.data,
                     user: {
-                        id: userId,
+                        id: origin.userId,
                         lastname: origin.lastname,
                         firstname: origin.firstname,
                     },
@@ -43,6 +44,7 @@ export default function MessageNurse({ messages, userId, bearer }) {
     return (
         <>
             <Chat
+                height={600}
                 messages={stateMessages}
                 viewport={viewport}
                 userId={userId}

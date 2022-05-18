@@ -1,3 +1,15 @@
+.wordWrap {
+    word-wrap: break-word;      /* IE 5.5-7 */
+    white-space: -moz-pre-wrap; /* Firefox 1.0-2.0 */
+    white-space: pre-wrap;      /* current browsers */
+}
+
+@media only screen and (max-width: 1026px) {
+    .hide {
+        display: none;
+    }
+}
+
 table {
     border: 1px solid #ccc;
     border-collapse: collapse;

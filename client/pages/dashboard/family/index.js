@@ -21,7 +21,7 @@ import { scrollToBottom } from '../../../services/scroll';
 import EventSource from 'eventsource';
 import dayjs from 'dayjs';
 
-export default function Page({ bearer, userId, messages }) {
+export default function Page({ bearer, userId, messages, chat }) {
     const [kids, setKids] = useState();
     const [page, onChange] = useState(1);
     const [total, setTotal] = useState(1);
@@ -29,35 +29,53 @@ export default function Page({ bearer, userId, messages }) {
     const [visible, setVisible] = useState(false);
     const viewport = useRef();
 
+    const open = (event) => {
+        event.preventDefault();
+        fetch(process.env.BASE_URL + `chat/family`, {
+            method: 'POST',
+            body: JSON.stringify({
+                family: userId,
+            }),
+            headers: {
+                'Content-type': 'application/json',
+                Authorization: bearer,
+            },
+        }).then((r) => {
+            console.log(r);
+        });
+    };
     const [stateMessages, setStateMessages] = useState(messages);
-
-    useEffect(() => {
-        scrollToBottom(viewport);
-        const url = new URL('http://localhost:9090/.well-known/mercure');
-        url.searchParams.append(
-            'topic',
-            `http://localhost:8010/proxy/api/message/${4}`
-        );
-        const eventSource = new EventSource(url.toString());
-        eventSource.onmessage = (e) => {
-            let origin = JSON.parse(e.data);
-            setStateMessages((state) => [
-                ...state,
-                {
-                    id: origin.id,
-                    message: origin.data,
-                    user: {
-                        id: userId,
-                        firstname: origin.firstname,
-                        lastname: origin.lastname,
-                    },
-                    sendDate: dayjs().toString(),
-                },
-            ]);
-
+    if (chat) {
+        useEffect(() => {
             scrollToBottom(viewport);
-        };
-    }, []);
+            const url = new URL('http://localhost:9090/.well-known/mercure');
+            url.searchParams.append(
+                'topic',
+                `http://localhost:8010/proxy/api/message/${chat[0].id}`
+            );
+            const eventSource = new EventSource(url.toString());
+            eventSource.onmessage = (e) => {
+                let origin = JSON.parse(e.data);
+                console.log(userId, origin.userId);
+                console.log(stateMessages);
+                setStateMessages((state) => [
+                    ...state,
+                    {
+                        id: origin.id,
+                        message: origin.data,
+                        user: {
+                            id: origin.userId,
+                            firstname: origin.firstname,
+                            lastname: origin.lastname,
+                        },
+                        sendDate: dayjs().toString(),
+                    },
+                ]);
+
+                scrollToBottom(viewport);
+            };
+        }, []);
+    }
 
     useEffect(() => {
         setVisible(true);
@@ -87,9 +105,9 @@ export default function Page({ bearer, userId, messages }) {
             <Space h={'xl'} />
             <Grid>
                 {familyCards &&
-                    Object.values(familyCards).map((card) => {
+                    Object.values(familyCards).map((card, id) => {
                         return (
-                            <Grid.Col md={3}>
+                            <Grid.Col md={3} key={id}>
                                 <DashboardCard
                                     title={card.title}
                                     buttonText={card.buttonText}
@@ -102,7 +120,7 @@ export default function Page({ bearer, userId, messages }) {
             </Grid>
             <Space h={'xl'} />
             <Grid gutter="xl">
-                <Grid.Col md={8}>
+                <Grid.Col md={6}>
                     <LoadingOverlay visible={visible} />
                     <table>
                         <thead>
@@ -149,14 +167,19 @@ export default function Page({ bearer, userId, messages }) {
                         <Pagination total={total} onChange={onChange} />
                     </Center>
                 </Grid.Col>
-                <Grid.Col md={4}>
-                    <Chat
-                        messages={stateMessages}
-                        viewport={viewport}
-                        userId={userId}
-                        bearer={bearer}
-                        cid={4}
-                    />
+                <Grid.Col md={6}>
+                    {chat != null ? (
+                        <Chat
+                            height={340}
+                            messages={stateMessages}
+                            viewport={viewport}
+                            userId={userId}
+                            bearer={bearer}
+                            cid={chat[0].id}
+                        />
+                    ) : (
+                        <Button onClick={open}>Ouvrir un chat</Button>
+                    )}
                 </Grid.Col>
             </Grid>
         </>
@@ -180,15 +203,33 @@ export async function getServerSideProps(ctx) {
     );
     const kids = await res.json();
 
-    const res1 = await fetch(process.env.BASE_URL + `message/${4}`, {
-        method: 'GET',
-        headers: {
-            'Content-type': 'application/json',
-            Authorization: authToken.authorizationString,
-        },
-    });
+    const res1 = await fetch(
+        process.env.BASE_URL + `chat/${authToken.decodedToken.id}`,
+        {
+            method: 'GET',
+            headers: {
+                'Content-type': 'application/json',
+                Authorization: authToken.authorizationString,
+            },
+        }
+    );
 
-    const messages = await res1.json();
+    const chat = await res1.json();
+
+    let messages = [];
+    if (chat) {
+        const res2 = await fetch(
+            process.env.BASE_URL + `message/${chat[0].id}`,
+            {
+                method: 'GET',
+                headers: {
+                    'Content-type': 'application/json',
+                    Authorization: authToken.authorizationString,
+                },
+            }
+        );
+        messages = await res2.json();
+    }
 
     return {
         props: {
@@ -196,6 +237,7 @@ export async function getServerSideProps(ctx) {
             bearer: authToken.authorizationString,
             kids,
             messages,
+            chat,
         },
     };
 }
