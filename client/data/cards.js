@@ -60,7 +60,7 @@ export const familyCards = {
         title: 'Gestionnaire de fichier',
         buttonText: 'Vos fichiers',
         text: 'Envoyez des fichiers à votre nourrice et recevez des fichiers',
-        linkHref: 'family/feed',
+        linkHref: 'family/file',
     },
     gallery: {
         title: 'Galerie photo',

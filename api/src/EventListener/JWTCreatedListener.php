@@ -20,8 +20,10 @@ class JWTCreatedListener
         $user = $this->userRepository->findOneBy(['email' => $event->getUser()->getUserIdentifier()]);
 
         $payload['id'] = $user->getId();
+        $payload['firstname'] = $user->getFirstname();
+        $payload['lastname'] = $user->getLastname();
         $payload['mercure'] = [
-            'publish' => ['*']
+            'publish' => ['*'],
         ];
 
         $event->setData($payload);

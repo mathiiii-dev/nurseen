@@ -36,7 +36,7 @@ function KidNotes({ kid, notes }) {
                 </td>
                 <td>
                     <Link
-                        href={`/dashboard/family/kid/${router.query.pid}/note/${element.id}`}
+                        href={`/dashboard/family/kid/${router.query.pid}/notes/${element.id}`}
                     >
                         <Button>Note</Button>
                     </Link>

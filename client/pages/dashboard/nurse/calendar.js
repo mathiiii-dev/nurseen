@@ -8,7 +8,7 @@ import { DatePicker, TimeRangeInput } from '@mantine/dates';
 import dayjs from 'dayjs';
 import { useNotifications } from '@mantine/notifications';
 import Router from 'next/router';
-import { AuthToken } from '../../../../services/auth_token';
+import { AuthToken } from '../../../services/auth_token';
 import { getSession } from 'next-auth/react';
 
 function Index({ bearer, kids, dayKidsCalendar }) {
@@ -139,104 +139,99 @@ function Index({ bearer, kids, dayKidsCalendar }) {
                     Supprimer
                 </Button>
                 <Space h={'xl'} />
-                {showError ? (
+                {showError && (
                     <>
                         <Alert title="Erreur!" color="red">
                             {errorMessage}
                         </Alert>
                         <Space h="xl" />
                     </>
-                ) : (
-                    ''
                 )}
-                {
-                    <form onSubmit={edit}>
-                        <DatePicker
-                            placeholder="Choisir une date"
-                            label="Jour de présence"
-                            value={day}
-                            onChange={setDay}
-                            required
-                        />
-                        <Space h={'xl'} />
-                        <TimeRangeInput
-                            label="Horaires de présence"
-                            value={timeRanges}
-                            onChange={setTimeRanges}
-                            clearable
-                        />
-                        <Space h={'xl'} />
-                        <Select
-                            value={select}
-                            onChange={setSelect}
-                            data={nurseKids}
-                            label="Enfant"
-                            placeholder="Choisir un enfant"
-                        />
-                        <Space h={'xl'} />
-                        <Button
-                            type="submit"
-                            style={{
-                                backgroundColor: '#4ad4c6',
-                                float: 'right',
-                            }}
-                        >
-                            Modifier
-                        </Button>
-                    </form>
-                }
+                <form onSubmit={edit}>
+                    <DatePicker
+                        placeholder="Choisir une date"
+                        label="Jour de présence"
+                        value={day}
+                        onChange={setDay}
+                        required
+                    />
+                    <Space h={'xl'} />
+                    <TimeRangeInput
+                        min="08:00"
+                        max="20:00"
+                        label="Horaires de présence"
+                        value={timeRanges}
+                        onChange={setTimeRanges}
+                        clearable
+                    />
+                    <Space h={'xl'} />
+                    <Select
+                        value={select}
+                        onChange={setSelect}
+                        data={nurseKids}
+                        label="Enfant"
+                        placeholder="Choisir un enfant"
+                    />
+                    <Space h={'xl'} />
+                    <Button
+                        type="submit"
+                        style={{
+                            backgroundColor: '#4ad4c6',
+                            float: 'right',
+                        }}
+                    >
+                        Modifier
+                    </Button>
+                </form>
             </Modal>
             <Modal
                 opened={opened}
                 onClose={() => setOpened(false)}
                 title="Enregistrer un jour pour un enfant"
             >
-                {showError ? (
+                {showError && (
                     <>
                         <Alert title="Erreur!" color="red">
                             {errorMessage}
                         </Alert>
                         <Space h="xl" />
                     </>
-                ) : (
-                    ''
                 )}
-                {
-                    <form onSubmit={calendar}>
-                        <DatePicker
-                            placeholder="Choisir une date"
-                            label="Jour de présence"
-                            value={day}
-                            onChange={setDay}
-                            required
-                        />
-                        <Space h={'xl'} />
-                        <TimeRangeInput
-                            label="Horaires de présence"
-                            value={timeRanges}
-                            onChange={setTimeRanges}
-                            clearable
-                        />
-                        <Space h={'xl'} />
-                        <Select
-                            value={select}
-                            onChange={setSelect}
-                            data={nurseKids}
-                            label="Enfant"
-                            placeholder="Choisir un enfant"
-                        />
-                        <Space h={'xl'} />
-                        <Button
-                            type="submit"
-                            style={{
-                                backgroundColor: '#4ad4c6',
-                                float: 'right',
-                            }}
-                        >
-                            Enregistrer
-                        </Button>
-                    </form>
-                }
+
+                <form onSubmit={calendar}>
+                    <DatePicker
+                        placeholder="Choisir une date"
+                        label="Jour de présence"
+                        value={day}
+                        onChange={setDay}
+                        required
+                    />
+                    <Space h={'xl'} />
+                    <TimeRangeInput
+                        label="Horaires de présence"
+                        value={timeRanges}
+                        onChange={setTimeRanges}
+                        clearable
+                    />
+                    <Space h={'xl'} />
+                    <Select
+                        value={select}
+                        onChange={setSelect}
+                        data={nurseKids}
+                        label="Enfant"
+                        placeholder="Choisir un enfant"
+                    />
+                    <Space h={'xl'} />
+                    <Button
+                        type="submit"
+                        style={{
+                            backgroundColor: '#4ad4c6',
+                            float: 'right',
+                        }}
+                    >
+                        Enregistrer
+                    </Button>
+                </form>
             </Modal>
             <FullCalendar
                 buttonText={{
@@ -297,7 +292,7 @@ export async function getServerSideProps(ctx) {
     const dayKidsCalendar = await res1.json();
 
     const res2 = await fetch(
-        process.env.BASE_URL + `kid/nurse/${authToken.decodedToken.id}`,
+        process.env.BASE_URL + `kid/nurse/${authToken.decodedToken.id}/all`,
         {
             method: 'GET',
             headers: {

@@ -41,6 +41,18 @@ class KidController extends AbstractController
     }
 
     #[IsGranted('ROLE_NURSE', message: 'Vous ne pouvez pas faire ça')]
+    #[Route('/kid/nurse/{nurseId}/all', name: 'app_kid_nurse_all')]
+    public function getAll(int $nurseId): JsonResponse
+    {
+        $kids = $this->kidManager->getKidsByNurse($nurseId);
+        if ($kids) {
+            $this->denyAccessUnlessGranted('owner', $kids[0]);
+        }
+
+        return $this->json($kids, Response::HTTP_OK, [], ['groups' => 'kid_list']);
+    }
+
+    #[IsGranted('ROLE_NURSE', message: 'Vous ne pouvez pas faire ça')]
     #[Route('/kid/{kid}/activate', name: 'app_kid_nurse_activate', methods: 'POST')]
     public function activate(Kid $kid): JsonResponse
     {

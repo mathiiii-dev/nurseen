@@ -21,7 +21,14 @@ import { scrollToBottom } from '../../../services/scroll';
 import EventSource from 'eventsource';
 import dayjs from 'dayjs';
 
-export default function Page({ bearer, userId, messages, chat }) {
+export default function Page({
+    bearer,
+    userId,
+    messages,
+    chat,
+    firstname,
+    lastname,
+}) {
     const [kids, setKids] = useState();
     const [page, onChange] = useState(1);
     const [total, setTotal] = useState(1);
@@ -98,7 +105,12 @@ export default function Page({ bearer, userId, messages, chat }) {
         <>
             <Grid>
                 <Grid.Col>
-                    <Title>Bonjour, John Doe ! </Title>
+                    <Title>{`Bonjour, ${firstname} ${lastname} !`}</Title>
+                </Grid.Col>
+                <Grid.Col>
+                    <Link href={'family/create-kid'}>
+                        <Button>Ajouter un enfant</Button>
+                    </Link>
                 </Grid.Col>
             </Grid>
 
@@ -238,6 +250,8 @@ export async function getServerSideProps(ctx) {
             kids,
             messages,
             chat,
+            firstname: authToken.decodedToken.firstname,
+            lastname: authToken.decodedToken.lastname,
         },
     };
 }

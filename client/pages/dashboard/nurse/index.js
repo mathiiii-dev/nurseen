@@ -344,18 +344,6 @@ export async function getServerSideProps(ctx) {
     const authToken = new AuthToken(sessionCallBack.user.access_token);
 
     const res = await fetch(
-        process.env.BASE_URL + `kid/nurse/${authToken.decodedToken.id}`,
-        {
-            method: 'GET',
-            headers: {
-                'Content-type': 'application/json',
-                Authorization: authToken.authorizationString,
-            },
-        }
-    );
-    const kids = await res.json();
-
-    const res1 = await fetch(
         process.env.BASE_URL + `link_code/${authToken.decodedToken.id}`,
         {
             method: 'GET',
@@ -365,13 +353,12 @@ export async function getServerSideProps(ctx) {
             },
         }
     );
-    const code = await res1.json();
+    const code = await res.json();
 
     return {
         props: {
             userId: sessionCallBack.user.id,
             bearer: authToken.authorizationString,
-            kids,
             code: code.code,
         },
     };
