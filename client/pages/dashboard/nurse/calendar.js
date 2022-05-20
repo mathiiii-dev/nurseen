@@ -2,27 +2,66 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Alert, Button, Modal, Select, Space } from '@mantine/core';
-import { DatePicker, TimeRangeInput } from '@mantine/dates';
+import { DatePicker, TimeInput, TimeRangeInput } from '@mantine/dates';
 import dayjs from 'dayjs';
 import { useNotifications } from '@mantine/notifications';
 import Router from 'next/router';
 import { AuthToken } from '../../../services/auth_token';
 import { getSession } from 'next-auth/react';
+import { useClickOutside } from '@mantine/hooks';
+import '../../../styles/globals.css';
 
 function Index({ bearer, kids, dayKidsCalendar }) {
-    const [opened, setOpened] = useState(false);
+    const [selectEvent, setSelectEvent] = useState('');
+    const notifications = useNotifications();
+
     const now = new Date();
+    const [day, setDay] = useState(null);
     const then = dayjs(now).add(8, 'hours').toDate();
+
+    const [_, setIsInputFocus] = useState(false);
+
+    const onExitInput = () => {
+        const first = dayjs(timeRanges[0]).toDate();
+        const two = dayjs(timeRanges[1]).toDate();
+        console.log('----- Debut onExitInput -----');
+        if (day && timeRanges && two.getDate() > first.getDate()) {
+            console.log('----- Premier if -----');
+            if (two.getHours() < first.getHours()) {
+                console.log('----- deuxieme if -----');
+                setTimeRanges([
+                    timeRanges[0],
+                    dayjs(first).hour(23).minute(59).toDate(),
+                ]);
+            }
+            setTimeRanges([
+                timeRanges[0],
+                dayjs(first)
+                    .hour(two.getHours())
+                    .minute(two.getMinutes())
+                    .toDate(),
+            ]);
+        }
+
+        if (timeRanges[1] < timeRanges[0]) {
+            console.log('----- Troisieme if -----');
+            setTimeRanges([
+                timeRanges[0],
+                dayjs(timeRanges[1]).hour(23).minute(59).toDate(),
+            ]);
+        }
+    };
+
+    const ref = useClickOutside(() => onExitInput());
+
+    const [opened, setOpened] = useState(false);
     const [timeRanges, setTimeRanges] = useState([now, then]);
     const [select, setSelect] = useState(null);
-    const [day, setDay] = useState(null);
     const [showError, setShowError] = useState(false);
     const [editModal, setEditModal] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
-    const [selectEvent, setSelectEvent] = useState('');
-    const notifications = useNotifications();
 
     let events = null;
     if (dayKidsCalendar) {
@@ -82,7 +121,7 @@ function Index({ bearer, kids, dayKidsCalendar }) {
                 Authorization: bearer,
             },
         }).then(async (r) => {
-            if (r.status !== 200) {
+            if (r.status !== 204) {
                 const res = await r.json();
                 setShowError(true);
                 setErrorMessage(res.error_description);
@@ -111,7 +150,7 @@ function Index({ bearer, kids, dayKidsCalendar }) {
                 Authorization: bearer,
             },
         }).then(async (r) => {
-            if (r.status !== 200) {
+            if (r.status !== 204) {
                 const res = await r.json();
                 setShowError(true);
                 setErrorMessage(res.error_description);
@@ -157,11 +196,13 @@ function Index({ bearer, kids, dayKidsCalendar }) {
                     />
                     <Space h={'xl'} />
                     <TimeRangeInput
-                        min="08:00"
-                        max="20:00"
                         label="Horaires de présence"
                         value={timeRanges}
+                        ref={ref}
                         onChange={setTimeRanges}
+                        onClick={() => {
+                            setIsInputFocus(true);
+                        }}
                         clearable
                     />
                     <Space h={'xl'} />
@@ -210,7 +251,11 @@ function Index({ bearer, kids, dayKidsCalendar }) {
                     <TimeRangeInput
                         label="Horaires de présence"
                         value={timeRanges}
+                        ref={ref}
                         onChange={setTimeRanges}
+                        onClick={() => {
+                            setIsInputFocus(true);
+                        }}
                         clearable
                     />
                     <Space h={'xl'} />
@@ -233,41 +278,46 @@ function Index({ bearer, kids, dayKidsCalendar }) {
                     </Button>
                 </form>
             </Modal>
-            <FullCalendar
-                buttonText={{
-                    today: "Aujourd'hui",
-                    month: 'Mois',
-                    week: 'Semaine',
-                    day: 'Jour',
-                }}
-                plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-                initialView="dayGridMonth"
-                headerToolbar={{
-                    center: 'dayGridMonth,timeGridWeek,timeGridDay new',
-                }}
-                customButtons={{
-                    new: {
-                        text: 'Nouveau',
-                        click: () => setOpened(true),
-                    },
-                }}
-                events={events}
-                dateClick={(e) => {
-                    e.view.calendar.changeView('timeGridDay', e.dateStr);
-                }}
-                eventClick={(e) => {
-                    setDay(e.event.start);
-                    setTimeRanges([
-                        dayjs(e.event.startStr).subtract(1, 'hours').toDate(),
-                        dayjs(e.event.endStr).subtract(1, 'hours').toDate(),
-                    ]);
-                    setSelect(e.event.id);
-                    setSelectEvent(e.event.groupId);
-                    setEditModal(true);
-                }}
-                timeZone="UTC"
-                locale="fr"
-            />
+            <>
+                <FullCalendar
+                    className={'test'}
+                    buttonText={{
+                        today: "Aujourd'hui",
+                        month: 'Mois',
+                        week: 'Semaine',
+                        day: 'Jour',
+                    }}
+                    plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+                    initialView="dayGridMonth"
+                    headerToolbar={{
+                        center: 'dayGridMonth,timeGridWeek,timeGridDay new',
+                    }}
+                    customButtons={{
+                        new: {
+                            text: 'Nouveau',
+                            click: () => setOpened(true),
+                        },
+                    }}
+                    events={events}
+                    dateClick={(e) => {
+                        e.view.calendar.changeView('timeGridDay', e.dateStr);
+                    }}
+                    eventClick={(e) => {
+                        setDay(e.event.start);
+                        setTimeRanges([
+                            dayjs(e.event.startStr)
+                                .subtract(2, 'hours')
+                                .toDate(),
+                            dayjs(e.event.endStr).subtract(2, 'hours').toDate(),
+                        ]);
+                        setSelect(e.event.id);
+                        setSelectEvent(e.event.groupId);
+                        setEditModal(true);
+                    }}
+                    timeZone="UTC"
+                    locale="fr"
+                />
+            </>
         </>
     );
 }

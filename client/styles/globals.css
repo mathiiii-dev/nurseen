@@ -1,3 +1,7 @@
+[class^="fc"] {
+    font-family: 'fcicons', 'Open Sans', sans-serif;
+}
+
 .wordWrap {
     word-wrap: break-word;      /* IE 5.5-7 */
     white-space: -moz-pre-wrap; /* Firefox 1.0-2.0 */
