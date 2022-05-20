@@ -1,172 +1,257 @@
-import {getSession} from "next-auth/react";
-import {AuthToken} from "../../../services/auth_token";
+import { getSession } from 'next-auth/react';
+import {
+    Button,
+    Center,
+    Grid,
+    Pagination,
+    Space,
+    Text,
+    Title,
+    LoadingOverlay,
+} from '@mantine/core';
+import { useEffect, useRef, useState } from 'react';
+import { AuthToken } from '../../../services/auth_token';
 import Link from 'next/link';
-import {Button, Center, Space, Table} from "@mantine/core";
-import DashboardCard from "../../../components/DashboardCard";
-import useEmblaCarousel from 'embla-carousel-react'
-import '../../../styles/globals.css'
-import {useCallback, useEffect, useState} from "react";
-import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
+import '../../../styles/globals.css';
+import DashboardCard from '../../../components/DashboardCard';
+import { familyCards } from '../../../data/cards';
+import { usePagination } from '@mantine/hooks';
+import Chat from '../../../components/Chat';
+import { scrollToBottom } from '../../../services/scroll';
+import EventSource from 'eventsource';
+import dayjs from 'dayjs';
 
-function Family({userId, bearer, kids}) {
+export default function Page({
+    bearer,
+    userId,
+    messages,
+    chat,
+    firstname,
+    lastname,
+}) {
+    const [kids, setKids] = useState();
+    const [page, onChange] = useState(1);
+    const [total, setTotal] = useState(1);
+    const pagination = usePagination({ total, page, onChange });
+    const [visible, setVisible] = useState(false);
+    const viewport = useRef();
 
-    const [viewportRef, embla] = useEmblaCarousel({
-        slidesToScroll: 2,
-        skipSnaps: false
-    });
-    const [prevBtnEnabled, setPrevBtnEnabled] = useState(false);
-    const [nextBtnEnabled, setNextBtnEnabled] = useState(false);
+    const open = (event) => {
+        event.preventDefault();
+        fetch(process.env.BASE_URL + `chat/family`, {
+            method: 'POST',
+            body: JSON.stringify({
+                family: userId,
+            }),
+            headers: {
+                'Content-type': 'application/json',
+                Authorization: bearer,
+            },
+        }).then((r) => {
+            console.log(r);
+        });
+    };
+    const [stateMessages, setStateMessages] = useState(messages);
+    if (chat) {
+        useEffect(() => {
+            scrollToBottom(viewport);
+            const url = new URL('http://localhost:9090/.well-known/mercure');
+            url.searchParams.append(
+                'topic',
+                `http://localhost:8010/proxy/api/message/${chat[0].id}`
+            );
+            const eventSource = new EventSource(url.toString());
+            eventSource.onmessage = (e) => {
+                let origin = JSON.parse(e.data);
+                console.log(userId, origin.userId);
+                console.log(stateMessages);
+                setStateMessages((state) => [
+                    ...state,
+                    {
+                        id: origin.id,
+                        message: origin.data,
+                        user: {
+                            id: origin.userId,
+                            firstname: origin.firstname,
+                            lastname: origin.lastname,
+                        },
+                        sendDate: dayjs().toString(),
+                    },
+                ]);
 
-    const scrollPrev = useCallback(() => embla && embla.scrollPrev(), [embla]);
-    const scrollNext = useCallback(() => embla && embla.scrollNext(), [embla]);
-    const onSelect = useCallback(() => {
-        if (!embla) return;
-        setPrevBtnEnabled(embla.canScrollPrev());
-        setNextBtnEnabled(embla.canScrollNext());
-    }, [embla]);
+                scrollToBottom(viewport);
+            };
+        }, []);
+    }
 
     useEffect(() => {
-        if (!embla) return;
-        embla.on("select", onSelect);
-        onSelect();
-    }, [embla, onSelect]);
-
-    let rows = null;
-    dayjs.locale('fr')
-    dayjs.extend(utc)
-    dayjs.utc().format()
-
-    if (kids) {
-        rows = kids.map((element) => (
-            <tr key={element.id}>
-                <td>{element.firstname}</td>
-                <td>{element.lastname}</td>
-                <td>{dayjs(element.birthday).utc().format('DD MMMM YYYY')}</td>
-                <td>
-                    <Link href={{
-                        pathname: `/dashboard/family/kid/[pid]/note`,
-                        query: {pid: element.id}
-                    }}>
-                        <Button>Note</Button>
-                    </Link>
-                </td>
-            </tr>
-        ));
-    }
+        setVisible(true);
+        fetch(`${process.env.BASE_URL}kid/family/${userId}?page=${page}`, {
+            method: 'GET',
+            headers: {
+                'Content-type': 'application/json',
+                Authorization: bearer,
+            },
+        })
+            .then((res) => res.json())
+            .then((data) => {
+                setKids(data.items);
+                setTotal(data.pagination.total_pages);
+                setVisible(false);
+            });
+    }, [page]);
 
     return (
         <>
-            <div className="embla" ref={embla}>
-                <div className="embla__viewport" ref={viewportRef}>
-                    <div className="embla__container">
-                        <div className="embla__slide">
-                            <DashboardCard
-                                title={"Vos enfants"}
-                                buttonText={"Ajouter un enfant"}
-                                text={"Ajouter vos enfant pour qu'ils soient liés à leur nourrice. Code nourrice nécessaire"}
-                                linkHref={"family/create-kid"}
-                            />
-                        </div>
-                        <div className="embla__slide">
-                            <DashboardCard
-                                title={"Gallerie photo"}
-                                buttonText={"Voir les photos"}
-                                text={"Votre nourrice peut ajouter ici des photos en vrac de tout les enfants"}
-                                linkHref={"family/gallery"}
-                            />
-                        </div>
-                        <div className="embla__slide">
-                            <DashboardCard
-                                title={"Menu du jour"}
-                                buttonText={"Voir le menu"}
-                                text={"Votre nourrice peut ajouter ici le menu du jour"}
-                                linkHref={"family/menu"}
-                            />
-                        </div>
-                        <div className="embla__slide">
-                            <DashboardCard
-                                title={"Chat en direct"}
-                                buttonText={"Chat"}
-                                text={"Voir les messages envoyez par votre nourrice. Envoyez des messages"}
-                                linkHref={"family/chat"}
-                            />
-                        </div>
-                        <div className="embla__slide">
-                            <DashboardCard
-                                title={"Gestionnaire de fichiers"}
-                                buttonText={"Mes fichiers"}
-                                text={"Envoyez des fichiers à votre nourrice. Voir vos fichiers"}
-                                linkHref={"family/file"}
-                            />
-                        </div>
-                    </div>
-                </div>
-                <Space h={"xl"}/>
-                <Center>
-                    <Button
-                        className="embla__button"
-                        onClick={scrollPrev}
-                        enabled={prevBtnEnabled}>&lt;</Button>
-                    <Button
-                        className="embla__button"
-                        onClick={scrollNext}
-                        enabled={nextBtnEnabled}>&gt;</Button>
-                </Center>
-            </div>
-            <Space h={"xl"}/>
-            <Table
-                horizontalSpacing="xl"
-                verticalSpacing="xl"
-                style={{marginTop: 10}}
-            >
-                <thead>
-                <tr>
-                    <th>Prénom</th>
-                    <th>Nom</th>
-                    <th>Date d'anniversaire</th>
-                    <th>Notes</th>
-                </tr>
-                </thead>
-                <tbody>{rows}</tbody>
-            </Table>
-        </>
-    )
-}
+            <Grid>
+                <Grid.Col>
+                    <Title>{`Bonjour, ${firstname} ${lastname} !`}</Title>
+                </Grid.Col>
+                <Grid.Col>
+                    <Link href={'family/create-kid'}>
+                        <Button>Ajouter un enfant</Button>
+                    </Link>
+                </Grid.Col>
+            </Grid>
 
-export default Family;
+            <Space h={'xl'} />
+            <Grid>
+                {familyCards &&
+                    Object.values(familyCards).map((card, id) => {
+                        return (
+                            <Grid.Col md={3} key={id}>
+                                <DashboardCard
+                                    title={card.title}
+                                    buttonText={card.buttonText}
+                                    text={card.text}
+                                    linkHref={card.linkHref}
+                                />
+                            </Grid.Col>
+                        );
+                    })}
+            </Grid>
+            <Space h={'xl'} />
+            <Grid gutter="xl">
+                <Grid.Col md={6}>
+                    <LoadingOverlay visible={visible} />
+                    <table>
+                        <thead>
+                            <tr>
+                                <th scope="col">
+                                    <Text>Nom</Text>
+                                </th>
+                                <th scope="col">
+                                    <Text>Prénom</Text>
+                                </th>
+                                <th scope="col">
+                                    <Text>Note</Text>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {kids &&
+                                kids.map((kid) => {
+                                    return (
+                                        <tr>
+                                            <td data-label="Nom">
+                                                <Text>{kid.lastname}</Text>
+                                            </td>
+                                            <td data-label="Prénom">
+                                                <Text>{kid.firstname}</Text>
+                                            </td>
+                                            <td data-label="Note">
+                                                <Link
+                                                    href={{
+                                                        pathname: `/dashboard/family/kid/[pid]/notes`,
+                                                        query: { pid: kid.id },
+                                                    }}
+                                                >
+                                                    <Button>Note</Button>
+                                                </Link>
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
+                        </tbody>
+                    </table>
+                    <Space h={'xl'} />
+                    <Center>
+                        <Pagination total={total} onChange={onChange} />
+                    </Center>
+                </Grid.Col>
+                <Grid.Col md={6}>
+                    {chat != null ? (
+                        <Chat
+                            height={340}
+                            messages={stateMessages}
+                            viewport={viewport}
+                            userId={userId}
+                            bearer={bearer}
+                            cid={chat[0].id}
+                        />
+                    ) : (
+                        <Button onClick={open}>Ouvrir un chat</Button>
+                    )}
+                </Grid.Col>
+            </Grid>
+        </>
+    );
+}
 
 export async function getServerSideProps(ctx) {
     const sessionCallBack = await getSession(ctx);
 
     const authToken = new AuthToken(sessionCallBack.user.access_token);
 
-    const res = await fetch(process.env.BASE_URL + `kid/family/${authToken.decodedToken.id}`,
+    const res = await fetch(
+        process.env.BASE_URL + `kid/family/${authToken.decodedToken.id}`,
         {
             method: 'GET',
             headers: {
                 'Content-type': 'application/json',
-                'Authorization': authToken.authorizationString
-            }
-        });
-    const kids = await res.json()
+                Authorization: authToken.authorizationString,
+            },
+        }
+    );
+    const kids = await res.json();
 
-    const res1 = await fetch(process.env.BASE_URL + `message`,
+    const res1 = await fetch(
+        process.env.BASE_URL + `chat/${authToken.decodedToken.id}`,
         {
             method: 'GET',
             headers: {
                 'Content-type': 'application/json',
-                'Authorization': authToken.authorizationString
+                Authorization: authToken.authorizationString,
+            },
+        }
+    );
+
+    const chat = await res1.json();
+
+    let messages = [];
+    if (chat) {
+        const res2 = await fetch(
+            process.env.BASE_URL + `message/${chat[0].id}`,
+            {
+                method: 'GET',
+                headers: {
+                    'Content-type': 'application/json',
+                    Authorization: authToken.authorizationString,
+                },
             }
-        });
-    const messages = await res1.json()
+        );
+        messages = await res2.json();
+    }
 
     return {
         props: {
             userId: sessionCallBack.user.id,
             bearer: authToken.authorizationString,
             kids,
-            messages
-        }
-    }
+            messages,
+            chat,
+            firstname: authToken.decodedToken.firstname,
+            lastname: authToken.decodedToken.lastname,
+        },
+    };
 }

@@ -47,6 +47,7 @@ class MessageHandler
                     'data' => $message->getMessage(),
                     'id' => $message->getId(),
                     'sendDate' => $message->getSendDate()->format("Y-m-d\TH:i:s+00:00"),
+                    'userId' => $user->getId(),
                     'lastname' => $user->getLastname(),
                     'firstname' => $user->getFirstname(),
                 ])

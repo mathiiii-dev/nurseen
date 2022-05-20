@@ -1,6 +1,6 @@
-import Layout from '../components/layout'
+import Layout from '../components/layout';
 import { NotificationsProvider } from '@mantine/notifications';
-import { SessionProvider } from 'next-auth/react'
+import { SessionProvider } from 'next-auth/react';
 
 export default function MyApp({ Component, pageProps }) {
     return (
@@ -11,5 +11,5 @@ export default function MyApp({ Component, pageProps }) {
                 </Layout>
             </NotificationsProvider>
         </SessionProvider>
-    )
+    );
 }
