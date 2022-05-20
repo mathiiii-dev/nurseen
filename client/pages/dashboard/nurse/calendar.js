@@ -26,16 +26,7 @@ function Index({ bearer, kids, dayKidsCalendar }) {
     const onExitInput = () => {
         const first = dayjs(timeRanges[0]).toDate();
         const two = dayjs(timeRanges[1]).toDate();
-        console.log('----- Debut onExitInput -----');
         if (day && timeRanges && two.getDate() > first.getDate()) {
-            console.log('----- Premier if -----');
-            if (two.getHours() < first.getHours()) {
-                console.log('----- deuxieme if -----');
-                setTimeRanges([
-                    timeRanges[0],
-                    dayjs(first).hour(23).minute(59).toDate(),
-                ]);
-            }
             setTimeRanges([
                 timeRanges[0],
                 dayjs(first)
@@ -43,10 +34,15 @@ function Index({ bearer, kids, dayKidsCalendar }) {
                     .minute(two.getMinutes())
                     .toDate(),
             ]);
+            if (two.getHours() < first.getHours()) {
+                setTimeRanges([
+                    timeRanges[0],
+                    dayjs(first).hour(23).minute(59).toDate(),
+                ]);
+            }
         }
 
         if (timeRanges[1] < timeRanges[0]) {
-            console.log('----- Troisieme if -----');
             setTimeRanges([
                 timeRanges[0],
                 dayjs(timeRanges[1]).hour(23).minute(59).toDate(),
