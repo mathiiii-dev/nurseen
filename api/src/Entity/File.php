@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\FileRepository;
+use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -13,27 +14,27 @@ class File
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
     #[Groups(['file'])]
-    private $id;
+    private int $id;
 
     #[ORM\Column(type: 'text')]
     #[Groups(['file'])]
-    private $url;
+    private string $url;
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'files')]
     #[Groups(['file'])]
-    private $sender;
+    private User $sender;
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'files')]
     #[Groups(['file'])]
-    private $recipient;
+    private User $recipient;
 
     #[ORM\Column(type: 'string', length: 255)]
     #[Groups(['file'])]
-    private $name;
+    private string $name;
 
     #[ORM\Column(type: 'date')]
     #[Groups(['file'])]
-    private $sendDate;
+    private DateTimeInterface $sendDate;
 
     public function getId(): ?int
     {
@@ -88,12 +89,12 @@ class File
         return $this;
     }
 
-    public function getSendDate(): ?\DateTimeInterface
+    public function getSendDate(): ?DateTimeInterface
     {
         return $this->sendDate;
     }
 
-    public function setSendDate(\DateTimeInterface $sendDate): self
+    public function setSendDate(DateTimeInterface $sendDate): self
     {
         $this->sendDate = $sendDate;
 

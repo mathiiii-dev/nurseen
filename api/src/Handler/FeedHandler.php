@@ -45,7 +45,7 @@ class FeedHandler
         $em->flush();
     }
 
-    public function handleFeedUpdate(Request $request, Feed $feed)
+    public function handleFeedUpdate(Request $request, Feed $feed): void
     {
         $data = $request->toArray();
         $feed->setText($data['text']);

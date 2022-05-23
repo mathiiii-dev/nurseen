@@ -20,7 +20,7 @@ class FamilyHandler
         $this->entityManager = $this->doctrine->getManager();
     }
 
-    public function handleFamilyCreate(User $user)
+    public function handleFamilyCreate(User $user): void
     {
         $nurse = new Family();
         $nurse->setParent($user);
@@ -30,7 +30,7 @@ class FamilyHandler
         $this->entityManager->flush();
     }
 
-    public function handleFamilyKidCreate(array $data, Nurse $nurse, Family $family)
+    public function handleFamilyKidCreate(array $data, Nurse $nurse, Family $family): void
     {
         $kid = (new Kid())
             ->setNurse($nurse)

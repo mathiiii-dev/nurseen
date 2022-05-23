@@ -11,13 +11,13 @@ class LinkCode
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    private $id;
+    private int $id;
 
     #[ORM\Column(type: 'integer')]
-    private $code;
+    private int $code;
 
     #[ORM\OneToOne(targetEntity: Nurse::class, cascade: ['persist', 'remove'])]
-    private $nurse;
+    private Nurse $nurse;
 
 
     public function getId(): ?int

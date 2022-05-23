@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\CalendarRepository;
+use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CalendarRepository::class)]
@@ -11,56 +12,56 @@ class Calendar
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    private $id;
+    private int $id;
 
     #[ORM\Column(type: 'date')]
-    private $day;
+    private DateTimeInterface $day;
 
     #[ORM\Column(type: 'time')]
-    private $arrival;
+    private DateTimeInterface $arrival;
 
     #[ORM\Column(type: 'time')]
-    private $departure;
+    private DateTimeInterface $departure;
 
     #[ORM\ManyToOne(targetEntity: Kid::class, inversedBy: 'calendars')]
     #[ORM\JoinColumn(nullable: false)]
-    private $kid;
+    private Kid $kid;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getDay(): ?\DateTimeInterface
+    public function getDay(): ?DateTimeInterface
     {
         return $this->day;
     }
 
-    public function setDay(\DateTimeInterface $day): self
+    public function setDay(DateTimeInterface $day): self
     {
         $this->day = $day;
 
         return $this;
     }
 
-    public function getArrival(): ?\DateTimeInterface
+    public function getArrival(): ?DateTimeInterface
     {
         return $this->arrival;
     }
 
-    public function setArrival(\DateTimeInterface $arrival): self
+    public function setArrival(DateTimeInterface $arrival): self
     {
         $this->arrival = $arrival;
 
         return $this;
     }
 
-    public function getDeparture(): ?\DateTimeInterface
+    public function getDeparture(): ?DateTimeInterface
     {
         return $this->departure;
     }
 
-    public function setDeparture(\DateTimeInterface $departure): self
+    public function setDeparture(DateTimeInterface $departure): self
     {
         $this->departure = $departure;
 

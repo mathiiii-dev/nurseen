@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\MenuRepository;
+use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -13,26 +14,26 @@ class Menu
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
     #[Groups(['menu'])]
-    private $id;
+    private int $id;
 
     #[Groups(['menu'])]
     #[ORM\Column(type: 'string', length: 255)]
-    private $entry;
+    private string $entry;
 
     #[Groups(['menu'])]
     #[ORM\Column(type: 'string', length: 255)]
-    private $meal;
+    private string $meal;
 
     #[Groups(['menu'])]
     #[ORM\Column(type: 'string', length: 255)]
-    private $dessert;
+    private string $dessert;
 
     #[Groups(['menu'])]
     #[ORM\Column(type: 'date')]
-    private $date;
+    private DateTimeInterface $date;
 
     #[ORM\ManyToOne(targetEntity: Nurse::class, inversedBy: 'menus')]
-    private $nurse;
+    private Nurse $nurse;
 
     public function getId(): ?int
     {
@@ -75,12 +76,12 @@ class Menu
         return $this;
     }
 
-    public function getDate(): ?\DateTimeInterface
+    public function getDate(): ?DateTimeInterface
     {
         return $this->date;
     }
 
-    public function setDate(\DateTimeInterface $date): self
+    public function setDate(DateTimeInterface $date): self
     {
         $this->date = $date;
 

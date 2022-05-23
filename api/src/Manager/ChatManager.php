@@ -7,7 +7,6 @@ use App\Repository\ChatRepository;
 use App\Repository\FamilyRepository;
 use App\Repository\MessageRepository;
 use App\Repository\NurseRepository;
-use JetBrains\PhpStorm\ArrayShape;
 
 class ChatManager
 {
@@ -56,7 +55,6 @@ class ChatManager
         return $response;
     }
 
-    #[ArrayShape(['chatId' => '', 'nurse' => 'array', 'family' => 'array'])]
     private function chatArray($value): array
     {
         return [
@@ -72,7 +70,6 @@ class ChatManager
         ];
     }
 
-    #[ArrayShape(['chatId' => '', 'nurse' => 'array', 'family' => 'array', 'lastMessage' => 'array'])]
     private function lastMessageChatArray($value, $lastMessage): array
     {
         return [

@@ -41,18 +41,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private string $password;
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Message::class)]
-    private $messages;
+    private Collection $messages;
 
     #[Groups(['chat', 'chat_list', 'file', 'feed'])]
     #[ORM\Column(type: 'string', length: 255)]
-    private $firstname;
+    private string $firstname;
 
     #[Groups(['chat', 'chat_list', 'file', 'feed'])]
     #[ORM\Column(type: 'string', length: 255)]
-    private $lastname;
+    private string $lastname;
 
     #[ORM\OneToMany(mappedBy: 'sender', targetEntity: File::class)]
-    private $files;
+    private Collection $files;
 
     public function __construct()
     {

@@ -7,25 +7,22 @@ use App\Entity\FeedImage;
 use App\Service\UploadService;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-use Symfony\Component\HttpFoundation\File\Exception\FileException;
-use Symfony\Component\String\Slugger\SluggerInterface;
+use Symfony\Component\HttpFoundation\FileBag;
 
 class FeedImageHandler
 {
-    private SluggerInterface $slugger;
     private ManagerRegistry $doctrine;
     private ParameterBagInterface $bag;
     private UploadService $uploadService;
 
-    public function __construct(SluggerInterface $slugger, ManagerRegistry $doctrine, ParameterBagInterface $bag, UploadService $uploadService)
+    public function __construct(ManagerRegistry $doctrine, ParameterBagInterface $bag, UploadService $uploadService)
     {
-        $this->slugger = $slugger;
         $this->doctrine = $doctrine;
         $this->bag = $bag;
         $this->uploadService = $uploadService;
     }
 
-    public function handleFeedImageCreate($files, Feed $feed)
+    public function handleFeedImageCreate(FileBag $files, Feed $feed): void
     {
         $em = $this->doctrine->getManager();
 

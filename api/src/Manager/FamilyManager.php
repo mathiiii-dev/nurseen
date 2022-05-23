@@ -42,7 +42,6 @@ class FamilyManager
         return array_values(array_unique($parents, SORT_REGULAR));
     }
 
-    #[ArrayShape(['userId' => 'int|null', 'lastname' => 'null|string', 'firstname' => 'null|string'])]
     public function getNurse(Nurse $nurse): array
     {
         return [

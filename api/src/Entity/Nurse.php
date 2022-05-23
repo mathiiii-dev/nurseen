@@ -15,27 +15,27 @@ class Nurse
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
     #[Groups(['chat_list', 'feed'])]
-    private $id;
+    private int $id;
 
     #[ORM\OneToOne(targetEntity: User::class, cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['gallery', 'chat_list', 'feed'])]
-    private $nurse;
+    private User $nurse;
 
     #[ORM\OneToMany(mappedBy: 'nurse', targetEntity: Kid::class, orphanRemoval: true)]
-    private $kids;
+    private Collection $kids;
 
     #[ORM\OneToMany(mappedBy: 'nurse', targetEntity: Gallery::class)]
-    private $galleries;
+    private Collection $galleries;
 
     #[ORM\OneToMany(mappedBy: 'nurse', targetEntity: Menu::class)]
-    private $menus;
+    private Collection $menus;
 
     #[ORM\OneToMany(mappedBy: 'nurse', targetEntity: Chat::class)]
-    private $chats;
+    private Collection $chats;
 
     #[ORM\OneToMany(mappedBy: 'nurse', targetEntity: Feed::class)]
-    private $feeds;
+    private Collection $feeds;
 
     public function __construct()
     {

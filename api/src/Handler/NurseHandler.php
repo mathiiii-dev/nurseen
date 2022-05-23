@@ -15,7 +15,7 @@ class NurseHandler
         $this->doctrine = $doctrine;
     }
 
-    public function handleNurseCreate(User $user)
+    public function handleNurseCreate(User $user): void
     {
         $entityManager = $this->doctrine->getManager();
 

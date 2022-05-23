@@ -13,15 +13,15 @@ class Gallery
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
     #[Groups(['gallery'])]
-    private $id;
+    private int $id;
 
     #[Groups(['gallery'])]
     #[ORM\Column(type: 'text')]
-    private $url;
+    private string $url;
 
     #[Groups(['gallery'])]
     #[ORM\ManyToOne(targetEntity: Nurse::class, inversedBy: 'galleries')]
-    private $nurse;
+    private Nurse $nurse;
 
     public function getId(): ?int
     {

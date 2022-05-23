@@ -6,6 +6,7 @@ use App\Entity\Kid;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -45,7 +46,7 @@ class KidRepository extends ServiceEntityRepository
         }
     }
 
-    public function findKidsByNurseNonArchived($nurse)
+    public function findKidsByNurseNonArchived(int $nurse): array
     {
         return $this->createQueryBuilder('k')
             ->andWhere('k.archived = false')

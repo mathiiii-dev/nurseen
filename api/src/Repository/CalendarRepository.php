@@ -49,6 +49,7 @@ class CalendarRepository extends ServiceEntityRepository
         }
     }
 
+
     public function getCalendarByNurse(int $nurseId): array
     {
         $sql = '
