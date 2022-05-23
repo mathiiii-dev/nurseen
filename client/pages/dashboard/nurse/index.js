@@ -24,7 +24,7 @@ import VerticalCard from '../../../components/VerticalCard';
 import { cards, verticalCards } from '../../../data/cards';
 import { usePagination } from '@mantine/hooks';
 
-export default function Page({ bearer, userId, code }) {
+export default function Page({ bearer, userId, code, firstname, lastname }) {
     const router = useRouter();
 
     const [archiveOpened, setArchiveOpened] = useState(false);
@@ -153,7 +153,7 @@ export default function Page({ bearer, userId, code }) {
             </Modal>
             <Grid>
                 <Grid.Col>
-                    <Title>Bonjour, John Doe ! </Title>
+                    <Title>{`Bonjour, ${firstname} ${lastname} ! `}</Title>
                 </Grid.Col>
                 <Grid.Col>
                     <Popover
@@ -360,6 +360,8 @@ export async function getServerSideProps(ctx) {
             userId: sessionCallBack.user.id,
             bearer: authToken.authorizationString,
             code: code.code,
+            lastname: authToken.decodedToken.lastname,
+            firstname: authToken.decodedToken.firstname,
         },
     };
 }
