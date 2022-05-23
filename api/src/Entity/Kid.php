@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\KidRepository;
+use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -15,41 +16,41 @@ class Kid
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
     #[Groups(['kid_list'])]
-    private $id;
+    private int $id;
 
     #[ORM\Column(type: 'string', length: 50)]
     #[Groups(['kid_list'])]
-    private $firstname;
+    private string $firstname;
 
     #[ORM\Column(type: 'string', length: 50)]
     #[Groups(['kid_list'])]
-    private $lastname;
+    private string $lastname;
 
     #[ORM\Column(type: 'date', nullable: true)]
     #[Groups(['kid_list'])]
-    private $birthday;
+    private DateTimeInterface $birthday;
 
     #[ORM\ManyToOne(targetEntity: Family::class, inversedBy: 'kids')]
     #[ORM\JoinColumn(nullable: false)]
-    private $family;
+    private Family $family;
 
     #[ORM\ManyToOne(targetEntity: Nurse::class, inversedBy: 'kids')]
     #[ORM\JoinColumn(nullable: false)]
-    private $nurse;
+    private Nurse $nurse;
 
     #[ORM\Column(type: 'boolean')]
     #[Groups(['kid_list'])]
-    private $archived;
+    private bool $archived;
 
     #[ORM\Column(type: 'boolean')]
     #[Groups(['kid_list'])]
-    private $activated;
+    private bool $activated;
 
     #[ORM\OneToMany(mappedBy: 'kid', targetEntity: Calendar::class, orphanRemoval: true)]
-    private $calendars;
+    private Collection $calendars;
 
     #[ORM\OneToMany(mappedBy: 'kid', targetEntity: Note::class)]
-    private $notes;
+    private Collection $notes;
 
     public function __construct()
     {
@@ -86,12 +87,12 @@ class Kid
         return $this;
     }
 
-    public function getBirthday(): ?\DateTimeInterface
+    public function getBirthday(): ?DateTimeInterface
     {
         return $this->birthday;
     }
 
-    public function setBirthday(?\DateTimeInterface $birthday): self
+    public function setBirthday(?DateTimeInterface $birthday): self
     {
         $this->birthday = $birthday;
 

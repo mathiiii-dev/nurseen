@@ -17,6 +17,7 @@ import { AiOutlineClose, AiTwotoneDelete } from 'react-icons/ai';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { usePagination } from '@mantine/hooks';
+import '../../../../styles/globals.css';
 
 function AddGallery({ bearer, userId }) {
     const [currentImage, setCurrentImage] = useState(0);
@@ -51,8 +52,9 @@ function AddGallery({ bearer, userId }) {
             id: element.id,
             src:
                 process.env.MEDIA_URL + 'gallery/' + userId + '/' + element.url,
-            width: 4,
-            height: 3,
+            sizes: ['(min-width: 480px) 50vw,(min-width: 1024px) 33.3vw,100vw'],
+            width: 3,
+            height: 4,
         }));
     }
 

@@ -2,6 +2,12 @@
     font-family: 'fcicons', 'Open Sans', sans-serif;
 }
 
+[class^="react-photo-gallery"] img {
+    object-fit: scale-down;
+    width: 400px;
+    height: 300px;
+}
+
 .wordWrap {
     word-wrap: break-word;      /* IE 5.5-7 */
     white-space: -moz-pre-wrap; /* Firefox 1.0-2.0 */
@@ -11,6 +17,11 @@
 @media only screen and (max-width: 1026px) {
     .hide {
         display: none;
+    }
+    [class^="react-photo-gallery"] img {
+        object-fit: scale-down;
+        width: 350px;
+        height: 250px;
     }
 }
 

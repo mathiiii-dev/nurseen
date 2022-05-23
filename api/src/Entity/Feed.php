@@ -3,9 +3,11 @@
 namespace App\Entity;
 
 use App\Repository\FeedRepository;
+use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use JetBrains\PhpStorm\Pure;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: FeedRepository::class)]
@@ -15,23 +17,24 @@ class Feed
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
     #[Groups(['feed'])]
-    private $id;
+    private int $id;
 
     #[ORM\Column(type: 'text')]
     #[Groups(['feed'])]
-    private $text;
+    private string $text;
 
     #[ORM\Column(type: 'date')]
     #[Groups(['feed'])]
-    private $creationDate;
+    private DateTimeInterface $creationDate;
 
     #[ORM\ManyToOne(targetEntity: Nurse::class, inversedBy: 'feeds')]
     #[Groups(['feed'])]
-    private $nurse;
+    private Nurse $nurse;
 
     #[ORM\OneToMany(mappedBy: 'feed', targetEntity: FeedImage::class)]
     #[Groups(['feed'])]
-    private $feedImages;
+    private Collection $feedImages;
+
 
     public function __construct()
     {
@@ -55,12 +58,12 @@ class Feed
         return $this;
     }
 
-    public function getCreationDate(): ?\DateTimeInterface
+    public function getCreationDate(): ?DateTimeInterface
     {
         return $this->creationDate;
     }
 
-    public function setCreationDate(\DateTimeInterface $creationDate): self
+    public function setCreationDate(DateTimeInterface $creationDate): self
     {
         $this->creationDate = $creationDate;
 

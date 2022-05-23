@@ -15,7 +15,7 @@ class ValidatorService
         $this->validator = $validator;
     }
 
-    public function validate($object)
+    public function validate(mixed $object): void
     {
         $errors = $this->validator->validate($object);
         if (count($errors) > 0) {

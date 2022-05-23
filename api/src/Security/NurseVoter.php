@@ -4,6 +4,7 @@ namespace App\Security;
 
 use App\Entity\Kid;
 use App\Entity\User;
+use Exception;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
@@ -12,7 +13,7 @@ class NurseVoter extends Voter
 {
     public const OWNER = 'owner';
 
-    protected function supports(string $attribute, $subject): bool
+    protected function supports(string $attribute, mixed $subject): bool
     {
         if (self::OWNER != $attribute) {
             return false;
@@ -28,7 +29,7 @@ class NurseVoter extends Voter
     /**
      * @throws Exception
      */
-    protected function voteOnAttribute(string $attribute, $subject, TokenInterface $token): bool
+    protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool
     {
         $user = $token->getUser();
 

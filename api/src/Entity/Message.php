@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\MessageRepository;
+use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -13,22 +14,22 @@ class Message
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
     #[Groups(['chat'])]
-    private $id;
+    private int $id;
 
     #[ORM\Column(type: 'text')]
     #[Groups(['chat'])]
-    private $message;
+    private string $message;
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'messages')]
     #[Groups(['chat'])]
-    private $user;
+    private User $user;
 
     #[ORM\ManyToOne(targetEntity: Chat::class, inversedBy: 'messages')]
-    private $chat;
+    private Chat $chat;
 
     #[ORM\Column(type: 'datetime')]
     #[Groups(['chat'])]
-    private $sendDate;
+    private DateTimeInterface $sendDate;
 
     public function getId(): ?int
     {
@@ -71,12 +72,12 @@ class Message
         return $this;
     }
 
-    public function getSendDate(): ?\DateTimeInterface
+    public function getSendDate(): ?DateTimeInterface
     {
         return $this->sendDate;
     }
 
-    public function setSendDate(\DateTimeInterface $sendDate): self
+    public function setSendDate(DateTimeInterface $sendDate): self
     {
         $this->sendDate = $sendDate;
 

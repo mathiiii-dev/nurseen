@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 class PaginationService
 {
-    public function getPagination(Request $request, $object, $maxPerPage = 10): Pagerfanta
+    public function getPagination(Request $request, mixed $object, int $maxPerPage = 10): Pagerfanta
     {
         $page = $request->query->get('page') ?? 1;
         $pagerfanta = new Pagerfanta(

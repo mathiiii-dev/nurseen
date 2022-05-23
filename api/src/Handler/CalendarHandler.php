@@ -21,7 +21,7 @@ class CalendarHandler
     /**
      * @throws Exception
      */
-    public function handleCalendarCreate(Request $request, Kid $kid)
+    public function handleCalendarCreate(Request $request, Kid $kid): void
     {
         $data = $request->toArray();
 
@@ -48,7 +48,7 @@ class CalendarHandler
     /**
      * @throws Exception
      */
-    public function handleEditCalendar(Request $request, Calendar $event, Kid $kid)
+    public function handleEditCalendar(Request $request, Calendar $event, Kid $kid): void
     {
         $data = $request->toArray();
 
@@ -63,7 +63,7 @@ class CalendarHandler
         $entityManager->flush();
     }
 
-    public function handleDeleteCalendar(Calendar $calendar)
+    public function handleDeleteCalendar(Calendar $calendar): void
     {
         $entityManager = $this->doctrine->getManager();
 

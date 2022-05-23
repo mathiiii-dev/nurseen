@@ -6,6 +6,7 @@ use App\Repository\ChatRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use JetBrains\PhpStorm\Pure;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: ChatRepository::class)]
@@ -15,18 +16,18 @@ class Chat
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
     #[Groups(['chat_list'])]
-    private $id;
+    private int $id;
 
     #[ORM\ManyToOne(targetEntity: Nurse::class, inversedBy: 'chats')]
     #[Groups(['chat_list'])]
-    private $nurse;
+    private Nurse $nurse;
 
     #[ORM\ManyToOne(targetEntity: Family::class, inversedBy: 'chats')]
     #[Groups(['chat_list'])]
-    private $family;
+    private Family $family;
 
     #[ORM\OneToMany(mappedBy: 'chat', targetEntity: Message::class)]
-    private $messages;
+    private Collection $messages;
 
     public function __construct()
     {

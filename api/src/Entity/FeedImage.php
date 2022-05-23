@@ -13,14 +13,14 @@ class FeedImage
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
     #[Groups(['feed'])]
-    private $id;
+    private int $id;
 
     #[ORM\Column(type: 'string', length: 255)]
     #[Groups(['feed'])]
-    private $url;
+    private string $url;
 
     #[ORM\ManyToOne(targetEntity: Feed::class, inversedBy: 'feedImages')]
-    private $feed;
+    private Feed $feed;
 
     public function getId(): ?int
     {

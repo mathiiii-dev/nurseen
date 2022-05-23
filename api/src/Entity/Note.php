@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\NoteRepository;
+use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -13,18 +14,18 @@ class Note
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
     #[Groups(['note_list'])]
-    private $id;
+    private int $id;
 
     #[Groups(['note_list'])]
     #[ORM\Column(type: 'text')]
-    private $note;
+    private string $note;
 
     #[Groups(['note_list'])]
     #[ORM\Column(type: 'date')]
-    private $date;
+    private DateTimeInterface $date;
 
     #[ORM\ManyToOne(targetEntity: Kid::class, inversedBy: 'note')]
-    private $kid;
+    private Kid $kid;
 
     public function getId(): ?int
     {
@@ -43,12 +44,12 @@ class Note
         return $this;
     }
 
-    public function getDate(): ?\DateTimeInterface
+    public function getDate(): ?DateTimeInterface
     {
         return $this->date;
     }
 
-    public function setDate(\DateTimeInterface $date): self
+    public function setDate(DateTimeInterface $date): self
     {
         $this->date = $date;
 

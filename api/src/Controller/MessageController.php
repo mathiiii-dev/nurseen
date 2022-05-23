@@ -48,9 +48,9 @@ class MessageController extends AbstractController
         $update = $this->messageHandler->handleMessageCreate($user, $data, $chat);
 
         if ($update) {
-            return new Response(Response::HTTP_OK);
+            return $this->json([], Response::HTTP_OK);
         }
 
-        return new Response(Response::HTTP_BAD_REQUEST);
+        return $this->json([], Response::HTTP_BAD_REQUEST);
     }
 }

@@ -6,6 +6,7 @@ use App\Repository\FamilyRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use JetBrains\PhpStorm\Pure;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: FamilyRepository::class)]
@@ -15,18 +16,18 @@ class Family
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
     #[Groups(['chat_list'])]
-    private $id;
+    private int $id;
 
     #[ORM\OneToOne(targetEntity: User::class, cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['chat_list'])]
-    private $parent;
+    private User $parent;
 
     #[ORM\OneToMany(mappedBy: 'family', targetEntity: Kid::class, orphanRemoval: true)]
-    private $kids;
+    private Collection $kids;
 
     #[ORM\OneToMany(mappedBy: 'family', targetEntity: Chat::class)]
-    private $chats;
+    private Collection $chats;
 
     public function __construct()
     {

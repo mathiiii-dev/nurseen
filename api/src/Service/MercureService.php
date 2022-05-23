@@ -14,7 +14,7 @@ class MercureService
         $this->bus = $bus;
     }
 
-    public function update(string $topics, string $data)
+    public function update(string $topics, string $data): void
     {
         $update = new Update(
             $topics,
