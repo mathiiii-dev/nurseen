@@ -36,7 +36,6 @@ class FeedHandler
         $em = $this->doctrine->getManager();
 
         foreach ($feed->getFeedImages() as $feedImage) {
-            $feed->removeFeedImage($feedImage);
             $em->remove($feedImage);
             $em->flush();
         }

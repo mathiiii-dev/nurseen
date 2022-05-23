@@ -1,7 +1,8 @@
 import { Space, Text, Title } from '@mantine/core';
-import Gallery from 'react-photo-gallery';
 import { getSession } from 'next-auth/react';
 import { AuthToken } from '../../../services/auth_token';
+import GalleryNurse from '../../../components/GalleryNurse';
+import dayjs from 'dayjs';
 
 function Feed({ feed }) {
     function createMarkup(text) {
@@ -9,6 +10,8 @@ function Feed({ feed }) {
             __html: text,
         };
     }
+
+    console.log(feed);
 
     return (
         <>
@@ -24,12 +27,20 @@ function Feed({ feed }) {
                                   borderRadius: '8px',
                               }}
                           >
-                              <Text>Mathias Micheli - 8 mai</Text>
+                              <Text>
+                                  {f.nurse.nurse.firstname +
+                                      ' ' +
+                                      f.nurse.nurse.lastname +
+                                      ' - ' +
+                                      dayjs(f.creationDate).format(
+                                          'DD MMM YYYY'
+                                      )}
+                              </Text>
                               <Text
                                   dangerouslySetInnerHTML={createMarkup(f.text)}
                               />
-                              <Gallery
-                                  photos={f.feedImages.map((i) => ({
+                              <GalleryNurse
+                                  galleryPhoto={f.feedImages.map((i) => ({
                                       src: `${process.env.MEDIA_URL}/feed/${f.id}/${i.url}`,
                                       width: 2,
                                       height: 3,

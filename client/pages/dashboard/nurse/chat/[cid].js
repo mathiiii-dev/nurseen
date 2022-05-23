@@ -5,7 +5,6 @@ import EventSource from 'eventsource';
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
 import { scrollToBottom } from '../../../../services/scroll';
-import { Space } from '@mantine/core';
 
 export default function MessageNurse({ messages, userId, bearer }) {
     const viewport = useRef();

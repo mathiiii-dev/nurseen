@@ -138,7 +138,12 @@ function NurseChat({ bearer, userId, family }) {
                                         <Text weight={500} size="lg">
                                             {d.family.name}
                                         </Text>
-                                        <Card key={idx} shadow="sm" p="xl">
+                                        <Card
+                                            key={idx}
+                                            shadow="sm"
+                                            p="xl"
+                                            radius={'md'}
+                                        >
                                             <Text size="lg">
                                                 {d.lastMessage
                                                     ? 'Dernier message : ' +
@@ -149,8 +154,8 @@ function NurseChat({ bearer, userId, family }) {
                                                       ' - ' +
                                                       dayjs(
                                                           d.lastMessage.sendDate
-                                                      ).format('HH:mm')
-                                                    : ''}
+                                                      ).format('DD/MM HH:mm')
+                                                    : 'Aucun message envoyé'}
                                             </Text>
                                         </Card>
                                     </Grid.Col>

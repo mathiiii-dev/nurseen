@@ -2,8 +2,12 @@
     font-family: 'fcicons', 'Open Sans', sans-serif;
 }
 
+[class^="css-"] {
+    font-family: 'fcicons', 'Open Sans', sans-serif;
+}
+
 [class^="react-photo-gallery"] img {
-    object-fit: scale-down;
+    object-fit: cover;
     width: 400px;
     height: 300px;
 }
@@ -19,7 +23,7 @@
         display: none;
     }
     [class^="react-photo-gallery"] img {
-        object-fit: scale-down;
+        object-fit: cover;
         width: 350px;
         height: 250px;
     }

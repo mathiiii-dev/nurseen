@@ -23,6 +23,7 @@ import { useNotifications } from '@mantine/notifications';
 import VerticalCard from '../../../components/VerticalCard';
 import { cards, verticalCards } from '../../../data/cards';
 import { usePagination } from '@mantine/hooks';
+import '../../../styles/globals.css';
 
 export default function Page({ bearer, userId, code, firstname, lastname }) {
     const router = useRouter();

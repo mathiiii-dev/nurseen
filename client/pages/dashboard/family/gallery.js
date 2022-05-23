@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useState } from 'react';
 import { AuthToken } from '../../../services/auth_token';
 import { getSession } from 'next-auth/react';
-import Gallery from 'react-photo-gallery';
 import Carousel, { Modal, ModalGateway } from 'react-images';
 import { Center, LoadingOverlay, Pagination, Space } from '@mantine/core';
 import { usePagination } from '@mantine/hooks';
+import GalleryNurse from '../../../components/GalleryNurse';
 
 function AddGallery({ bearer, userId }) {
     const [currentImage, setCurrentImage] = useState(0);
@@ -64,7 +64,7 @@ function AddGallery({ bearer, userId }) {
                 ''
             ) : (
                 <>
-                    <Gallery photos={galleryPhoto} onClick={openLightbox} />
+                    <GalleryNurse galleryPhoto={galleryPhoto} bearer={bearer} />
                     <ModalGateway>
                         {viewerIsOpen ? (
                             <Modal onClose={closeLightbox}>
