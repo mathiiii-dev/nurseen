@@ -6,6 +6,9 @@ import 'dayjs/locale/fr';
 function Menu({ menu, role }) {
     return (
         <div>
+            <Link href={'menu/list'}>
+                <Button>Voir la liste des anciens menus</Button>
+            </Link>
             {menu ? (
                 <>
                     <Title order={1}>

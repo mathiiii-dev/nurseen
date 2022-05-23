@@ -6,6 +6,7 @@ use App\Entity\Calendar;
 use App\Entity\Kid;
 use App\Handler\CalendarHandler;
 use App\Repository\CalendarRepository;
+use App\Repository\FamilyRepository;
 use Exception;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -18,11 +19,13 @@ class CalendarController extends AbstractController
 {
     private CalendarHandler $calendarHandler;
     private CalendarRepository $calendarRepository;
+    private FamilyRepository $familyRepository;
 
-    public function __construct(CalendarHandler $calendarHandler, CalendarRepository $calendarRepository)
+    public function __construct(CalendarHandler $calendarHandler, CalendarRepository $calendarRepository, FamilyRepository $familyRepository)
     {
         $this->calendarHandler = $calendarHandler;
         $this->calendarRepository = $calendarRepository;
+        $this->familyRepository = $familyRepository;
     }
 
     /**
@@ -74,5 +77,13 @@ class CalendarController extends AbstractController
         $this->calendarHandler->handleDeleteCalendar($calendar);
 
         return $this->json([], Response::HTTP_NO_CONTENT);
+    }
+
+    #[IsGranted('ROLE_PARENT', message: 'Vous ne pouvez pas faire ça')]
+    #[Route('/calendar/family/{familyId}', name: 'app_calendar_family', methods: 'GET')]
+    public function calendarFamily(int $familyId): JsonResponse
+    {
+        $family = $this->familyRepository->findOneBy(['parent' => $familyId]);
+        return $this->json($this->calendarRepository->getCalendarByFamily($family->getId()), Response::HTTP_OK);
     }
 }

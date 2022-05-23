@@ -60,4 +60,14 @@ class CalendarRepository extends ServiceEntityRepository
 
         return $this->connection->fetchAllAssociative($sql);
     }
+
+    public function getCalendarByFamily(int $familyId): array
+    {
+        $sql = '
+            select * from calendar as c
+            inner join kid k on k.id = c.kid_id and k.family_id = '.$familyId.'
+                ';
+
+        return $this->connection->fetchAllAssociative($sql);
+    }
 }

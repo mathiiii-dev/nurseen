@@ -1,9 +1,34 @@
 import Menu from '../../../../components/Menu';
 import { getSession } from 'next-auth/react';
 import { AuthToken } from '../../../../services/auth_token';
+import { Button, Text } from '@mantine/core';
+import Link from 'next/link';
 
 function MenuFamily({ menu, role }) {
-    return <Menu menu={menu} role={role} />;
+    let wKid = true;
+    if (menu) {
+        if (menu.hasOwnProperty('kids')) {
+            wKid = false;
+        }
+    }
+
+    return (
+        <>
+            {wKid ? (
+                <Menu menu={menu} role={role} />
+            ) : (
+                <>
+                    <Text>
+                        Vous devez enregistrer au moins un enfant pour
+                        visualiser le menu
+                    </Text>
+                    <Link href={'create-kid'}>
+                        <Button>Ajouter un enfant</Button>
+                    </Link>
+                </>
+            )}
+        </>
+    );
 }
 
 export default MenuFamily;

@@ -8,6 +8,7 @@ import {
     Text,
     Title,
     LoadingOverlay,
+    Group,
 } from '@mantine/core';
 import { useEffect, useRef, useState } from 'react';
 import { AuthToken } from '../../../services/auth_token';
@@ -102,9 +103,14 @@ export default function Page({
                     <Title>{`Bonjour, ${firstname} ${lastname} !`}</Title>
                 </Grid.Col>
                 <Grid.Col>
-                    <Link href={'family/create-kid'}>
-                        <Button>Ajouter un enfant</Button>
-                    </Link>
+                    <Group>
+                        <Link href={'family/create-kid'}>
+                            <Button>Ajouter un enfant</Button>
+                        </Link>
+                        <Link href={'family/calendar'}>
+                            <Button>Calendrier</Button>
+                        </Link>
+                    </Group>
                 </Grid.Col>
             </Grid>
 
