@@ -1,8 +1,9 @@
-import { Space, Text, Title } from '@mantine/core';
+import { Button, Space, Text, Title } from '@mantine/core';
 import { getSession } from 'next-auth/react';
 import { AuthToken } from '../../../services/auth_token';
 import GalleryNurse from '../../../components/GalleryNurse';
 import dayjs from 'dayjs';
+import Link from 'next/link';
 
 function Feed({ feed }) {
     function createMarkup(text) {
@@ -11,46 +12,58 @@ function Feed({ feed }) {
         };
     }
 
-    console.log(feed);
-
     return (
         <>
-            <Title>Les actualités de vos enfants</Title>
-            <Space h={'xl'} />
-            {feed
-                ? feed.map((f) => (
-                      <>
-                          <div
-                              style={{
-                                  backgroundColor: '#edf2f4',
-                                  padding: '16px',
-                                  borderRadius: '8px',
-                              }}
-                          >
-                              <Text>
-                                  {f.nurse.nurse.firstname +
-                                      ' ' +
-                                      f.nurse.nurse.lastname +
-                                      ' - ' +
-                                      dayjs(f.creationDate).format(
-                                          'DD MMM YYYY'
-                                      )}
-                              </Text>
-                              <Text
-                                  dangerouslySetInnerHTML={createMarkup(f.text)}
-                              />
-                              <GalleryNurse
-                                  galleryPhoto={f.feedImages.map((i) => ({
-                                      src: `${process.env.MEDIA_URL}/feed/${f.id}/${i.url}`,
-                                      width: 2,
-                                      height: 3,
-                                  }))}
-                              />
-                          </div>
-                          <Space h={'xl'} />
-                      </>
-                  ))
-                : ''}
+            {feed.length > 0 ? (
+                <>
+                    <Title>Les actualités de vos enfants</Title>
+                    <Space h={'xl'} />
+                    {feed.map((f) => (
+                        <>
+                            <div
+                                style={{
+                                    backgroundColor: '#edf2f4',
+                                    padding: '16px',
+                                    borderRadius: '8px',
+                                }}
+                            >
+                                <Text>
+                                    {f.nurse.nurse.firstname +
+                                        ' ' +
+                                        f.nurse.nurse.lastname +
+                                        ' - ' +
+                                        dayjs(f.creationDate).format(
+                                            'DD MMM YYYY'
+                                        )}
+                                </Text>
+                                <Text
+                                    dangerouslySetInnerHTML={createMarkup(
+                                        f.text
+                                    )}
+                                />
+                                <GalleryNurse
+                                    galleryPhoto={f.feedImages.map((i) => ({
+                                        src: `${process.env.MEDIA_URL}/feed/${f.id}/${i.url}`,
+                                        width: 2,
+                                        height: 3,
+                                    }))}
+                                />
+                            </div>
+                            <Space h={'xl'} />
+                        </>
+                    ))}
+                </>
+            ) : (
+                <>
+                    <Text>
+                        Vous devez enregistrer au moins un enfant pour voir
+                        apparaitre les posts sur l'actualité
+                    </Text>
+                    <Link href={'create-kid'}>
+                        <Button>Ajouter un enfant</Button>
+                    </Link>
+                </>
+            )}
         </>
     );
 }
@@ -72,9 +85,9 @@ export async function getServerSideProps(ctx) {
             },
         }
     );
-    console.log(res);
+
     const feed = await res.json();
-    console.log(feed);
+
     return {
         props: {
             userId: sessionCallBack.user.id,

@@ -94,8 +94,11 @@ class GalleryController extends AbstractController
     {
         $family = $this->familyRepository->findOneBy(['parent' => $familyId]);
         $kid = $this->kidRepository->findOneBy(['family' => $family->getId()]);
-        $photos = $this->galleryRepository->findBy(['nurse' => $kid->getNurse()->getId()]);
 
+        $photos = [];
+        if ($kid) {
+            $photos = $this->galleryRepository->findBy(['nurse' => $kid->getNurse()->getId()]);
+        }
 
         return $this->json(
             $this->paginationService->getPagination($request, $photos),

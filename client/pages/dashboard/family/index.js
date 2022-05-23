@@ -29,15 +29,14 @@ export default function Page({
     firstname,
     lastname,
 }) {
-    const [kids, setKids] = useState();
+    const [kids, setKids] = useState([]);
     const [page, onChange] = useState(1);
     const [total, setTotal] = useState(1);
     const pagination = usePagination({ total, page, onChange });
     const [visible, setVisible] = useState(false);
     const viewport = useRef();
 
-    const open = (event) => {
-        event.preventDefault();
+    const open = () => {
         fetch(process.env.BASE_URL + `chat/family`, {
             method: 'POST',
             body: JSON.stringify({
@@ -54,7 +53,6 @@ export default function Page({
     const [stateMessages, setStateMessages] = useState(messages);
     if (chat) {
         useEffect(() => {
-            scrollToBottom(viewport);
             const url = new URL('http://localhost:9090/.well-known/mercure');
             url.searchParams.append(
                 'topic',
@@ -63,8 +61,6 @@ export default function Page({
             const eventSource = new EventSource(url.toString());
             eventSource.onmessage = (e) => {
                 let origin = JSON.parse(e.data);
-                console.log(userId, origin.userId);
-                console.log(stateMessages);
                 setStateMessages((state) => [
                     ...state,
                     {
@@ -78,8 +74,6 @@ export default function Page({
                         sendDate: dayjs().toString(),
                     },
                 ]);
-
-                scrollToBottom(viewport);
             };
         }, []);
     }
@@ -134,63 +128,77 @@ export default function Page({
             <Grid gutter="xl">
                 <Grid.Col md={6}>
                     <LoadingOverlay visible={visible} />
-                    <table>
-                        <thead>
-                            <tr>
-                                <th scope="col">
-                                    <Text>Nom</Text>
-                                </th>
-                                <th scope="col">
-                                    <Text>Prénom</Text>
-                                </th>
-                                <th scope="col">
-                                    <Text>Note</Text>
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {kids &&
-                                kids.map((kid) => {
-                                    return (
-                                        <tr>
-                                            <td data-label="Nom">
-                                                <Text>{kid.lastname}</Text>
-                                            </td>
-                                            <td data-label="Prénom">
-                                                <Text>{kid.firstname}</Text>
-                                            </td>
-                                            <td data-label="Note">
-                                                <Link
-                                                    href={{
-                                                        pathname: `/dashboard/family/kid/[pid]/notes`,
-                                                        query: { pid: kid.id },
-                                                    }}
-                                                >
-                                                    <Button>Note</Button>
-                                                </Link>
-                                            </td>
-                                        </tr>
-                                    );
-                                })}
-                        </tbody>
-                    </table>
-                    <Space h={'xl'} />
-                    <Center>
-                        <Pagination total={total} onChange={onChange} />
-                    </Center>
+                    {kids.length > 0 && (
+                        <>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th scope="col">
+                                            <Text>Nom</Text>
+                                        </th>
+                                        <th scope="col">
+                                            <Text>Prénom</Text>
+                                        </th>
+                                        <th scope="col">
+                                            <Text>Note</Text>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {kids.map((kid) => {
+                                        return (
+                                            <tr>
+                                                <td data-label="Nom">
+                                                    <Text>{kid.lastname}</Text>
+                                                </td>
+                                                <td data-label="Prénom">
+                                                    <Text>{kid.firstname}</Text>
+                                                </td>
+                                                <td data-label="Note">
+                                                    <Link
+                                                        href={{
+                                                            pathname: `/dashboard/family/kid/[pid]/notes`,
+                                                            query: {
+                                                                pid: kid.id,
+                                                            },
+                                                        }}
+                                                    >
+                                                        <Button>Note</Button>
+                                                    </Link>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
+                                </tbody>
+                            </table>
+                            <Space h={'xl'} />
+                            <Center>
+                                <Pagination total={total} onChange={onChange} />
+                            </Center>
+                        </>
+                    )}
                 </Grid.Col>
                 <Grid.Col md={6}>
-                    {chat != null ? (
-                        <Chat
-                            height={340}
-                            messages={stateMessages}
-                            viewport={viewport}
-                            userId={userId}
-                            bearer={bearer}
-                            cid={chat[0].id}
-                        />
+                    {kids.length > 0 ? (
+                        <>
+                            {chat != null ? (
+                                <Chat
+                                    height={340}
+                                    messages={stateMessages}
+                                    viewport={viewport}
+                                    userId={userId}
+                                    bearer={bearer}
+                                    cid={chat[0].id}
+                                />
+                            ) : (
+                                <Button onClick={open}>Ouvrir un chat</Button>
+                            )}
+                        </>
                     ) : (
-                        <Button onClick={open}>Ouvrir un chat</Button>
+                        <Text>
+                            Ajouter un enfant pour pouvoir accéder à toutes les
+                            fonctionnalités correctement
+                        </Text>
                     )}
                 </Grid.Col>
             </Grid>

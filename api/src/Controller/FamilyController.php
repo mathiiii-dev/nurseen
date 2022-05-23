@@ -90,8 +90,13 @@ class FamilyController extends AbstractController
     {
         $familyId = $this->familyRepository->findOneBy(['parent' => $familyId]);
         $kid = $this->kidRepository->findOneBy(['id' => $familyId->getKids()->get(0)]);
-        $nurse = $this->nurseRepository->findOneBy(['id' => $kid->getNurse()->getId()]);
 
-        return new JsonResponse($this->familyManager->getNurse($nurse), Response::HTTP_OK);
+        $data = [];
+        if ($kid) {
+            $nurse = $this->nurseRepository->findOneBy(['id' => $kid->getNurse()->getId()]);
+            $data = $this->familyManager->getNurse($nurse);
+        }
+
+        return new JsonResponse($data, Response::HTTP_OK);
     }
 }

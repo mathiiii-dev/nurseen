@@ -97,7 +97,6 @@ function AddGallery({ bearer, userId }) {
         setLoading(true);
         const data = new FormData();
         if (files) {
-            console.log(files);
             files.forEach((photo) => {
                 data.append(photo.name, photo);
             });

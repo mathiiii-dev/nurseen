@@ -47,7 +47,6 @@ export default function Page({ userId, bearer, family, files }) {
     }
 
     let parents = null;
-    console.log(family);
     if (family.length !== 0) {
         parents = family.map((element) => ({
             value: element.id.toString(),

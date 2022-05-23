@@ -11,6 +11,7 @@ import {
 import { Dropzone, MIME_TYPES } from '@mantine/dropzone';
 import { useState } from 'react';
 import FileManager from '../../../components/FileManager';
+import Link from 'next/link';
 
 export const dropzoneChildrenUploaded = () => (
     <Text>Votre fichier à bien été ajouté</Text>
@@ -31,8 +32,6 @@ export default function Page({ userId, bearer, nurse, files }) {
     const [uploaded, setUploaded] = useState(false);
     const [rejected, setRejected] = useState(false);
     const [title, setTitle] = useState();
-
-    console.log(nurse);
 
     let style = null;
 
@@ -75,59 +74,77 @@ export default function Page({ userId, bearer, nurse, files }) {
 
     return (
         <>
-            <Accordion initialItem={0} multiple>
-                <Accordion.Item label="Formulaire d'envoie de fichier">
+            {nurse.length > 0 ? (
+                <>
+                    <Accordion initialItem={0} multiple>
+                        <Accordion.Item label="Formulaire d'envoie de fichier">
+                            <Text>
+                                Envoyé un fichier à votre nourrice{' '}
+                                {nurse.firstname + ' ' + nurse.lastname}
+                            </Text>
+                            <form onSubmit={send}>
+                                <Space h={'md'} />
+                                <TextInput
+                                    placeholder="Contrat du mois"
+                                    label="Nom du fichier"
+                                    value={title}
+                                    onChange={(e) =>
+                                        setTitle(e.currentTarget.value)
+                                    }
+                                    required
+                                />
+                                <Space h={'md'} />
+                                <InputWrapper label="Fichier">
+                                    <Dropzone
+                                        styles={{
+                                            root: style,
+                                        }}
+                                        onDrop={(file) => {
+                                            setFile(file);
+                                            setUploaded(true);
+                                            setRejected(false);
+                                        }}
+                                        onReject={(files) => setRejected(true)}
+                                        maxSize={3 * 1024 ** 2}
+                                        accept={[
+                                            MIME_TYPES.csv,
+                                            MIME_TYPES.doc,
+                                            MIME_TYPES.docx,
+                                            MIME_TYPES.pdf,
+                                            MIME_TYPES.ppt,
+                                            MIME_TYPES.pptx,
+                                            MIME_TYPES.xls,
+                                            MIME_TYPES.xlsx,
+                                        ]}
+                                        multiple={false}
+                                    >
+                                        {uploaded
+                                            ? (status) =>
+                                                  dropzoneChildrenUploaded()
+                                            : (status) =>
+                                                  dropzoneChildren(rejected)}
+                                    </Dropzone>
+                                </InputWrapper>
+                                <Space h={'md'} />
+                                <Button type={'submit'}>Envoyer</Button>
+                            </form>
+                        </Accordion.Item>
+                        <Accordion.Item label="Mes fichiers reçus">
+                            <FileManager files={files} userId={userId} />
+                        </Accordion.Item>
+                    </Accordion>
+                </>
+            ) : (
+                <>
                     <Text>
-                        Envoyé un fichier à votre nourrice{' '}
-                        {nurse.firstname + ' ' + nurse.lastname}
+                        Vous devez enregistrer au moins un enfant pour envoyer
+                        des fichies a votre nourrice
                     </Text>
-                    <form onSubmit={send}>
-                        <Space h={'md'} />
-                        <TextInput
-                            placeholder="Contrat du mois"
-                            label="Nom du fichier"
-                            value={title}
-                            onChange={(e) => setTitle(e.currentTarget.value)}
-                            required
-                        />
-                        <Space h={'md'} />
-                        <InputWrapper label="Fichier">
-                            <Dropzone
-                                styles={{
-                                    root: style,
-                                }}
-                                onDrop={(file) => {
-                                    setFile(file);
-                                    setUploaded(true);
-                                    setRejected(false);
-                                }}
-                                onReject={(files) => setRejected(true)}
-                                maxSize={3 * 1024 ** 2}
-                                accept={[
-                                    MIME_TYPES.csv,
-                                    MIME_TYPES.doc,
-                                    MIME_TYPES.docx,
-                                    MIME_TYPES.pdf,
-                                    MIME_TYPES.ppt,
-                                    MIME_TYPES.pptx,
-                                    MIME_TYPES.xls,
-                                    MIME_TYPES.xlsx,
-                                ]}
-                                multiple={false}
-                            >
-                                {uploaded
-                                    ? (status) => dropzoneChildrenUploaded()
-                                    : (status) => dropzoneChildren(rejected)}
-                            </Dropzone>
-                        </InputWrapper>
-                        <Space h={'md'} />
-                        <Button type={'submit'}>Envoyer</Button>
-                    </form>
-                </Accordion.Item>
-                <Accordion.Item label="Mes fichiers reçus">
-                    <FileManager files={files} userId={userId} />
-                </Accordion.Item>
-            </Accordion>
+                    <Link href={'create-kid'}>
+                        <Button>Ajouter un enfant</Button>
+                    </Link>
+                </>
+            )}
         </>
     );
 }

@@ -31,7 +31,6 @@ function Chat({ userId, messages, viewport, bearer, cid, height }) {
             .then((r) => r.json())
             .then((res) => {
                 setValue('');
-                console.log(res);
                 scrollToBottom(viewport);
             });
     };

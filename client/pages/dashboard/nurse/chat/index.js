@@ -37,7 +37,6 @@ function NurseChat({ bearer, userId, family }) {
             .then((data) => {
                 setLoading(false);
                 setChat(data.items);
-                console.log(chat);
                 setTotal(data.pagination.total_pages);
             });
     }, [page]);

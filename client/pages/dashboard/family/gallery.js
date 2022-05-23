@@ -2,9 +2,17 @@ import { useCallback, useEffect, useState } from 'react';
 import { AuthToken } from '../../../services/auth_token';
 import { getSession } from 'next-auth/react';
 import Carousel, { Modal, ModalGateway } from 'react-images';
-import { Center, LoadingOverlay, Pagination, Space } from '@mantine/core';
+import {
+    Button,
+    Center,
+    LoadingOverlay,
+    Pagination,
+    Space,
+    Text,
+} from '@mantine/core';
 import { usePagination } from '@mantine/hooks';
 import GalleryNurse from '../../../components/GalleryNurse';
+import Link from 'next/link';
 
 function AddGallery({ bearer, userId }) {
     const [currentImage, setCurrentImage] = useState(0);
@@ -61,7 +69,15 @@ function AddGallery({ bearer, userId }) {
             <LoadingOverlay visible={isLoading} />
             <Space h={'xl'} />
             {galleryPhoto && galleryPhoto.length === 0 ? (
-                ''
+                <>
+                    <Text>
+                        Vous devez enregistrer au moins un enfant pour voir les
+                        photos de la galerie
+                    </Text>
+                    <Link href={'create-kid'}>
+                        <Button>Ajouter un enfant</Button>
+                    </Link>
+                </>
             ) : (
                 <>
                     <GalleryNurse galleryPhoto={galleryPhoto} bearer={bearer} />
@@ -79,13 +95,13 @@ function AddGallery({ bearer, userId }) {
                             </Modal>
                         ) : null}
                     </ModalGateway>
+                    <Space h={'xl'} />
+                    <Center>
+                        <Pagination total={total} onChange={onChange} />
+                    </Center>
+                    <Space h={'xl'} />
                 </>
             )}
-            <Space h={'xl'} />
-            <Center>
-                <Pagination total={total} onChange={onChange} />
-            </Center>
-            <Space h={'xl'} />
         </div>
     );
 }

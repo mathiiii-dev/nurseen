@@ -23,12 +23,13 @@ class FeedController extends AbstractController
     private FeedImageHandler $feedImageHandler;
 
     public function __construct(
-        NurseRepository $nurseRepository,
-        FeedRepository $feedRepository,
+        NurseRepository  $nurseRepository,
+        FeedRepository   $feedRepository,
         FamilyRepository $familyRepository,
-        FeedHandler $feedHandler,
+        FeedHandler      $feedHandler,
         FeedImageHandler $feedImageHandler
-    ) {
+    )
+    {
         $this->nurseRepository = $nurseRepository;
         $this->feedRepository = $feedRepository;
         $this->familyRepository = $familyRepository;
@@ -57,9 +58,12 @@ class FeedController extends AbstractController
          * @var Kid $kid
          */
         $kid = $family->getKids()->get(0);
-        $nurseId = $kid->getNurse()->getId();
-
-        return $this->json($this->feedRepository->findBy(['nurse' => $nurseId], ['id' => 'DESC']), Response::HTTP_OK, [], ['groups' => 'feed']);
+        $feed = [];
+        if ($kid) {
+            $nurseId = $kid->getNurse()->getId();
+            $feed = $this->feedRepository->findBy(['nurse' => $nurseId], ['id' => 'DESC']);
+        }
+        return $this->json($feed, Response::HTTP_OK, [], ['groups' => 'feed']);
     }
 
     #[Route('/feed/{nurseId}', name: 'app_feed_post', methods: 'POST')]

@@ -83,7 +83,6 @@ function NoteList({ bearer, kid, notes }) {
                 Authorization: bearer,
             },
         }).then((r) => {
-            console.log(r.status);
             if (r.status === 204) {
                 setOpened(false);
                 router.reload();
