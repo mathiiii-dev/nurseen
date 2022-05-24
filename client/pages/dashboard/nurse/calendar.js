@@ -12,6 +12,7 @@ import { AuthToken } from '../../../services/auth_token';
 import { getSession } from 'next-auth/react';
 import { useClickOutside } from '@mantine/hooks';
 import '../../../styles/globals.css';
+import { loadGetInitialProps } from 'next/dist/shared/lib/utils';
 
 function Index({ bearer, kids, dayKidsCalendar }) {
     const [selectEvent, setSelectEvent] = useState('');
@@ -67,8 +68,10 @@ function Index({ bearer, kids, dayKidsCalendar }) {
             title: element.firstname + ' ' + element.lastname,
             start: element.day + ' ' + element.arrival,
             end: element.day + ' ' + element.departure,
+            color: element.color,
         }));
     }
+    console.log(events);
 
     let nurseKids = null;
     if (kids) {
@@ -80,7 +83,7 @@ function Index({ bearer, kids, dayKidsCalendar }) {
 
     const calendar = async (event) => {
         event.preventDefault();
-        fetch(process.env.BASE_URL + `calendar/kid/${select}`, {
+        fetch(`${process.env.BASE_URL}calendar/kid/${select}`, {
             method: 'POST',
             body: JSON.stringify({
                 day,
@@ -110,7 +113,7 @@ function Index({ bearer, kids, dayKidsCalendar }) {
 
     const deleteEvent = async (event) => {
         event.preventDefault();
-        fetch(process.env.BASE_URL + `calendar/${selectEvent}`, {
+        fetch(`${process.env.BASE_URL}calendar/${selectEvent}`, {
             method: 'DELETE',
             headers: {
                 'Content-type': 'application/json',
@@ -135,7 +138,7 @@ function Index({ bearer, kids, dayKidsCalendar }) {
 
     const edit = async (event) => {
         event.preventDefault();
-        fetch(process.env.BASE_URL + `calendar/${selectEvent}/kid/${select}`, {
+        fetch(`${process.env.BASE_URL}calendar/${selectEvent}/kid/${select}`, {
             method: 'PATCH',
             body: JSON.stringify({
                 day,
@@ -312,6 +315,7 @@ function Index({ bearer, kids, dayKidsCalendar }) {
                     }}
                     timeZone="UTC"
                     locale="fr"
+                    eventColor
                 />
             </>
         </>
@@ -326,7 +330,7 @@ export async function getServerSideProps(ctx) {
     const authToken = new AuthToken(sessionCallBack.user.access_token);
 
     const res1 = await fetch(
-        process.env.BASE_URL + `calendar/nurse/${authToken.decodedToken.id}`,
+        `${process.env.BASE_URL}calendar/nurse/${authToken.decodedToken.id}`,
         {
             method: 'GET',
             headers: {
@@ -338,7 +342,7 @@ export async function getServerSideProps(ctx) {
     const dayKidsCalendar = await res1.json();
 
     const res2 = await fetch(
-        process.env.BASE_URL + `kid/nurse/${authToken.decodedToken.id}/all`,
+        `${process.env.BASE_URL}kid/nurse/${authToken.decodedToken.id}/all`,
         {
             method: 'GET',
             headers: {

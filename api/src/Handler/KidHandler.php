@@ -28,4 +28,11 @@ class KidHandler
         $entityManager = $this->doctrine->getManager();
         $entityManager->flush();
     }
+
+    public function handleColorKid(Kid $kid, string $color)
+    {
+        $kid->setColor($color);
+        $entityManager = $this->doctrine->getManager();
+        $entityManager->flush();
+    }
 }

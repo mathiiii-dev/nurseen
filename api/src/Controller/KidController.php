@@ -95,4 +95,17 @@ class KidController extends AbstractController
 
         return $this->json($data, Response::HTTP_OK, [], ['groups' => 'kid_list']);
     }
+
+    #[IsGranted('ROLE_NURSE', message: 'Vous ne pouvez pas faire ça')]
+    #[Route('/kid/color/{kid}', name: 'app_kid_color')]
+    public function colorKid(Kid $kid, Request $request): JsonResponse
+    {
+        $this->denyAccessUnlessGranted('owner', $kid);
+        $data = $request->toArray();
+        $color = $data['color'];
+
+        $this->kidHandler->handleColorKid($kid, $color);
+
+        return $this->json([], Response::HTTP_NO_CONTENT);
+    }
 }

@@ -38,7 +38,7 @@ export default function Page({
     const viewport = useRef();
 
     const open = () => {
-        fetch(process.env.BASE_URL + `chat/family`, {
+        fetch(`${process.env.BASE_URL}chat/family`, {
             method: 'POST',
             body: JSON.stringify({
                 family: userId,
@@ -218,7 +218,7 @@ export async function getServerSideProps(ctx) {
     const authToken = new AuthToken(sessionCallBack.user.access_token);
 
     const res = await fetch(
-        process.env.BASE_URL + `kid/family/${authToken.decodedToken.id}`,
+        `${process.env.BASE_URL}kid/family/${authToken.decodedToken.id}`,
         {
             method: 'GET',
             headers: {
@@ -230,7 +230,7 @@ export async function getServerSideProps(ctx) {
     const kids = await res.json();
 
     const res1 = await fetch(
-        process.env.BASE_URL + `chat/${authToken.decodedToken.id}`,
+        `${process.env.BASE_URL}chat/${authToken.decodedToken.id}`,
         {
             method: 'GET',
             headers: {
@@ -245,7 +245,7 @@ export async function getServerSideProps(ctx) {
     let messages = [];
     if (chat) {
         const res2 = await fetch(
-            process.env.BASE_URL + `message/${chat[0].id}`,
+            `${process.env.BASE_URL}message/${chat[0].id}`,
             {
                 method: 'GET',
                 headers: {

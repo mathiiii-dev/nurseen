@@ -15,6 +15,7 @@ export default function Calendar({ dayKidsCalendar }) {
             title: element.firstname + ' ' + element.lastname,
             start: element.day + ' ' + element.arrival,
             end: element.day + ' ' + element.departure,
+            color: element.color,
         }));
     }
     return (
@@ -38,6 +39,7 @@ export default function Calendar({ dayKidsCalendar }) {
                 }}
                 timeZone="UTC"
                 locale="fr"
+                eventColor
             />
         </>
     );
@@ -49,7 +51,7 @@ export async function getServerSideProps(ctx) {
     const authToken = new AuthToken(sessionCallBack.user.access_token);
 
     const res = await fetch(
-        process.env.BASE_URL + `calendar/family/${authToken.decodedToken.id}`,
+        `${process.env.BASE_URL}calendar/family/${authToken.decodedToken.id}`,
         {
             method: 'GET',
             headers: {
