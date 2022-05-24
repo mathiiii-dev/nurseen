@@ -24,7 +24,7 @@ function AddMenu({ bearer, userId }) {
 
     const add = (event) => {
         event.preventDefault();
-        fetch(process.env.BASE_URL + `menu/add/${userId}`, {
+        fetch(`${process.env.BASE_URL}menu/add/${userId}`, {
             body: JSON.stringify({
                 date: form.values.date,
                 entry: form.values.entry,

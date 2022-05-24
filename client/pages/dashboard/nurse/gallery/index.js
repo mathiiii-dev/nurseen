@@ -24,7 +24,7 @@ function AddGallery({ bearer, userId }) {
 
     useEffect(() => {
         setLoading(true);
-        fetch(process.env.BASE_URL + `gallery/nurse/${userId}?page=${page}`, {
+        fetch(`${process.env.BASE_URL}gallery/nurse/${userId}?page=${page}`, {
             method: 'GET',
             headers: {
                 'Content-type': 'application/json',

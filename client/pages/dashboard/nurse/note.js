@@ -19,7 +19,7 @@ function Note({ bearer, kids }) {
 
     const create = (event) => {
         event.preventDefault();
-        fetch(process.env.BASE_URL + `note/kid/${select}`, {
+        fetch(`${process.env.BASE_URL}note/kid/${select}`, {
             method: 'POST',
             body: JSON.stringify({
                 note: value,

@@ -12,6 +12,10 @@ import {
     Title,
     Popover,
     LoadingOverlay,
+    ColorInput,
+    ActionIcon,
+    Select,
+    TextInput,
 } from '@mantine/core';
 import { useEffect, useState } from 'react';
 import { AuthToken } from '../../../services/auth_token';
@@ -24,6 +28,11 @@ import VerticalCard from '../../../components/VerticalCard';
 import { cards, verticalCards } from '../../../data/cards';
 import { usePagination } from '@mantine/hooks';
 import '../../../styles/globals.css';
+import { AiOutlineBgColors } from 'react-icons/ai';
+import { loadGetInitialProps } from 'next/dist/shared/lib/utils';
+
+const randomColor = () =>
+    `#${Math.floor(Math.random() * 16777215).toString(16)}`;
 
 export default function Page({ bearer, userId, code, firstname, lastname }) {
     const router = useRouter();
@@ -32,13 +41,24 @@ export default function Page({ bearer, userId, code, firstname, lastname }) {
     const [kidId, setKidId] = useState(false);
     const [popOpen, setPopOpen] = useState(false);
     const [opened, setOpened] = useState(false);
-    const [kids, setKids] = useState();
+    const [openedColor, setOpenedColor] = useState(false);
+    const [kids, setKids] = useState([]);
     const [link, setLink] = useState(code);
     const notifications = useNotifications();
     const [page, onChange] = useState(1);
     const [total, setTotal] = useState(1);
     const pagination = usePagination({ total, page, onChange });
     const [visible, setVisible] = useState(false);
+    const [color, onColorChange] = useState(randomColor());
+    const [selectedkid, setSelectedKid] = useState(randomColor());
+
+    const getKid = (id) => {
+        kids.forEach((kid) => {
+            if (kid.id === id) {
+                setSelectedKid(kid);
+            }
+        });
+    };
 
     useEffect(() => {
         setVisible(true);
@@ -58,7 +78,7 @@ export default function Page({ bearer, userId, code, firstname, lastname }) {
     }, [page]);
 
     const activate = (kidId) => {
-        fetch(process.env.BASE_URL + `kid/${kidId}/activate`, {
+        fetch(`${process.env.BASE_URL}kid/${kidId}/activate`, {
             method: 'POST',
             headers: {
                 'Content-type': 'application/json',
@@ -70,7 +90,7 @@ export default function Page({ bearer, userId, code, firstname, lastname }) {
     };
 
     const archived = () => {
-        fetch(process.env.BASE_URL + `kid/${kidId}/archive`, {
+        fetch(`${process.env.BASE_URL}kid/${kidId}/archive`, {
             method: 'POST',
             headers: {
                 'Content-type': 'application/json',
@@ -82,7 +102,7 @@ export default function Page({ bearer, userId, code, firstname, lastname }) {
     };
 
     const linkParent = () => {
-        fetch(process.env.BASE_URL + `link_code/${userId}`, {
+        fetch(`${process.env.BASE_URL}link_code/${userId}`, {
             method: 'POST',
             headers: {
                 'Content-type': 'application/json',
@@ -93,6 +113,19 @@ export default function Page({ bearer, userId, code, firstname, lastname }) {
             .then((response) => {
                 setLink(response.code);
             });
+    };
+
+    const colorKid = () => {
+        fetch(`${process.env.BASE_URL}kid/color/${kidId}`, {
+            method: 'POST',
+            body: JSON.stringify({
+                color,
+            }),
+            headers: {
+                'Content-type': 'application/json',
+                Authorization: bearer,
+            },
+        }).then((response) => console.log(response));
     };
 
     const copyToClipboard = () => {
@@ -107,6 +140,41 @@ export default function Page({ bearer, userId, code, firstname, lastname }) {
 
     return (
         <>
+            <Modal
+                opened={openedColor}
+                onClose={() => setOpenedColor(false)}
+                title="Ajouter ou modifier la couleur lié à un enfant"
+            >
+                <form onSubmit={colorKid}>
+                    <TextInput
+                        disabled
+                        value={`${
+                            selectedkid.firstname + ' ' + selectedkid.lastname
+                        }`}
+                    />
+                    <Space h={'md'} />
+                    <ColorInput
+                        placeholder="Choisissez une couleur"
+                        label="Couleur"
+                        value={color}
+                        onChange={onColorChange}
+                        rightSection={
+                            <ActionIcon
+                                onClick={() => onColorChange(randomColor())}
+                            >
+                                <AiOutlineBgColors size={16} />
+                            </ActionIcon>
+                        }
+                    />
+                    <Space h={'md'} />
+                    <Button
+                        type="submit"
+                        style={{ backgroundColor: '#4ad4c6', float: 'right' }}
+                    >
+                        Enregistrer
+                    </Button>
+                </form>
+            </Modal>
             <Modal
                 opened={opened}
                 onClose={() => setOpened(false)}
@@ -242,6 +310,9 @@ export default function Page({ bearer, userId, code, firstname, lastname }) {
                                 <th scope="col">
                                     <Text>Note</Text>
                                 </th>
+                                <th scope="col">
+                                    <Text>Couleur</Text>
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
@@ -310,6 +381,25 @@ export default function Page({ bearer, userId, code, firstname, lastname }) {
                                                     <Button>Note</Button>
                                                 </Link>
                                             </td>
+                                            <td data-label="Couleur">
+                                                {
+                                                    <Button
+                                                        onClick={() => {
+                                                            getKid(kid.id);
+                                                            onColorChange(
+                                                                kid.color ??
+                                                                    randomColor()
+                                                            );
+                                                            setOpenedColor(
+                                                                true
+                                                            );
+                                                            setKidId(kid.id);
+                                                        }}
+                                                    >
+                                                        Couleur
+                                                    </Button>
+                                                }
+                                            </td>
                                         </tr>
                                     );
                                 })}
@@ -345,7 +435,7 @@ export async function getServerSideProps(ctx) {
     const authToken = new AuthToken(sessionCallBack.user.access_token);
 
     const res = await fetch(
-        process.env.BASE_URL + `link_code/${authToken.decodedToken.id}`,
+        `${process.env.BASE_URL}link_code/${authToken.decodedToken.id}`,
         {
             method: 'GET',
             headers: {

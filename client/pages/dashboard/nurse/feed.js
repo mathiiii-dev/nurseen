@@ -124,7 +124,7 @@ function Feed({ userId, bearer, feed }) {
             });
         }
         data.append('text', value);
-        fetch(process.env.BASE_URL + `feed/${userId}`, {
+        fetch(`${process.env.BASE_URL}feed/${userId}`, {
             body: data,
             method: 'POST',
             headers: {
@@ -145,7 +145,7 @@ function Feed({ userId, bearer, feed }) {
     const update = (event) => {
         event.preventDefault();
 
-        fetch(process.env.BASE_URL + `feed/${feedId}`, {
+        fetch(`${process.env.BASE_URL}feed/${feedId}`, {
             body: JSON.stringify({
                 text: feedText,
             }),
@@ -164,7 +164,7 @@ function Feed({ userId, bearer, feed }) {
 
     const deleteFeed = (event) => {
         event.preventDefault();
-        fetch(process.env.BASE_URL + `feed/${feedId}`, {
+        fetch(`${process.env.BASE_URL}feed/${feedId}`, {
             method: 'DELETE',
             headers: {
                 Authorization: bearer,
@@ -352,7 +352,7 @@ export async function getServerSideProps(ctx) {
     const authToken = new AuthToken(sessionCallBack.user.access_token);
 
     const res = await fetch(
-        process.env.BASE_URL + `feed/${authToken.decodedToken.id}`,
+        `${process.env.BASE_URL}feed/${authToken.decodedToken.id}`,
         {
             method: 'GET',
             headers: {

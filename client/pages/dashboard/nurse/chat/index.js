@@ -26,7 +26,7 @@ function NurseChat({ bearer, userId, family }) {
 
     useEffect(() => {
         setLoading(true);
-        fetch(process.env.BASE_URL + `chat/${userId}/nurse?page=${page}`, {
+        fetch(`${process.env.BASE_URL}chat/${userId}/nurse?page=${page}`, {
             method: 'GET',
             headers: {
                 'Content-type': 'application/json',
@@ -50,7 +50,7 @@ function NurseChat({ bearer, userId, family }) {
     }
 
     const open = () => {
-        fetch(process.env.BASE_URL + `chat`, {
+        fetch(`${process.env.BASE_URL}chat`, {
             method: 'POST',
             body: JSON.stringify({
                 nurse: userId,
@@ -179,7 +179,7 @@ export async function getServerSideProps(ctx) {
     const authToken = new AuthToken(sessionCallBack.user.access_token);
 
     const res = await fetch(
-        process.env.BASE_URL + `family/${authToken.decodedToken.id}`,
+        `${process.env.BASE_URL}family/${authToken.decodedToken.id}`,
         {
             method: 'GET',
             headers: {

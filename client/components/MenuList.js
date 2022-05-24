@@ -17,7 +17,7 @@ function Menu({ menus, role, bearer }) {
     const [selected, setSelected] = useState('');
 
     const edit = async () => {
-        await fetch(process.env.BASE_URL + `menu/${selected}/edit`, {
+        await fetch(`${process.env.BASE_URL}menu/${selected}/edit`, {
             method: 'PATCH',
             body: JSON.stringify({
                 date,
