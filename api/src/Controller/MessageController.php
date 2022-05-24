@@ -28,10 +28,10 @@ class MessageController extends AbstractController
         $this->messageHandler = $messageHandler;
     }
 
-    #[Route('/message/{chatId}', name: 'app_message_get', methods: 'GET')]
-    public function get(int $chatId): Response
+    #[Route('/message/{chat}', name: 'app_message_get', methods: 'GET')]
+    public function get(Chat $chat): Response
     {
-        $messages = $this->messageRepository->findBy(['chat' => $chatId]);
+        $messages = $this->messageRepository->findBy(['chat' => $chat->getId()]);
 
         return $this->json($messages, Response::HTTP_OK, [], ['groups' => 'chat']);
     }

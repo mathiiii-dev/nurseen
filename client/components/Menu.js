@@ -1,4 +1,4 @@
-import { Button, Space, Text, Title } from '@mantine/core';
+import { Button, Center, Space, Text, Title } from '@mantine/core';
 import Link from 'next/link';
 import dayjs from 'dayjs';
 import 'dayjs/locale/fr';
@@ -11,25 +11,51 @@ function Menu({ menu, role }) {
             </Link>
             {menu ? (
                 <>
-                    <Title order={1}>
-                        Menu du{' '}
-                        {dayjs(menu.date)
-                            .add(1, 'day')
-                            .locale('fr')
-                            .format('DD MMMM YYYY')}
-                    </Title>
+                    <Center>
+                        <Title order={1}>
+                            Menu du{' '}
+                            {dayjs(menu.date)
+                                .add(1, 'day')
+                                .locale('fr')
+                                .format('DD MMMM YYYY')}
+                        </Title>
+                    </Center>
+
                     <Space h={'xl'} />
 
-                    <Title order={2}>Entrée</Title>
-                    <Text>{menu.entry}</Text>
+                    <Center>
+                        <Title order={2}>Entrée</Title>
+                    </Center>
+                    <Center>
+                        <Text>{menu.entry}</Text>
+                    </Center>
+
                     <Space h={'xl'} />
 
-                    <Title order={2}>Plat</Title>
-                    <Text>{menu.meal}</Text>
+                    <Center>
+                        <Title order={2}>Entrée</Title>
+                    </Center>
+                    <Center>
+                        <Text>{menu.entry}</Text>
+                    </Center>
+
                     <Space h={'xl'} />
 
-                    <Title order={2}>Dessert</Title>
-                    <Text>{menu.dessert}</Text>
+                    <Center>
+                        <Title order={2}>Plat</Title>
+                    </Center>
+                    <Center>
+                        <Text>{menu.meal}</Text>
+                    </Center>
+
+                    <Space h={'xl'} />
+
+                    <Center>
+                        <Title order={2}>Dessert</Title>
+                    </Center>
+                    <Center>
+                        <Text>{menu.dessert}</Text>
+                    </Center>
                 </>
             ) : (
                 <>

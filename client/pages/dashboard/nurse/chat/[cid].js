@@ -70,6 +70,11 @@ export async function getServerSideProps(ctx) {
 
     const messages = await res.json();
 
+    if (messages.error) {
+        return {
+            notFound: true,
+        };
+    }
     return {
         props: {
             userId: sessionCallBack.user.id,

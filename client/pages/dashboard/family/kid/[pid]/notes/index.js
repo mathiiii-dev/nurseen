@@ -101,5 +101,6 @@ export async function getServerSideProps(ctx) {
             kid,
             notes,
         },
+        notFound: true,
     };
 }

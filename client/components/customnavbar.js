@@ -30,7 +30,7 @@ const useStyles = createStyles((theme) => ({
 
 export default function CustomNavbar() {
     const { data: session, status } = useSession();
-    let dashboard = '/';
+    let dashboard = '';
 
     if (session) {
         const role = session.user.role;

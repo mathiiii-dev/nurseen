@@ -179,6 +179,13 @@ export async function getServerSideProps(ctx) {
             Authorization: authToken.authorizationString,
         },
     });
+    const kid = await res1.json();
+
+    if (kid.error) {
+        return {
+            notFound: true,
+        };
+    }
 
     const res2 = await fetch(
         `${process.env.BASE_URL}note/kid/${ctx.params.pid}/all`,
@@ -191,7 +198,6 @@ export async function getServerSideProps(ctx) {
         }
     );
 
-    const kid = await res1.json();
     const notes = await res2.json();
 
     return {

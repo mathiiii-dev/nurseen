@@ -5,7 +5,7 @@ import { AuthToken } from '../../../../../../services/auth_token';
 
 function Note({ note }) {
     const router = useRouter();
-
+    console.log(note);
     return (
         <>
             <Button type="button" onClick={() => router.back()}>
@@ -41,5 +41,6 @@ export async function getServerSideProps(ctx) {
         props: {
             note,
         },
+        notFound: true,
     };
 }
