@@ -53,9 +53,9 @@ class CalendarRepository extends ServiceEntityRepository
     public function getCalendarByNurse(int $nurseId): array
     {
         $sql = '
-                select c.*, k.firstname, k.lastname, k.color from calendar as c
-                inner join kid k on k.id = c.kid_id
-                inner join nurse n on n.nurse_id = '.$nurseId.'
+                select c.*, k.firstname, k.lastname, k.color from kid k 
+                inner join calendar c on c.kid_id = k.id
+                where k.family_id = '.$nurseId.'
                 ';
 
         return $this->connection->fetchAllAssociative($sql);

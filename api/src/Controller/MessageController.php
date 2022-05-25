@@ -31,6 +31,7 @@ class MessageController extends AbstractController
     #[Route('/message/{chat}', name: 'app_message_get', methods: 'GET')]
     public function get(Chat $chat): Response
     {
+        $this->denyAccessUnlessGranted('owner', $chat);
         $messages = $this->messageRepository->findBy(['chat' => $chat->getId()]);
 
         return $this->json($messages, Response::HTTP_OK, [], ['groups' => 'chat']);
@@ -42,6 +43,7 @@ class MessageController extends AbstractController
     #[Route('/message/{chat}', name: 'app_message_post', methods: 'POST')]
     public function post(Request $request, Chat $chat): Response
     {
+        $this->denyAccessUnlessGranted('owner', $chat);
         $data = $request->toArray();
         $user = $this->userRepository->findOneBy(['id' => $data['user']]);
 

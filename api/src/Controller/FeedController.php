@@ -4,11 +4,13 @@ namespace App\Controller;
 
 use App\Entity\Feed;
 use App\Entity\Kid;
+use App\Entity\User;
 use App\Handler\FeedHandler;
 use App\Handler\FeedImageHandler;
 use App\Repository\FamilyRepository;
 use App\Repository\FeedRepository;
 use App\Repository\NurseRepository;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -23,13 +25,12 @@ class FeedController extends AbstractController
     private FeedImageHandler $feedImageHandler;
 
     public function __construct(
-        NurseRepository  $nurseRepository,
-        FeedRepository   $feedRepository,
+        NurseRepository $nurseRepository,
+        FeedRepository $feedRepository,
         FamilyRepository $familyRepository,
-        FeedHandler      $feedHandler,
+        FeedHandler $feedHandler,
         FeedImageHandler $feedImageHandler
-    )
-    {
+    ) {
         $this->nurseRepository = $nurseRepository;
         $this->feedRepository = $feedRepository;
         $this->familyRepository = $familyRepository;
@@ -37,10 +38,12 @@ class FeedController extends AbstractController
         $this->feedImageHandler = $feedImageHandler;
     }
 
-    #[Route('/feed/{nurseId}', name: 'app_feed_get', methods: 'GET')]
-    public function get(int $nurseId): Response
+    #[IsGranted('ROLE_NURSE', message: 'Vous ne pouvez pas faire ça')]
+    #[Route('/feed/{nurse}', name: 'app_feed_get', methods: 'GET')]
+    public function get(User $nurse): Response
     {
-        $nurse = $this->nurseRepository->findOneBy(['nurse' => $nurseId]);
+        $this->denyAccessUnlessGranted('owner', $nurse);
+        $nurse = $this->nurseRepository->findOneBy(['nurse' => $nurse->getId()]);
 
         return $this->json(
             $this->feedRepository->findBy(['nurse' => $nurse->getId()], ['id' => 'DESC']),
@@ -50,10 +53,12 @@ class FeedController extends AbstractController
         );
     }
 
-    #[Route('/feed/family/{familyId}', name: 'app_feed_get_family', methods: 'GET')]
-    public function getFamily(int $familyId): Response
+    #[IsGranted('ROLE_PARENT', message: 'Vous ne pouvez pas faire ça')]
+    #[Route('/feed/family/{family}', name: 'app_feed_get_family', methods: 'GET')]
+    public function getFamily(User $family): Response
     {
-        $family = $this->familyRepository->findOneBy(['parent' => $familyId]);
+        $this->denyAccessUnlessGranted('owner', $family);
+        $family = $this->familyRepository->findOneBy(['parent' => $family->getId()]);
         /**
          * @var Kid $kid
          */
@@ -63,14 +68,17 @@ class FeedController extends AbstractController
             $nurseId = $kid->getNurse()->getId();
             $feed = $this->feedRepository->findBy(['nurse' => $nurseId], ['id' => 'DESC']);
         }
+
         return $this->json($feed, Response::HTTP_OK, [], ['groups' => 'feed']);
     }
 
-    #[Route('/feed/{nurseId}', name: 'app_feed_post', methods: 'POST')]
-    public function post(Request $request, int $nurseId): Response
+    #[IsGranted('ROLE_NURSE', message: 'Vous ne pouvez pas faire ça')]
+    #[Route('/feed/{nurse}', name: 'app_feed_post', methods: 'POST')]
+    public function post(Request $request, User $nurse): Response
     {
+        $this->denyAccessUnlessGranted('owner', $nurse);
         $text = $request->get('text');
-        $feed = $this->feedHandler->handleFeedCreate($text, $nurseId);
+        $feed = $this->feedHandler->handleFeedCreate($text, $nurse);
         $files = $request->files;
 
         if ($files) {
@@ -80,17 +88,21 @@ class FeedController extends AbstractController
         return $this->json([], Response::HTTP_CREATED);
     }
 
+    #[IsGranted('ROLE_NURSE', message: 'Vous ne pouvez pas faire ça')]
     #[Route('/feed/{feed}', name: 'app_feed_delete', methods: 'DELETE')]
     public function delete(Feed $feed): Response
     {
+        $this->denyAccessUnlessGranted('owner', $feed);
         $this->feedHandler->handleFeedDelete($feed);
 
         return $this->json([], Response::HTTP_NO_CONTENT);
     }
 
+    #[IsGranted('ROLE_NURSE', message: 'Vous ne pouvez pas faire ça')]
     #[Route('/feed/{feed}', name: 'app_feed_patch', methods: 'PATCH')]
     public function patch(Feed $feed, Request $request): Response
     {
+        $this->denyAccessUnlessGranted('owner', $feed);
         $this->feedHandler->handleFeedUpdate($request, $feed);
 
         return $this->json([], Response::HTTP_NO_CONTENT);

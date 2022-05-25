@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
 use App\Handler\FamilyHandler;
 use App\Manager\FamilyManager;
 use App\Repository\FamilyRepository;
@@ -45,13 +46,14 @@ class FamilyController extends AbstractController
      * @throws Exception
      */
     #[IsGranted('ROLE_PARENT', message: 'Vous ne pouvez pas faire ça')]
-    #[Route('/family/{familyId}/kid', name: 'app_family_kid', methods: 'POST')]
-    public function link(Request $request, int $familyId): Response
+    #[Route('/family/{family}/kid', name: 'app_family_kid', methods: 'POST')]
+    public function link(Request $request, User $family): Response
     {
+        $this->denyAccessUnlessGranted('owner', $family);
         try {
             $data = $request->toArray();
 
-            $family = $this->familyRepository->findOneBy(['parent' => $familyId]);
+            $family = $this->familyRepository->findOneBy(['parent' => $family->getId()]);
             $code = $this->linkCodeRepository->findOneBy(['code' => $data['code']]);
             $nurse = $this->nurseRepository->findOneBy(['id' => $code->getNurse()->getId()]);
 
@@ -63,32 +65,38 @@ class FamilyController extends AbstractController
         }
     }
 
-    #[Route('/family/{nurseId}', name: 'app_family_nurse', methods: 'GET')]
-    public function getFamilyNurse(int $nurseId): Response
+    #[IsGranted('ROLE_NURSE', message: 'Vous ne pouvez pas faire ça')]
+    #[Route('/family/{nurse}', name: 'app_family_nurse', methods: 'GET')]
+    public function getFamilyNurse(User $nurse): Response
     {
+        $this->denyAccessUnlessGranted('owner', $nurse);
         return new JsonResponse(
             $this->familyManager->getFamilyNurse(
-                $this->nurseRepository->findOneBy(['nurse' => $nurseId])
+                $this->nurseRepository->findOneBy(['nurse' => $nurse->getId()])
             ),
             Response::HTTP_CREATED
         );
     }
 
-    #[Route('/family/{nurseId}/list', name: 'app_family_nurse_list', methods: 'GET')]
-    public function getFamilyNurseList(int $nurseId): Response
+    #[IsGranted('ROLE_NURSE', message: 'Vous ne pouvez pas faire ça')]
+    #[Route('/family/{nurse}/list', name: 'app_family_nurse_list', methods: 'GET')]
+    public function getFamilyNurseList(User $nurse): Response
     {
+        $this->denyAccessUnlessGranted('owner', $nurse);
         return new JsonResponse(
             $this->familyManager->getFamilyNurseList(
-                $this->nurseRepository->findOneBy(['nurse' => $nurseId])
+                $this->nurseRepository->findOneBy(['nurse' => $nurse->getId()])
             ),
             Response::HTTP_CREATED
         );
     }
 
-    #[Route('/family/{familyId}/nurse', name: 'app_family_nurse_get', methods: 'GET')]
-    public function getNurse(int $familyId): Response
+    #[IsGranted('ROLE_PARENT', message: 'Vous ne pouvez pas faire ça')]
+    #[Route('/family/{family}/nurse', name: 'app_family_nurse_get', methods: 'GET')]
+    public function getNurse(User $family): Response
     {
-        $familyId = $this->familyRepository->findOneBy(['parent' => $familyId]);
+        $this->denyAccessUnlessGranted('owner', $family);
+        $familyId = $this->familyRepository->findOneBy(['parent' => $family->getId()]);
         $kid = $this->kidRepository->findOneBy(['id' => $familyId->getKids()->get(0)]);
 
         $data = [];

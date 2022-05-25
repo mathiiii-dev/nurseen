@@ -3,6 +3,7 @@
 namespace App\Handler;
 
 use App\Entity\Feed;
+use App\Entity\User;
 use App\Repository\NurseRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,9 +19,9 @@ class FeedHandler
         $this->doctrine = $doctrine;
     }
 
-    public function handleFeedCreate(string $text, int $nurseId): Feed
+    public function handleFeedCreate(string $text, User $nurse): Feed
     {
-        $nurse = $this->nurseRepository->findOneBy(['nurse' => $nurseId]);
+        $nurse = $this->nurseRepository->findOneBy(['nurse' => $nurse->getId()]);
         $feed = (new Feed())->setCreationDate(new \DateTime())->setText($text)->setNurse($nurse);
 
         $em = $this->doctrine->getManager();

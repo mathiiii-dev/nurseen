@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Entity\Menu;
+use App\Entity\User;
 use App\Handler\MenuHandler;
 use App\Repository\FamilyRepository;
 use App\Repository\KidRepository;
@@ -40,11 +42,12 @@ class MenuController extends AbstractController
      * @throws Exception
      */
     #[IsGranted('ROLE_NURSE', message: 'Vous ne pouvez pas faire ça')]
-    #[Route('/menu/add/{nurseId}', name: 'app_menu_add')]
-    public function add(Request $request, int $nurseId): Response
+    #[Route('/menu/add/{nurse}', name: 'app_menu_add')]
+    public function add(Request $request, User $nurse): Response
     {
+        $this->denyAccessUnlessGranted('owner', $nurse);
         $data = $request->toArray();
-        $nurse = $this->nurseRepository->findOneBy(['nurse' => $nurseId]);
+        $nurse = $this->nurseRepository->findOneBy(['nurse' => $nurse->getId()]);
 
         $this->menuHandler->handleMenuCreate($data, $nurse);
 
@@ -52,10 +55,11 @@ class MenuController extends AbstractController
     }
 
     #[IsGranted('ROLE_NURSE', message: 'Vous ne pouvez pas faire ça')]
-    #[Route('/menu/{nurseId}', name: 'app_menu_get', methods: 'GET')]
-    public function get(int $nurseId): Response
+    #[Route('/menu/{nurse}', name: 'app_menu_get', methods: 'GET')]
+    public function get(User $nurse): Response
     {
-        $nurse = $this->nurseRepository->findOneBy(['nurse' => $nurseId]);
+        $this->denyAccessUnlessGranted('owner', $nurse);
+        $nurse = $this->nurseRepository->findOneBy(['nurse' => $nurse->getId()]);
         $menu = $this->menuRepository->findOneBy([
             'date' => (new \DateTime())->modify('-1 day'),
             'nurse' => $nurse->getId(),
@@ -65,20 +69,22 @@ class MenuController extends AbstractController
     }
 
     #[IsGranted('ROLE_NURSE', message: 'Vous ne pouvez pas faire ça')]
-    #[Route('/menu/{nurseId}/list', name: 'app_menu_get_list', methods: 'GET')]
-    public function getList(int $nurseId): Response
+    #[Route('/menu/{nurse}/list', name: 'app_menu_get_list', methods: 'GET')]
+    public function getList(User $nurse): Response
     {
-        $nurse = $this->nurseRepository->findOneBy(['nurse' => $nurseId]);
+        $this->denyAccessUnlessGranted('owner', $nurse);
+        $nurse = $this->nurseRepository->findOneBy(['nurse' => $nurse->getId()]);
         $menu = $this->menuRepository->findBy(['nurse' => $nurse->getId()]);
 
         return $this->json($menu, Response::HTTP_OK, [], ['groups' => 'menu']);
     }
 
     #[IsGranted('ROLE_PARENT', message: 'Vous ne pouvez pas faire ça')]
-    #[Route('/menu/family/{familyId}', name: 'app_menu_get_family', methods: 'GET')]
-    public function getMenuFamily(int $familyId): Response
+    #[Route('/menu/family/{family}', name: 'app_menu_get_family', methods: 'GET')]
+    public function getMenuFamily(User $family): Response
     {
-        $family = $this->familyRepository->findOneBy(['parent' => $familyId]);
+        $this->denyAccessUnlessGranted('owner', $family);
+        $family = $this->familyRepository->findOneBy(['parent' => $family->getId()]);
         $kid = $this->kidRepository->findOneBy(['family' => $family->getId()]);
 
         $menu = ['kids' => false];
@@ -94,10 +100,11 @@ class MenuController extends AbstractController
     }
 
     #[IsGranted('ROLE_PARENT', message: 'Vous ne pouvez pas faire ça')]
-    #[Route('/menu/family/{familyId}/list', name: 'app_menu_get_list_family', methods: 'GET')]
-    public function getListMenuFamily(int $familyId): Response
+    #[Route('/menu/family/{family}/list', name: 'app_menu_get_list_family', methods: 'GET')]
+    public function getListMenuFamily(User $family): Response
     {
-        $family = $this->familyRepository->findOneBy(['parent' => $familyId]);
+        $this->denyAccessUnlessGranted('owner', $family);
+        $family = $this->familyRepository->findOneBy(['parent' => $family->getId()]);
         $kid = $this->kidRepository->findOneBy(['family' => $family->getId()]);
         $nurse = $this->nurseRepository->findOneBy(['nurse' => $kid->getNurse()->getNurse()->getId()]);
         $menu = $this->menuRepository->findBy(['nurse' => $nurse->getId()]);
@@ -109,11 +116,11 @@ class MenuController extends AbstractController
      * @throws Exception
      */
     #[IsGranted('ROLE_NURSE', message: 'Vous ne pouvez pas faire ça')]
-    #[Route('/menu/{menuId}/edit', name: 'app_menu_edit', methods: 'PATCH')]
-    public function edit(int $menuId, Request $request): Response
+    #[Route('/menu/{menu}/edit', name: 'app_menu_edit', methods: 'PATCH')]
+    public function edit(Menu $menu, Request $request): Response
     {
+        $this->denyAccessUnlessGranted('owner', $menu);
         $data = $request->toArray();
-        $menu = $this->menuRepository->findOneBy(['id' => $menuId]);
 
         $this->menuHandler->handleMenuUpdate($menu, $data);
 

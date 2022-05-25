@@ -46,10 +46,11 @@ class ChatController extends AbstractController
         return $this->json([], Response::HTTP_CREATED);
     }
 
-    #[Route('/chat/{familyId}', name: 'app_chat_get_id', methods: 'GET')]
-    public function getChatId(int $familyId): Response
+    #[Route('/chat/{family}', name: 'app_chat_get_id', methods: 'GET')]
+    public function getChatId(User $family): Response
     {
-        $family = $this->familyRepository->findOneBy(['parent' => $familyId]);
+        $this->denyAccessUnlessGranted('owner', $family);
+        $family = $this->familyRepository->findOneBy(['parent' => $family->getId()]);
         $chat = $this->chatRepository->findBy(['family' => $family->getId()]);
 
         if (!$chat) {
@@ -62,6 +63,8 @@ class ChatController extends AbstractController
     #[Route('/chat/{user}/{role}', name: 'app_chat_nurse')]
     public function getChat(User $user, string $role, Request $request): Response
     {
+        $this->denyAccessUnlessGranted('owner', $user);
+
         return $this->json(
             $this->pagination->getPagination(
                 $request, $this->chatManager->getChat($user, $role), 4), Response::HTTP_OK
