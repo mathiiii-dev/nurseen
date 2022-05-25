@@ -83,6 +83,12 @@ export async function getServerSideProps(ctx) {
     });
     const kid = await res.json();
 
+    if (kid.error) {
+        return {
+            notFound: true,
+        };
+    }
+
     const res1 = await fetch(
         `${process.env.BASE_URL}note/kid/${ctx.params.pid}/all`,
         {
@@ -101,6 +107,5 @@ export async function getServerSideProps(ctx) {
             kid,
             notes,
         },
-        notFound: true,
     };
 }

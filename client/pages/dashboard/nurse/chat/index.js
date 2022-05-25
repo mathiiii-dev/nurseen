@@ -18,7 +18,7 @@ import { usePagination } from '@mantine/hooks';
 
 function NurseChat({ bearer, userId, family }) {
     const [select, setSelect] = useState(null);
-    const [chat, setChat] = useState(null);
+    const [chat, setChat] = useState([]);
     const [loading, setLoading] = useState(false);
     const [page, onChange] = useState(1);
     const [total, setTotal] = useState(1);
@@ -49,8 +49,8 @@ function NurseChat({ bearer, userId, family }) {
         }));
     }
 
-    const open = () => {
-        fetch(`${process.env.BASE_URL}chat`, {
+    const open = async () => {
+        await fetch(`${process.env.BASE_URL}chat`, {
             method: 'POST',
             body: JSON.stringify({
                 nurse: userId,
@@ -60,8 +60,6 @@ function NurseChat({ bearer, userId, family }) {
                 'Content-type': 'application/json',
                 Authorization: bearer,
             },
-        }).then((r) => {
-            console.log(r);
         });
     };
 
@@ -101,7 +99,7 @@ function NurseChat({ bearer, userId, family }) {
             <Space h={'xl'} />
             <Space h={'xl'} />
 
-            {chat &&
+            {chat.length > 0 ? (
                 chat.map(function (d, idx) {
                     return (
                         <>
@@ -163,10 +161,18 @@ function NurseChat({ bearer, userId, family }) {
                             <Space h={'xl'} />
                         </>
                     );
-                })}
-            <Center>
-                <Pagination total={total} onChange={onChange} />
-            </Center>
+                })
+            ) : (
+                <Text>
+                    Aucun n'enfant n'est rélié à vous. Vous n'avez donc pas la
+                    possiblité d'envoyé de message à des parents
+                </Text>
+            )}
+            {chat.length > 0 && (
+                <Center>
+                    <Pagination total={total} onChange={onChange} />
+                </Center>
+            )}
         </>
     );
 }

@@ -115,8 +115,8 @@ export default function Page({ bearer, userId, code, firstname, lastname }) {
             });
     };
 
-    const colorKid = () => {
-        fetch(`${process.env.BASE_URL}kid/color/${kidId}`, {
+    const colorKid = async () => {
+        await fetch(`${process.env.BASE_URL}kid/color/${kidId}`, {
             method: 'POST',
             body: JSON.stringify({
                 color,
@@ -125,7 +125,7 @@ export default function Page({ bearer, userId, code, firstname, lastname }) {
                 'Content-type': 'application/json',
                 Authorization: bearer,
             },
-        }).then((response) => console.log(response));
+        });
     };
 
     const copyToClipboard = () => {
@@ -292,123 +292,137 @@ export default function Page({ bearer, userId, code, firstname, lastname }) {
             <Grid gutter="xl">
                 <Grid.Col md={8}>
                     <LoadingOverlay visible={visible} />
-                    <table>
-                        <thead>
-                            <tr>
-                                <th scope="col">
-                                    <Text>Nom</Text>
-                                </th>
-                                <th scope="col">
-                                    <Text>Prénom</Text>
-                                </th>
-                                <th scope="col">
-                                    <Text>Activer</Text>
-                                </th>
-                                <th scope="col">
-                                    <Text>Archiver</Text>
-                                </th>
-                                <th scope="col">
-                                    <Text>Note</Text>
-                                </th>
-                                <th scope="col">
-                                    <Text>Couleur</Text>
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {kids &&
-                                kids.map((kid) => {
-                                    return (
-                                        <tr>
-                                            <td data-label="Nom">
-                                                <Text>{kid.lastname}</Text>
-                                            </td>
-                                            <td data-label="Prénom">
-                                                <Text>{kid.firstname}</Text>
-                                            </td>
-                                            <td data-label="Activer">
-                                                {kid.activated ? (
-                                                    <Button
-                                                        color="red"
-                                                        onClick={() =>
-                                                            activate(
-                                                                kid.id,
-                                                                false
-                                                            )
-                                                        }
-                                                    >
-                                                        Désactiver
-                                                    </Button>
-                                                ) : (
-                                                    <Button
-                                                        style={{
-                                                            backgroundColor:
-                                                                '#4ad4c6',
-                                                        }}
-                                                        onClick={() =>
-                                                            activate(
-                                                                kid.id,
-                                                                true
-                                                            )
-                                                        }
-                                                    >
-                                                        Activer
-                                                    </Button>
-                                                )}
-                                            </td>
-                                            <td data-label="Archiver">
-                                                {
-                                                    <Button
-                                                        color="red"
-                                                        onClick={() => {
-                                                            setArchiveOpened(
-                                                                true
-                                                            );
-                                                            setKidId(kid.id);
-                                                        }}
-                                                    >
-                                                        Archiver
-                                                    </Button>
-                                                }
-                                            </td>
-                                            <td data-label="Note">
-                                                <Link
-                                                    href={{
-                                                        pathname: `/dashboard/nurse/kid/[pid]/notes`,
-                                                        query: { pid: kid.id },
-                                                    }}
-                                                >
-                                                    <Button>Note</Button>
-                                                </Link>
-                                            </td>
-                                            <td data-label="Couleur">
-                                                {
-                                                    <Button
-                                                        onClick={() => {
-                                                            getKid(kid.id);
-                                                            onColorChange(
-                                                                kid.color ??
-                                                                    randomColor()
-                                                            );
-                                                            setOpenedColor(
-                                                                true
-                                                            );
-                                                            setKidId(kid.id);
+                    {kids.length > 0 ? (
+                        <>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th scope="col">
+                                            <Text>Nom</Text>
+                                        </th>
+                                        <th scope="col">
+                                            <Text>Prénom</Text>
+                                        </th>
+                                        <th scope="col">
+                                            <Text>Activer</Text>
+                                        </th>
+                                        <th scope="col">
+                                            <Text>Archiver</Text>
+                                        </th>
+                                        <th scope="col">
+                                            <Text>Note</Text>
+                                        </th>
+                                        <th scope="col">
+                                            <Text>Couleur</Text>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {kids.map((kid) => {
+                                        return (
+                                            <tr>
+                                                <td data-label="Nom">
+                                                    <Text>{kid.lastname}</Text>
+                                                </td>
+                                                <td data-label="Prénom">
+                                                    <Text>{kid.firstname}</Text>
+                                                </td>
+                                                <td data-label="Activer">
+                                                    {kid.activated ? (
+                                                        <Button
+                                                            color="red"
+                                                            onClick={() =>
+                                                                activate(
+                                                                    kid.id,
+                                                                    false
+                                                                )
+                                                            }
+                                                        >
+                                                            Désactiver
+                                                        </Button>
+                                                    ) : (
+                                                        <Button
+                                                            style={{
+                                                                backgroundColor:
+                                                                    '#4ad4c6',
+                                                            }}
+                                                            onClick={() =>
+                                                                activate(
+                                                                    kid.id,
+                                                                    true
+                                                                )
+                                                            }
+                                                        >
+                                                            Activer
+                                                        </Button>
+                                                    )}
+                                                </td>
+                                                <td data-label="Archiver">
+                                                    {
+                                                        <Button
+                                                            color="red"
+                                                            onClick={() => {
+                                                                setArchiveOpened(
+                                                                    true
+                                                                );
+                                                                setKidId(
+                                                                    kid.id
+                                                                );
+                                                            }}
+                                                        >
+                                                            Archiver
+                                                        </Button>
+                                                    }
+                                                </td>
+                                                <td data-label="Note">
+                                                    <Link
+                                                        href={{
+                                                            pathname: `/dashboard/nurse/kid/[pid]/notes`,
+                                                            query: {
+                                                                pid: kid.id,
+                                                            },
                                                         }}
                                                     >
-                                                        Couleur
-                                                    </Button>
-                                                }
-                                            </td>
-                                        </tr>
-                                    );
-                                })}
-                        </tbody>
-                    </table>
-                    <Space h={'xl'} />
-                    <Center>
-                        <Pagination total={total} onChange={onChange} />
-                    </Center>
+                                                        <Button>Note</Button>
+                                                    </Link>
+                                                </td>
+                                                <td data-label="Couleur">
+                                                    {
+                                                        <Button
+                                                            onClick={() => {
+                                                                getKid(kid.id);
+                                                                onColorChange(
+                                                                    kid.color ??
+                                                                        randomColor()
+                                                                );
+                                                                setOpenedColor(
+                                                                    true
+                                                                );
+                                                                setKidId(
+                                                                    kid.id
+                                                                );
+                                                            }}
+                                                        >
+                                                            Couleur
+                                                        </Button>
+                                                    }
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
+                                </tbody>
+                            </table>
+                            <Space h={'xl'} />
+                            <Center>
+                                <Pagination total={total} onChange={onChange} />
+                            </Center>
+                        </>
+                    ) : (
+                        <Text>
+                            Aucun enfant n'est relié à vous, dès qu'un enfant le
+                            sera, il apparaîtra ici.
+                        </Text>
+                    )}
                 </Grid.Col>
                 <Grid.Col md={4}>
                     {verticalCards &&

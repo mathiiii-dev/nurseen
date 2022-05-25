@@ -59,11 +59,7 @@ export default function Page({ userId, bearer, nurse, files }) {
             headers: {
                 Authorization: bearer,
             },
-        })
-            .then((response) => response.json())
-            .then((data) => {
-                console.log(data);
-            });
+        }).then((response) => response.json());
     };
 
     const download = (url) => {

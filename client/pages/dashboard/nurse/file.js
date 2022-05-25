@@ -46,7 +46,7 @@ export default function Page({ userId, bearer, family, files }) {
         style = null;
     }
 
-    let parents = null;
+    let parents = [];
     if (family.length !== 0) {
         parents = family.map((element) => ({
             value: element.id.toString(),
@@ -67,11 +67,7 @@ export default function Page({ userId, bearer, family, files }) {
             headers: {
                 Authorization: bearer,
             },
-        })
-            .then((response) => response.json())
-            .then((data) => {
-                console.log(data);
-            });
+        }).then((response) => response.json());
     };
 
     return (
@@ -125,7 +121,12 @@ export default function Page({ userId, bearer, family, files }) {
                             </Dropzone>
                         </InputWrapper>
                         <Space h={'md'} />
-                        <Button type={'submit'}>Envoyer</Button>
+                        <Button
+                            type={'submit'}
+                            disabled={parents.length === 0 ? true : false}
+                        >
+                            Envoyer
+                        </Button>
                     </form>
                 </Accordion.Item>
 

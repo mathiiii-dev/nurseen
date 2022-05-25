@@ -8,9 +8,11 @@ import { AuthToken } from '../../../services/auth_token';
 function Note({ bearer, kids }) {
     const [value, onChange] = useState('');
     const [select, setSelect] = useState(null);
-    let nurseKids = null;
+    const [hKids, sethKids] = useState(kids.length === 0 ? false : true);
 
-    if (kids) {
+    let nurseKids = [];
+
+    if (kids.length > 0) {
         nurseKids = kids.map((element) => ({
             value: element.id.toString(),
             label: element.firstname + ' ' + element.lastname,
@@ -45,7 +47,7 @@ function Note({ bearer, kids }) {
         <>
             <form onSubmit={create}>
                 <Select
-                    searchable
+                    searchable={hKids}
                     nothingFound="No options"
                     value={select}
                     onChange={setSelect}
@@ -72,6 +74,7 @@ function Note({ bearer, kids }) {
                 <Button
                     type="submit"
                     size={'lg'}
+                    disabled={!hKids}
                     style={{ backgroundColor: '#4ad4c6', float: 'right' }}
                 >
                     Enregistrer

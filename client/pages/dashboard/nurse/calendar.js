@@ -2,9 +2,9 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Alert, Button, Modal, Select, Space } from '@mantine/core';
-import { DatePicker, TimeInput, TimeRangeInput } from '@mantine/dates';
+import { DatePicker, TimeRangeInput } from '@mantine/dates';
 import dayjs from 'dayjs';
 import { useNotifications } from '@mantine/notifications';
 import Router from 'next/router';
@@ -12,7 +12,6 @@ import { AuthToken } from '../../../services/auth_token';
 import { getSession } from 'next-auth/react';
 import { useClickOutside } from '@mantine/hooks';
 import '../../../styles/globals.css';
-import { loadGetInitialProps } from 'next/dist/shared/lib/utils';
 
 function Index({ bearer, kids, dayKidsCalendar }) {
     const [selectEvent, setSelectEvent] = useState('');
@@ -59,6 +58,7 @@ function Index({ bearer, kids, dayKidsCalendar }) {
     const [showError, setShowError] = useState(false);
     const [editModal, setEditModal] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
+    const [hKids, setHKids] = useState(kids.length === 0 ? false : true);
 
     let events = null;
     if (dayKidsCalendar) {
@@ -71,7 +71,6 @@ function Index({ bearer, kids, dayKidsCalendar }) {
             color: element.color,
         }));
     }
-    console.log(events);
 
     let nurseKids = null;
     if (kids) {
@@ -288,15 +287,23 @@ function Index({ bearer, kids, dayKidsCalendar }) {
                     }}
                     plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
                     initialView="dayGridMonth"
-                    headerToolbar={{
-                        center: 'dayGridMonth,timeGridWeek,timeGridDay new',
-                    }}
-                    customButtons={{
-                        new: {
-                            text: 'Nouveau',
-                            click: () => setOpened(true),
-                        },
-                    }}
+                    headerToolbar={
+                        hKids
+                            ? {
+                                  center: 'dayGridMonth,timeGridWeek,timeGridDay new',
+                              }
+                            : {
+                                  center: 'dayGridMonth,timeGridWeek,timeGridDay',
+                              }
+                    }
+                    customButtons={
+                        hKids && {
+                            new: {
+                                text: 'Nouveau',
+                                click: () => setOpened(true),
+                            },
+                        }
+                    }
                     events={events}
                     dateClick={(e) => {
                         e.view.calendar.changeView('timeGridDay', e.dateStr);

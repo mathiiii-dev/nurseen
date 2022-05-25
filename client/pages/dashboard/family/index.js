@@ -37,8 +37,8 @@ export default function Page({
     const [visible, setVisible] = useState(false);
     const viewport = useRef();
 
-    const open = () => {
-        fetch(`${process.env.BASE_URL}chat/family`, {
+    const open = async () => {
+        await fetch(`${process.env.BASE_URL}chat/family`, {
             method: 'POST',
             body: JSON.stringify({
                 family: userId,
@@ -47,11 +47,11 @@ export default function Page({
                 'Content-type': 'application/json',
                 Authorization: bearer,
             },
-        }).then((r) => {
-            console.log(r);
         });
     };
+
     const [stateMessages, setStateMessages] = useState(messages);
+
     if (chat) {
         useEffect(() => {
             const url = new URL('http://localhost:9090/.well-known/mercure');
