@@ -5,15 +5,18 @@ import { AuthToken } from '../../../services/auth_token';
 
 async function refreshAccessToken(token) {
     try {
-        const response = await fetch(process.env.BASE_URL + 'token/refresh', {
-            method: 'POST',
-            body: JSON.stringify({
-                refresh_token: token.refresh_token,
-            }),
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
+        const response = await fetch(
+            process.env.NEXT_PUBLIC_BASE_URL + 'token/refresh',
+            {
+                method: 'POST',
+                body: JSON.stringify({
+                    refresh_token: token.refresh_token,
+                }),
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            }
+        );
 
         const refreshedTokens = await response.json();
 
@@ -62,13 +65,16 @@ const options = {
                     password: credentials.password,
                 };
 
-                const res = await fetch(`${process.env.BASE_URL}login_check`, {
-                    method: 'POST',
-                    body: JSON.stringify(payload),
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                });
+                const res = await fetch(
+                    `${process.env.NEXT_PUBLIC_BASE_URL}login_check`,
+                    {
+                        method: 'POST',
+                        body: JSON.stringify(payload),
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    }
+                );
 
                 if (res.status === 401) {
                     const user = await res.json();
@@ -125,7 +131,7 @@ const options = {
     pages: {
         signIn: '/sign-in',
     },
-    secret: process.env.SECRET,
+    secret: process.env.NEXT_PUBLIC_BASE_URL,
 };
 
 export default (req, res) => NextAuth(req, res, options);

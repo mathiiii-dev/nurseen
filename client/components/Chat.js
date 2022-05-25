@@ -16,7 +16,7 @@ function Chat({ userId, messages, viewport, bearer, cid, height }) {
 
     const send = (event) => {
         event.preventDefault();
-        fetch(`${process.env.BASE_URL}message/${cid}`, {
+        fetch(`${process.env.NEXT_PUBLIC_BASE_URL}message/${cid}`, {
             method: 'POST',
             body: JSON.stringify({
                 message: value,

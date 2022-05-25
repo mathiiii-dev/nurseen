@@ -46,7 +46,7 @@ export default function SignUp() {
     });
 
     const signUpUser = () => {
-        fetch(process.env.BASE_URL + 'user', {
+        fetch(process.env.NEXT_PUBLIC_BASE_URL + 'user', {
             method: 'POST',
             body: JSON.stringify({
                 email: form.values.email,

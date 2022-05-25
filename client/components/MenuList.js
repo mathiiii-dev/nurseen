@@ -17,19 +17,22 @@ function Menu({ menus, role, bearer }) {
     const [selected, setSelected] = useState('');
 
     const edit = async () => {
-        await fetch(`${process.env.BASE_URL}menu/${selected}/edit`, {
-            method: 'PATCH',
-            body: JSON.stringify({
-                date,
-                entry,
-                meal,
-                dessert,
-            }),
-            headers: {
-                'Content-type': 'application/json',
-                Authorization: bearer,
-            },
-        });
+        await fetch(
+            `${process.env.NEXT_PUBLIC_BASE_URL}menu/${selected}/edit`,
+            {
+                method: 'PATCH',
+                body: JSON.stringify({
+                    date,
+                    entry,
+                    meal,
+                    dessert,
+                }),
+                headers: {
+                    'Content-type': 'application/json',
+                    Authorization: bearer,
+                },
+            }
+        );
     };
 
     let list = null;

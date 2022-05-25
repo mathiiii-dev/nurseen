@@ -38,7 +38,7 @@ export default function Page({
     const viewport = useRef();
 
     const open = async () => {
-        await fetch(`${process.env.BASE_URL}chat/family`, {
+        await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}chat/family`, {
             method: 'POST',
             body: JSON.stringify({
                 family: userId,
@@ -81,13 +81,16 @@ export default function Page({
 
     useEffect(() => {
         setVisible(true);
-        fetch(`${process.env.BASE_URL}kid/family/${userId}?page=${page}`, {
-            method: 'GET',
-            headers: {
-                'Content-type': 'application/json',
-                Authorization: bearer,
-            },
-        })
+        fetch(
+            `${process.env.NEXT_PUBLIC_BASE_URL}kid/family/${userId}?page=${page}`,
+            {
+                method: 'GET',
+                headers: {
+                    'Content-type': 'application/json',
+                    Authorization: bearer,
+                },
+            }
+        )
             .then((res) => res.json())
             .then((data) => {
                 setKids(data.items);
@@ -218,7 +221,7 @@ export async function getServerSideProps(ctx) {
     const authToken = new AuthToken(sessionCallBack.user.access_token);
 
     const res = await fetch(
-        `${process.env.BASE_URL}kid/family/${authToken.decodedToken.id}`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}kid/family/${authToken.decodedToken.id}`,
         {
             method: 'GET',
             headers: {
@@ -230,7 +233,7 @@ export async function getServerSideProps(ctx) {
     const kids = await res.json();
 
     const res1 = await fetch(
-        `${process.env.BASE_URL}chat/${authToken.decodedToken.id}`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}chat/${authToken.decodedToken.id}`,
         {
             method: 'GET',
             headers: {
@@ -245,7 +248,7 @@ export async function getServerSideProps(ctx) {
     let messages = [];
     if (chat) {
         const res2 = await fetch(
-            `${process.env.BASE_URL}message/${chat[0].id}`,
+            `${process.env.NEXT_PUBLIC_BASE_URL}message/${chat[0].id}`,
             {
                 method: 'GET',
                 headers: {

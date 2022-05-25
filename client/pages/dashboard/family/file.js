@@ -53,7 +53,7 @@ export default function Page({ userId, bearer, nurse, files }) {
         data.append('sender', userId);
         data.append('recipient', nurse.userId);
         data.append('name', title);
-        fetch(`${process.env.BASE_URL}file/${userId}/send`, {
+        fetch(`${process.env.NEXT_PUBLIC_BASE_URL}file/${userId}/send`, {
             body: data,
             method: 'POST',
             headers: {
@@ -148,7 +148,7 @@ export async function getServerSideProps(ctx) {
     const authToken = new AuthToken(sessionCallBack.user.access_token);
 
     const res = await fetch(
-        `${process.env.BASE_URL}family/${authToken.decodedToken.id}/nurse`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}family/${authToken.decodedToken.id}/nurse`,
         {
             method: 'GET',
             headers: {
@@ -161,7 +161,7 @@ export async function getServerSideProps(ctx) {
     const nurse = await res.json();
 
     const res1 = await fetch(
-        `${process.env.BASE_URL}file/${authToken.decodedToken.id}`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}file/${authToken.decodedToken.id}`,
         {
             method: 'GET',
             headers: {

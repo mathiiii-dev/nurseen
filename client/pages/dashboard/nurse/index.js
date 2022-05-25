@@ -62,13 +62,16 @@ export default function Page({ bearer, userId, code, firstname, lastname }) {
 
     useEffect(() => {
         setVisible(true);
-        fetch(`${process.env.BASE_URL}kid/nurse/${userId}?page=${page}`, {
-            method: 'GET',
-            headers: {
-                'Content-type': 'application/json',
-                Authorization: bearer,
-            },
-        })
+        fetch(
+            `${process.env.NEXT_PUBLIC_BASE_URL}kid/nurse/${userId}?page=${page}`,
+            {
+                method: 'GET',
+                headers: {
+                    'Content-type': 'application/json',
+                    Authorization: bearer,
+                },
+            }
+        )
             .then((res) => res.json())
             .then((data) => {
                 setKids(data.items);
@@ -78,7 +81,7 @@ export default function Page({ bearer, userId, code, firstname, lastname }) {
     }, [page]);
 
     const activate = (kidId) => {
-        fetch(`${process.env.BASE_URL}kid/${kidId}/activate`, {
+        fetch(`${process.env.NEXT_PUBLIC_BASE_URL}kid/${kidId}/activate`, {
             method: 'POST',
             headers: {
                 'Content-type': 'application/json',
@@ -90,7 +93,7 @@ export default function Page({ bearer, userId, code, firstname, lastname }) {
     };
 
     const archived = () => {
-        fetch(`${process.env.BASE_URL}kid/${kidId}/archive`, {
+        fetch(`${process.env.NEXT_PUBLIC_BASE_URL}kid/${kidId}/archive`, {
             method: 'POST',
             headers: {
                 'Content-type': 'application/json',
@@ -102,7 +105,7 @@ export default function Page({ bearer, userId, code, firstname, lastname }) {
     };
 
     const linkParent = () => {
-        fetch(`${process.env.BASE_URL}link_code/${userId}`, {
+        fetch(`${process.env.NEXT_PUBLIC_BASE_URL}link_code/${userId}`, {
             method: 'POST',
             headers: {
                 'Content-type': 'application/json',
@@ -116,7 +119,7 @@ export default function Page({ bearer, userId, code, firstname, lastname }) {
     };
 
     const colorKid = async () => {
-        await fetch(`${process.env.BASE_URL}kid/color/${kidId}`, {
+        await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}kid/color/${kidId}`, {
             method: 'POST',
             body: JSON.stringify({
                 color,
@@ -449,7 +452,7 @@ export async function getServerSideProps(ctx) {
     const authToken = new AuthToken(sessionCallBack.user.access_token);
 
     const res = await fetch(
-        `${process.env.BASE_URL}link_code/${authToken.decodedToken.id}`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}link_code/${authToken.decodedToken.id}`,
         {
             method: 'GET',
             headers: {

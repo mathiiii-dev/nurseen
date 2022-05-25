@@ -43,7 +43,7 @@ function Feed({ feed }) {
                                 />
                                 <GalleryNurse
                                     galleryPhoto={f.feedImages.map((i) => ({
-                                        src: `${process.env.MEDIA_URL}/feed/${f.id}/${i.url}`,
+                                        src: `${process.env.NEXT_PUBLIC_MEDIA_URL}/feed/${f.id}/${i.url}`,
                                         width: 2,
                                         height: 3,
                                     }))}
@@ -73,7 +73,7 @@ export async function getServerSideProps(ctx) {
     const authToken = new AuthToken(sessionCallBack.user.access_token);
 
     const res = await fetch(
-        `${process.env.BASE_URL}feed/family/${authToken.decodedToken.id}`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}feed/family/${authToken.decodedToken.id}`,
         {
             method: 'GET',
             headers: {

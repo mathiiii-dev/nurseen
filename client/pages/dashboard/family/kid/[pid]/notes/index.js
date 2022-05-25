@@ -74,13 +74,16 @@ export async function getServerSideProps(ctx) {
 
     const authToken = new AuthToken(sessionCallBack.user.access_token);
 
-    const res = await fetch(`${process.env.BASE_URL}kid/${ctx.params.pid}`, {
-        method: 'GET',
-        headers: {
-            'Content-type': 'application/json',
-            Authorization: authToken.authorizationString,
-        },
-    });
+    const res = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}kid/${ctx.params.pid}`,
+        {
+            method: 'GET',
+            headers: {
+                'Content-type': 'application/json',
+                Authorization: authToken.authorizationString,
+            },
+        }
+    );
     const kid = await res.json();
 
     if (kid.error) {
@@ -90,7 +93,7 @@ export async function getServerSideProps(ctx) {
     }
 
     const res1 = await fetch(
-        `${process.env.BASE_URL}note/kid/${ctx.params.pid}/all`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}note/kid/${ctx.params.pid}/all`,
         {
             method: 'GET',
             headers: {

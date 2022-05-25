@@ -101,7 +101,7 @@ function AddGallery({ bearer, userId }) {
                 data.append(photo.name, photo);
             });
         }
-        fetch(`${process.env.BASE_URL}gallery/${userId}`, {
+        fetch(`${process.env.NEXT_PUBLIC_BASE_URL}gallery/${userId}`, {
             body: data,
             method: 'POST',
             headers: {

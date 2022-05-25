@@ -21,7 +21,7 @@ function Note({ bearer, kids }) {
 
     const create = (event) => {
         event.preventDefault();
-        fetch(`${process.env.BASE_URL}note/kid/${select}`, {
+        fetch(`${process.env.NEXT_PUBLIC_BASE_URL}note/kid/${select}`, {
             method: 'POST',
             body: JSON.stringify({
                 note: value,
@@ -92,7 +92,7 @@ export async function getServerSideProps(ctx) {
     const authToken = new AuthToken(sessionCallBack.user.access_token);
 
     const res = await fetch(
-        `${process.env.BASE_URL}kid/nurse/${authToken.decodedToken.id}/all`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}kid/nurse/${authToken.decodedToken.id}/all`,
         {
             method: 'GET',
             headers: {

@@ -6,7 +6,10 @@ export async function middleware(req) {
         return NextResponse.next();
     }
 
-    const session = await getToken({ req, secret: process.env.SECRET });
+    const session = await getToken({
+        req,
+        secret: process.env.NEXT_PUBLIC_BASE_URL,
+    });
 
     if (!session) {
         return NextResponse.redirect('http://localhost:3000/sign-in');

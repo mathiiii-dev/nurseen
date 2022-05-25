@@ -34,7 +34,7 @@ export async function getServerSideProps(ctx) {
     const authToken = new AuthToken(sessionCallBack.user.access_token);
 
     const res = await fetch(
-        `${process.env.BASE_URL}menu/family/${sessionCallBack.user.id}`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}menu/family/${sessionCallBack.user.id}`,
         {
             method: 'GET',
             headers: {

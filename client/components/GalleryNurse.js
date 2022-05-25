@@ -33,7 +33,7 @@ export default function GalleryNurse({
 
     const deleteImage = async () => {
         const res = await fetch(
-            `${process.env.BASE_URL}gallery/${galleryPhoto[currentImage].id}`,
+            `${process.env.NEXT_PUBLIC_BASE_URL}gallery/${galleryPhoto[currentImage].id}`,
             {
                 method: 'DELETE',
                 headers: {

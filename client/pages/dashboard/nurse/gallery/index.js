@@ -24,13 +24,16 @@ function AddGallery({ bearer, userId }) {
 
     useEffect(() => {
         setLoading(true);
-        fetch(`${process.env.BASE_URL}gallery/nurse/${userId}?page=${page}`, {
-            method: 'GET',
-            headers: {
-                'Content-type': 'application/json',
-                Authorization: bearer,
-            },
-        })
+        fetch(
+            `${process.env.NEXT_PUBLIC_BASE_URL}gallery/nurse/${userId}?page=${page}`,
+            {
+                method: 'GET',
+                headers: {
+                    'Content-type': 'application/json',
+                    Authorization: bearer,
+                },
+            }
+        )
             .then((res) => res.json())
             .then((data) => {
                 setLoading(false);
@@ -44,7 +47,11 @@ function AddGallery({ bearer, userId }) {
         galleryPhoto = photos.map((element) => ({
             id: element.id,
             src:
-                process.env.MEDIA_URL + 'gallery/' + userId + '/' + element.url,
+                process.env.NEXT_PUBLIC_MEDIA_URL +
+                'gallery/' +
+                userId +
+                '/' +
+                element.url,
             sizes: ['(min-width: 480px) 50vw,(min-width: 1024px) 33.3vw,100vw'],
             width: 3,
             height: 4,
