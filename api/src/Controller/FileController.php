@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
 use App\Handler\FileHandler;
 use App\Repository\FileRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -28,10 +29,11 @@ class FileController extends AbstractController
         return $this->json([], Response::HTTP_CREATED);
     }
 
-    #[Route('/file/{recipientId}', name: 'app_file_get')]
-    public function get(int $recipientId): Response
+    #[Route('/file/{recipient}', name: 'app_file_get')]
+    public function get(User $recipient): Response
     {
-        $files = $this->fileRepository->findBy(['recipient' => $recipientId]);
+        $this->denyAccessUnlessGranted('owner', $recipient);
+        $files = $this->fileRepository->findBy(['recipient' => $recipient->getId()]);
 
         return $this->json($files, Response::HTTP_CREATED, [], ['groups' => 'file']);
     }

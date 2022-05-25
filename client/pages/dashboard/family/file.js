@@ -11,6 +11,7 @@ import {
 import { Dropzone, MIME_TYPES } from '@mantine/dropzone';
 import { useState } from 'react';
 import FileManager from '../../../components/FileManager';
+import NonKidsMessage from '../../../components/NoKidsMessage';
 
 export const dropzoneChildrenUploaded = () => (
     <Text>Votre fichier à bien été ajouté</Text>
@@ -32,8 +33,6 @@ export default function Page({ userId, bearer, nurse, files }) {
     const [rejected, setRejected] = useState(false);
     const [title, setTitle] = useState();
 
-    console.log(nurse);
-
     let style = null;
 
     if (rejected) {
@@ -54,17 +53,13 @@ export default function Page({ userId, bearer, nurse, files }) {
         data.append('sender', userId);
         data.append('recipient', nurse.userId);
         data.append('name', title);
-        fetch(process.env.BASE_URL + `file/${userId}/send`, {
+        fetch(`${process.env.BASE_URL}file/${userId}/send`, {
             body: data,
             method: 'POST',
             headers: {
                 Authorization: bearer,
             },
-        })
-            .then((response) => response.json())
-            .then((data) => {
-                console.log(data);
-            });
+        }).then((response) => response.json());
     };
 
     const download = (url) => {
@@ -75,59 +70,74 @@ export default function Page({ userId, bearer, nurse, files }) {
 
     return (
         <>
-            <Accordion initialItem={0} multiple>
-                <Accordion.Item label="Formulaire d'envoie de fichier">
-                    <Text>
-                        Envoyé un fichier à votre nourrice{' '}
-                        {nurse.firstname + ' ' + nurse.lastname}
-                    </Text>
-                    <form onSubmit={send}>
-                        <Space h={'md'} />
-                        <TextInput
-                            placeholder="Contrat du mois"
-                            label="Nom du fichier"
-                            value={title}
-                            onChange={(e) => setTitle(e.currentTarget.value)}
-                            required
-                        />
-                        <Space h={'md'} />
-                        <InputWrapper label="Fichier">
-                            <Dropzone
-                                styles={{
-                                    root: style,
-                                }}
-                                onDrop={(file) => {
-                                    setFile(file);
-                                    setUploaded(true);
-                                    setRejected(false);
-                                }}
-                                onReject={(files) => setRejected(true)}
-                                maxSize={3 * 1024 ** 2}
-                                accept={[
-                                    MIME_TYPES.csv,
-                                    MIME_TYPES.doc,
-                                    MIME_TYPES.docx,
-                                    MIME_TYPES.pdf,
-                                    MIME_TYPES.ppt,
-                                    MIME_TYPES.pptx,
-                                    MIME_TYPES.xls,
-                                    MIME_TYPES.xlsx,
-                                ]}
-                                multiple={false}
-                            >
-                                {uploaded
-                                    ? (status) => dropzoneChildrenUploaded()
-                                    : (status) => dropzoneChildren(rejected)}
-                            </Dropzone>
-                        </InputWrapper>
-                        <Space h={'md'} />
-                        <Button type={'submit'}>Envoyer</Button>
-                    </form>
-                </Accordion.Item>
-                <Accordion.Item label="Mes fichiers reçus">
-                    <FileManager files={files} userId={userId} />
-                </Accordion.Item>
-            </Accordion>
+            {nurse.length > 0 ? (
+                <>
+                    <Accordion initialItem={0} multiple>
+                        <Accordion.Item label="Formulaire d'envoie de fichier">
+                            <Text>
+                                Envoyé un fichier à votre nourrice{' '}
+                                {nurse.firstname + ' ' + nurse.lastname}
+                            </Text>
+                            <form onSubmit={send}>
+                                <Space h={'md'} />
+                                <TextInput
+                                    placeholder="Contrat du mois"
+                                    label="Nom du fichier"
+                                    value={title}
+                                    onChange={(e) =>
+                                        setTitle(e.currentTarget.value)
+                                    }
+                                    required
+                                />
+                                <Space h={'md'} />
+                                <InputWrapper label="Fichier">
+                                    <Dropzone
+                                        styles={{
+                                            root: style,
+                                        }}
+                                        onDrop={(file) => {
+                                            setFile(file);
+                                            setUploaded(true);
+                                            setRejected(false);
+                                        }}
+                                        onReject={(files) => setRejected(true)}
+                                        maxSize={3 * 1024 ** 2}
+                                        accept={[
+                                            MIME_TYPES.csv,
+                                            MIME_TYPES.doc,
+                                            MIME_TYPES.docx,
+                                            MIME_TYPES.pdf,
+                                            MIME_TYPES.ppt,
+                                            MIME_TYPES.pptx,
+                                            MIME_TYPES.xls,
+                                            MIME_TYPES.xlsx,
+                                        ]}
+                                        multiple={false}
+                                    >
+                                        {uploaded
+                                            ? (status) =>
+                                                  dropzoneChildrenUploaded()
+                                            : (status) =>
+                                                  dropzoneChildren(rejected)}
+                                    </Dropzone>
+                                </InputWrapper>
+                                <Space h={'md'} />
+                                <Button type={'submit'}>Envoyer</Button>
+                            </form>
+                        </Accordion.Item>
+                        <Accordion.Item label="Mes fichiers reçus">
+                            <FileManager files={files} userId={userId} />
+                        </Accordion.Item>
+                    </Accordion>
+                </>
+            ) : (
+                <NonKidsMessage
+                    message={
+                        'Vous devez enregistrer au moins un enfant pour envoyer\n' +
+                        '                        des fichies a votre nourrice'
+                    }
+                />
+            )}
         </>
     );
 }
@@ -138,7 +148,7 @@ export async function getServerSideProps(ctx) {
     const authToken = new AuthToken(sessionCallBack.user.access_token);
 
     const res = await fetch(
-        process.env.BASE_URL + `family/${authToken.decodedToken.id}/nurse`,
+        `${process.env.BASE_URL}family/${authToken.decodedToken.id}/nurse`,
         {
             method: 'GET',
             headers: {
@@ -151,7 +161,7 @@ export async function getServerSideProps(ctx) {
     const nurse = await res.json();
 
     const res1 = await fetch(
-        process.env.BASE_URL + `file/${authToken.decodedToken.id}`,
+        `${process.env.BASE_URL}file/${authToken.decodedToken.id}`,
         {
             method: 'GET',
             headers: {

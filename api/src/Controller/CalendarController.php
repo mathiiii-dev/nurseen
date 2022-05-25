@@ -4,8 +4,10 @@ namespace App\Controller;
 
 use App\Entity\Calendar;
 use App\Entity\Kid;
+use App\Entity\User;
 use App\Handler\CalendarHandler;
 use App\Repository\CalendarRepository;
+use App\Repository\FamilyRepository;
 use Exception;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -18,11 +20,13 @@ class CalendarController extends AbstractController
 {
     private CalendarHandler $calendarHandler;
     private CalendarRepository $calendarRepository;
+    private FamilyRepository $familyRepository;
 
-    public function __construct(CalendarHandler $calendarHandler, CalendarRepository $calendarRepository)
+    public function __construct(CalendarHandler $calendarHandler, CalendarRepository $calendarRepository, FamilyRepository $familyRepository)
     {
         $this->calendarHandler = $calendarHandler;
         $this->calendarRepository = $calendarRepository;
+        $this->familyRepository = $familyRepository;
     }
 
     /**
@@ -43,10 +47,11 @@ class CalendarController extends AbstractController
     }
 
     #[IsGranted('ROLE_NURSE', message: 'Vous ne pouvez pas faire ça')]
-    #[Route('/calendar/nurse/{nurseId}', name: 'app_calendar_nurse', methods: 'GET')]
-    public function calendarNurse(int $nurseId): JsonResponse
+    #[Route('/calendar/nurse/{nurse}', name: 'app_calendar_nurse', methods: 'GET')]
+    public function calendarNurse(User $nurse): JsonResponse
     {
-        return $this->json($this->calendarRepository->getCalendarByNurse($nurseId), Response::HTTP_OK);
+        $this->denyAccessUnlessGranted('owner', $nurse);
+        return $this->json($this->calendarRepository->getCalendarByNurse($nurse->getId()), Response::HTTP_OK);
     }
 
     /**
@@ -71,8 +76,18 @@ class CalendarController extends AbstractController
     #[Route('/calendar/{calendar}', name: 'app_calendar_delete', methods: 'DELETE')]
     public function delete(Calendar $calendar): JsonResponse
     {
+        $this->denyAccessUnlessGranted('owner', $calendar->getKid());
         $this->calendarHandler->handleDeleteCalendar($calendar);
 
         return $this->json([], Response::HTTP_NO_CONTENT);
+    }
+
+    #[IsGranted('ROLE_PARENT', message: 'Vous ne pouvez pas faire ça')]
+    #[Route('/calendar/family/{family}', name: 'app_calendar_family', methods: 'GET')]
+    public function calendarFamily(User $family): JsonResponse
+    {
+        $this->denyAccessUnlessGranted('owner', $family);
+        $family = $this->familyRepository->findOneBy(['parent' => $family->getId()]);
+        return $this->json($this->calendarRepository->getCalendarByFamily($family->getId()), Response::HTTP_OK);
     }
 }

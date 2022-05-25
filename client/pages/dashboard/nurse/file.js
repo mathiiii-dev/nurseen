@@ -46,8 +46,7 @@ export default function Page({ userId, bearer, family, files }) {
         style = null;
     }
 
-    let parents = null;
-    console.log(family);
+    let parents = [];
     if (family.length !== 0) {
         parents = family.map((element) => ({
             value: element.id.toString(),
@@ -62,17 +61,13 @@ export default function Page({ userId, bearer, family, files }) {
         data.append('sender', userId);
         data.append('recipient', select);
         data.append('name', title);
-        fetch(process.env.BASE_URL + `file/${userId}/send`, {
+        fetch(`${process.env.BASE_URL}file/${userId}/send`, {
             body: data,
             method: 'POST',
             headers: {
                 Authorization: bearer,
             },
-        })
-            .then((response) => response.json())
-            .then((data) => {
-                console.log(data);
-            });
+        }).then((response) => response.json());
     };
 
     return (
@@ -126,7 +121,12 @@ export default function Page({ userId, bearer, family, files }) {
                             </Dropzone>
                         </InputWrapper>
                         <Space h={'md'} />
-                        <Button type={'submit'}>Envoyer</Button>
+                        <Button
+                            type={'submit'}
+                            disabled={parents.length === 0 ? true : false}
+                        >
+                            Envoyer
+                        </Button>
                     </form>
                 </Accordion.Item>
 
@@ -144,7 +144,7 @@ export async function getServerSideProps(ctx) {
     const authToken = new AuthToken(sessionCallBack.user.access_token);
 
     const res = await fetch(
-        process.env.BASE_URL + `family/${authToken.decodedToken.id}/list`,
+        `${process.env.BASE_URL}family/${authToken.decodedToken.id}/list`,
         {
             method: 'GET',
             headers: {
@@ -157,7 +157,7 @@ export async function getServerSideProps(ctx) {
     const family = await res.json();
 
     const res1 = await fetch(
-        process.env.BASE_URL + `file/${authToken.decodedToken.id}`,
+        `${process.env.BASE_URL}file/${authToken.decodedToken.id}`,
         {
             method: 'GET',
             headers: {

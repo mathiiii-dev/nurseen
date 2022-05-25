@@ -11,11 +11,13 @@ import {
     Center,
     Drawer,
 } from '@mantine/core';
-import Gallery from 'react-photo-gallery';
 import { Dropzone, IMAGE_MIME_TYPE } from '@mantine/dropzone';
 import { getSession } from 'next-auth/react';
 import { AuthToken } from '../../../services/auth_token';
 import { useRouter } from 'next/router';
+import GalleryNurse from '../../../components/GalleryNurse';
+import dayjs from 'dayjs';
+import { AiOutlineDelete, AiOutlineEdit } from 'react-icons/ai';
 
 export const dropzoneChildren = (rejected) => (
     <>
@@ -122,7 +124,7 @@ function Feed({ userId, bearer, feed }) {
             });
         }
         data.append('text', value);
-        fetch(process.env.BASE_URL + `feed/${userId}`, {
+        fetch(`${process.env.BASE_URL}feed/${userId}`, {
             body: data,
             method: 'POST',
             headers: {
@@ -143,7 +145,7 @@ function Feed({ userId, bearer, feed }) {
     const update = (event) => {
         event.preventDefault();
 
-        fetch(process.env.BASE_URL + `feed/${feedId}`, {
+        fetch(`${process.env.BASE_URL}feed/${feedId}`, {
             body: JSON.stringify({
                 text: feedText,
             }),
@@ -162,7 +164,7 @@ function Feed({ userId, bearer, feed }) {
 
     const deleteFeed = (event) => {
         event.preventDefault();
-        fetch(process.env.BASE_URL + `feed/${feedId}`, {
+        fetch(`${process.env.BASE_URL}feed/${feedId}`, {
             method: 'DELETE',
             headers: {
                 Authorization: bearer,
@@ -219,7 +221,9 @@ function Feed({ userId, bearer, feed }) {
                     <>
                         <Center>
                             <Group>
-                                <Button onClick={deleteFeed}>Supprimer</Button>
+                                <Button color="red" onClick={deleteFeed}>
+                                    Supprimer
+                                </Button>
                                 <Button onClick={() => setOpened(false)}>
                                     Annuler
                                 </Button>
@@ -289,33 +293,48 @@ function Feed({ userId, bearer, feed }) {
                                 borderRadius: '8px',
                             }}
                         >
-                            <Text>Mathias Micheli - 8 mai</Text>
-                            <Button
-                                onClick={() => {
-                                    setFeedId(f.id);
-                                    setOpened(true);
-                                }}
-                            >
-                                Supprimer
-                            </Button>
-                            <Button
-                                onClick={() => {
-                                    setFeedId(f.id);
-                                    setFeedText(f.text);
-                                    setOpenDrawer(true);
-                                }}
-                            >
-                                Modifier
-                            </Button>
+                            <Group position="right">
+                                <Button
+                                    style={{
+                                        marginleft: 'auto',
+                                        marginRight: 0,
+                                    }}
+                                    color="red"
+                                    onClick={() => {
+                                        setFeedId(f.id);
+                                        setOpened(true);
+                                    }}
+                                >
+                                    <AiOutlineDelete size={25} />
+                                </Button>
+                                <Button
+                                    onClick={() => {
+                                        setFeedId(f.id);
+                                        setFeedText(f.text);
+                                        setOpenDrawer(true);
+                                    }}
+                                >
+                                    <AiOutlineEdit size={25} />
+                                </Button>
+                            </Group>
+                            <Text>
+                                {f.nurse.nurse.firstname +
+                                    ' ' +
+                                    f.nurse.nurse.lastname +
+                                    ' - ' +
+                                    dayjs(f.creationDate).format('DD MMM YYYY')}
+                            </Text>
+
                             <Text
                                 dangerouslySetInnerHTML={createMarkup(f.text)}
                             />
-                            <Gallery
-                                photos={f.feedImages.map((i) => ({
+                            <GalleryNurse
+                                galleryPhoto={f.feedImages.map((i) => ({
                                     src: `${process.env.MEDIA_URL}/feed/${f.id}/${i.url}`,
                                     width: 2,
                                     height: 3,
                                 }))}
+                                bearer={bearer}
                             />
                         </div>
                         <Space h={'xl'} />
@@ -333,7 +352,7 @@ export async function getServerSideProps(ctx) {
     const authToken = new AuthToken(sessionCallBack.user.access_token);
 
     const res = await fetch(
-        process.env.BASE_URL + `feed/${authToken.decodedToken.id}`,
+        `${process.env.BASE_URL}feed/${authToken.decodedToken.id}`,
         {
             method: 'GET',
             headers: {
@@ -342,9 +361,9 @@ export async function getServerSideProps(ctx) {
             },
         }
     );
-    console.log(res);
+
     const feed = await res.json();
-    console.log(feed);
+
     return {
         props: {
             userId: sessionCallBack.user.id,

@@ -62,7 +62,7 @@ const options = {
                     password: credentials.password,
                 };
 
-                const res = await fetch(process.env.BASE_URL + 'login_check', {
+                const res = await fetch(`${process.env.BASE_URL}login_check`, {
                     method: 'POST',
                     body: JSON.stringify(payload),
                     headers: {

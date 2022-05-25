@@ -41,7 +41,7 @@ function CreateKid({ userId, bearer }) {
 
     const create = async (event) => {
         event.preventDefault();
-        await fetch(process.env.BASE_URL + `family/${userId}/kid`, {
+        await fetch(`${process.env.BASE_URL}family/${userId}/kid`, {
             method: 'POST',
             body: JSON.stringify({
                 lastname: form.values.lastname,

@@ -76,14 +76,13 @@ function NoteList({ bearer, kid, notes }) {
     }
 
     const deleteNote = () => {
-        fetch(process.env.BASE_URL + `note/${noteId}`, {
+        fetch(`${process.env.BASE_URL}note/${noteId}`, {
             method: 'DELETE',
             headers: {
                 'Content-type': 'application/json',
                 Authorization: bearer,
             },
         }).then((r) => {
-            console.log(r.status);
             if (r.status === 204) {
                 setOpened(false);
                 router.reload();
@@ -92,7 +91,7 @@ function NoteList({ bearer, kid, notes }) {
     };
 
     const edit = async () => {
-        await fetch(process.env.BASE_URL + `note/${noteId}/edit`, {
+        await fetch(`${process.env.BASE_URL}note/${noteId}/edit`, {
             method: 'PATCH',
             body: JSON.stringify({
                 note: value,
@@ -173,16 +172,23 @@ export async function getServerSideProps(ctx) {
 
     const authToken = new AuthToken(sessionCallBack.user.access_token);
 
-    const res1 = await fetch(process.env.BASE_URL + `kid/${ctx.params.pid}`, {
+    const res1 = await fetch(`${process.env.BASE_URL}kid/${ctx.params.pid}`, {
         method: 'GET',
         headers: {
             'Content-type': 'application/json',
             Authorization: authToken.authorizationString,
         },
     });
+    const kid = await res1.json();
+
+    if (kid.error) {
+        return {
+            notFound: true,
+        };
+    }
 
     const res2 = await fetch(
-        process.env.BASE_URL + `note/kid/${ctx.params.pid}/all`,
+        `${process.env.BASE_URL}note/kid/${ctx.params.pid}/all`,
         {
             method: 'GET',
             headers: {
@@ -192,7 +198,6 @@ export async function getServerSideProps(ctx) {
         }
     );
 
-    const kid = await res1.json();
     const notes = await res2.json();
 
     return {

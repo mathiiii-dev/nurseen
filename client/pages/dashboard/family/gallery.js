@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
 import { AuthToken } from '../../../services/auth_token';
 import { getSession } from 'next-auth/react';
-import Gallery from 'react-photo-gallery';
 import Carousel, { Modal, ModalGateway } from 'react-images';
 import { Center, LoadingOverlay, Pagination, Space } from '@mantine/core';
 import { usePagination } from '@mantine/hooks';
+import GalleryNurse from '../../../components/GalleryNurse';
+import NonKidsMessage from '../../../components/NoKidsMessage';
 
 function AddGallery({ bearer, userId }) {
     const [currentImage, setCurrentImage] = useState(0);
@@ -17,7 +18,7 @@ function AddGallery({ bearer, userId }) {
 
     useEffect(() => {
         setLoading(true);
-        fetch(process.env.BASE_URL + `gallery/family/${userId}?page=${page}`, {
+        fetch(`${process.env.BASE_URL}gallery/family/${userId}?page=${page}`, {
             method: 'GET',
             headers: {
                 'Content-type': 'application/json',
@@ -61,10 +62,14 @@ function AddGallery({ bearer, userId }) {
             <LoadingOverlay visible={isLoading} />
             <Space h={'xl'} />
             {galleryPhoto && galleryPhoto.length === 0 ? (
-                ''
+                <NonKidsMessage
+                    message={
+                        'Vous devez enregistrer au moins un enfant pour voir les photos de la galerie'
+                    }
+                />
             ) : (
                 <>
-                    <Gallery photos={galleryPhoto} onClick={openLightbox} />
+                    <GalleryNurse galleryPhoto={galleryPhoto} bearer={bearer} />
                     <ModalGateway>
                         {viewerIsOpen ? (
                             <Modal onClose={closeLightbox}>
@@ -79,13 +84,13 @@ function AddGallery({ bearer, userId }) {
                             </Modal>
                         ) : null}
                     </ModalGateway>
+                    <Space h={'xl'} />
+                    <Center>
+                        <Pagination total={total} onChange={onChange} />
+                    </Center>
+                    <Space h={'xl'} />
                 </>
             )}
-            <Space h={'xl'} />
-            <Center>
-                <Pagination total={total} onChange={onChange} />
-            </Center>
-            <Space h={'xl'} />
         </div>
     );
 }

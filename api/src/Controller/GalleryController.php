@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Gallery;
+use App\Entity\User;
 use App\Handler\GalleryHandler;
 use App\Repository\FamilyRepository;
 use App\Repository\GalleryRepository;
@@ -51,11 +52,12 @@ class GalleryController extends AbstractController
      * @throws Exception
      */
     #[IsGranted('ROLE_NURSE', message: 'Vous ne pouvez pas faire ça')]
-    #[Route('/gallery/{nurseId}', name: 'app_gallery', methods: 'POST')]
-    public function index(Request $request, int $nurseId): JsonResponse
+    #[Route('/gallery/{nurse}', name: 'app_gallery', methods: 'POST')]
+    public function index(Request $request, User $nurse): JsonResponse
     {
+        $this->denyAccessUnlessGranted('owner', $nurse);
         $files = $request->files;
-        $nurse = $this->nurseRepository->findOneBy(['nurse' => $nurseId]);
+        $nurse = $this->nurseRepository->findOneBy(['nurse' => $nurse->getId()]);
 
         /* @var UploadedFile $file */
         foreach ($files as $file) {
@@ -65,7 +67,7 @@ class GalleryController extends AbstractController
 
             $this->uploadService->uploadFile(
                 $file,
-                $this->getParameter('gallery_directory').'/'.$nurseId,
+                $this->getParameter('gallery_directory').'/'.$nurse->getId(),
                 $fileName
             );
         }
@@ -74,10 +76,11 @@ class GalleryController extends AbstractController
     }
 
     #[IsGranted('ROLE_NURSE', message: 'Vous ne pouvez pas faire ça')]
-    #[Route('/gallery/nurse/{nurseId}', name: 'app_gallery_get_nurse', methods: 'GET')]
-    public function galleryNurse(int $nurseId, Request $request): JsonResponse
+    #[Route('/gallery/nurse/{nurse}', name: 'app_gallery_get_nurse', methods: 'GET')]
+    public function galleryNurse(User $nurse, Request $request): JsonResponse
     {
-        $nurse = $this->nurseRepository->findOneBy(['nurse' => $nurseId]);
+        $this->denyAccessUnlessGranted('owner', $nurse);
+        $nurse = $this->nurseRepository->findOneBy(['nurse' => $nurse->getId()]);
         $photos = $this->galleryRepository->findBy(['nurse' => $nurse->getId()]);
 
         return $this->json(
@@ -89,13 +92,17 @@ class GalleryController extends AbstractController
     }
 
     #[IsGranted('ROLE_PARENT', message: 'Vous ne pouvez pas faire ça')]
-    #[Route('/gallery/family/{familyId}', name: 'app_gallery_get_family', methods: 'GET')]
-    public function galleryFamily(int $familyId, Request $request): JsonResponse
+    #[Route('/gallery/family/{family}', name: 'app_gallery_get_family', methods: 'GET')]
+    public function galleryFamily(User $family, Request $request): JsonResponse
     {
-        $family = $this->familyRepository->findOneBy(['parent' => $familyId]);
+        $this->denyAccessUnlessGranted('owner', $family);
+        $family = $this->familyRepository->findOneBy(['parent' => $family->getId()]);
         $kid = $this->kidRepository->findOneBy(['family' => $family->getId()]);
-        $photos = $this->galleryRepository->findBy(['nurse' => $kid->getNurse()->getId()]);
 
+        $photos = [];
+        if ($kid) {
+            $photos = $this->galleryRepository->findBy(['nurse' => $kid->getNurse()->getId()]);
+        }
 
         return $this->json(
             $this->paginationService->getPagination($request, $photos),
@@ -109,6 +116,7 @@ class GalleryController extends AbstractController
     #[Route('/gallery/{gallery}', name: 'app_gallery_delete', methods: 'DELETE')]
     public function delete(Gallery $gallery): JsonResponse
     {
+        $this->denyAccessUnlessGranted('owner', $gallery);
         $this->galleryHandler->handleGalleryDelete($gallery);
 
         return $this->json([], Response::HTTP_NO_CONTENT);

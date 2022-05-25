@@ -97,12 +97,11 @@ function AddGallery({ bearer, userId }) {
         setLoading(true);
         const data = new FormData();
         if (files) {
-            console.log(files);
             files.forEach((photo) => {
                 data.append(photo.name, photo);
             });
         }
-        fetch(process.env.BASE_URL + `gallery/${userId}`, {
+        fetch(`${process.env.BASE_URL}gallery/${userId}`, {
             body: data,
             method: 'POST',
             headers: {

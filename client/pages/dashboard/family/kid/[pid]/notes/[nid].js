@@ -27,7 +27,7 @@ export async function getServerSideProps(ctx) {
 
     const authToken = new AuthToken(sessionCallBack.user.access_token);
 
-    const res = await fetch(process.env.BASE_URL + `note/${ctx.params.nid}`, {
+    const res = await fetch(`${process.env.BASE_URL}note/${ctx.params.nid}`, {
         method: 'GET',
         headers: {
             'Content-type': 'application/json',
@@ -36,6 +36,12 @@ export async function getServerSideProps(ctx) {
     });
 
     const note = await res.json();
+
+    if (note.error) {
+        return {
+            notFound: true,
+        };
+    }
 
     return {
         props: {

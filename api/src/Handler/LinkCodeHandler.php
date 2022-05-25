@@ -3,6 +3,7 @@
 namespace App\Handler;
 
 use App\Entity\LinkCode;
+use App\Entity\User;
 use App\Repository\LinkCodeRepository;
 use App\Repository\NurseRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -20,12 +21,12 @@ class LinkCodeHandler
         $this->linkCodeRepository = $linkCodeRepository;
     }
 
-    public function handleLinkeCodeCreate(int $nurse): int
+    public function handleLinkeCodeCreate(User $nurse): int
     {
         $entityManager = $this->doctrine->getManager();
         $code = rand(1000, 9999);
         $linkCode = new LinkCode();
-        $nurse = $this->nurseRepository->findOneBy(['nurse' => $nurse]);
+        $nurse = $this->nurseRepository->findOneBy(['nurse' => $nurse->getId()]);
         $linkCode->setNurse($nurse)
             ->setCode($code);
         $entityManager->persist($linkCode);

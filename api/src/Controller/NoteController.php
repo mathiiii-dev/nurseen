@@ -45,6 +45,8 @@ class NoteController extends AbstractController
     #[Route('/note/{note}', name: 'app_note_get_one', methods: 'GET')]
     public function getOne(Note $note): Response
     {
+        $this->denyAccessUnlessGranted('owner', $note->getKid()->getFamily()->getParent());
+        $note->getKid()->getFamily()->getParent();
         return $this->json($note, Response::HTTP_OK, [], ['groups' => 'note_list']);
     }
 

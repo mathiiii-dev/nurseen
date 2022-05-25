@@ -5,7 +5,6 @@ import EventSource from 'eventsource';
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
 import { scrollToBottom } from '../../../../services/scroll';
-import { Space } from '@mantine/core';
 
 export default function MessageNurse({ messages, userId, bearer }) {
     const viewport = useRef();
@@ -61,7 +60,7 @@ export async function getServerSideProps(ctx) {
     const authToken = new AuthToken(sessionCallBack.user.access_token);
     const cid = ctx.params.cid;
 
-    const res = await fetch(process.env.BASE_URL + `message/${cid}`, {
+    const res = await fetch(`${process.env.BASE_URL}message/${cid}`, {
         method: 'GET',
         headers: {
             'Content-type': 'application/json',
@@ -70,7 +69,13 @@ export async function getServerSideProps(ctx) {
     });
 
     const messages = await res.json();
+    console.log(messages);
 
+    if (messages.error) {
+        return {
+            notFound: true,
+        };
+    }
     return {
         props: {
             userId: sessionCallBack.user.id,

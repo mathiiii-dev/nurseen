@@ -2,9 +2,9 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Alert, Button, Modal, Select, Space } from '@mantine/core';
-import { DatePicker, TimeInput, TimeRangeInput } from '@mantine/dates';
+import { DatePicker, TimeRangeInput } from '@mantine/dates';
 import dayjs from 'dayjs';
 import { useNotifications } from '@mantine/notifications';
 import Router from 'next/router';
@@ -58,6 +58,7 @@ function Index({ bearer, kids, dayKidsCalendar }) {
     const [showError, setShowError] = useState(false);
     const [editModal, setEditModal] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
+    const [hKids, setHKids] = useState(kids.length === 0 ? false : true);
 
     let events = null;
     if (dayKidsCalendar) {
@@ -67,6 +68,7 @@ function Index({ bearer, kids, dayKidsCalendar }) {
             title: element.firstname + ' ' + element.lastname,
             start: element.day + ' ' + element.arrival,
             end: element.day + ' ' + element.departure,
+            color: element.color,
         }));
     }
 
@@ -80,7 +82,7 @@ function Index({ bearer, kids, dayKidsCalendar }) {
 
     const calendar = async (event) => {
         event.preventDefault();
-        fetch(process.env.BASE_URL + `calendar/kid/${select}`, {
+        fetch(`${process.env.BASE_URL}calendar/kid/${select}`, {
             method: 'POST',
             body: JSON.stringify({
                 day,
@@ -110,7 +112,7 @@ function Index({ bearer, kids, dayKidsCalendar }) {
 
     const deleteEvent = async (event) => {
         event.preventDefault();
-        fetch(process.env.BASE_URL + `calendar/${selectEvent}`, {
+        fetch(`${process.env.BASE_URL}calendar/${selectEvent}`, {
             method: 'DELETE',
             headers: {
                 'Content-type': 'application/json',
@@ -135,7 +137,7 @@ function Index({ bearer, kids, dayKidsCalendar }) {
 
     const edit = async (event) => {
         event.preventDefault();
-        fetch(process.env.BASE_URL + `calendar/${selectEvent}/kid/${select}`, {
+        fetch(`${process.env.BASE_URL}calendar/${selectEvent}/kid/${select}`, {
             method: 'PATCH',
             body: JSON.stringify({
                 day,
@@ -285,15 +287,23 @@ function Index({ bearer, kids, dayKidsCalendar }) {
                     }}
                     plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
                     initialView="dayGridMonth"
-                    headerToolbar={{
-                        center: 'dayGridMonth,timeGridWeek,timeGridDay new',
-                    }}
-                    customButtons={{
-                        new: {
-                            text: 'Nouveau',
-                            click: () => setOpened(true),
-                        },
-                    }}
+                    headerToolbar={
+                        hKids
+                            ? {
+                                  center: 'dayGridMonth,timeGridWeek,timeGridDay new',
+                              }
+                            : {
+                                  center: 'dayGridMonth,timeGridWeek,timeGridDay',
+                              }
+                    }
+                    customButtons={
+                        hKids && {
+                            new: {
+                                text: 'Nouveau',
+                                click: () => setOpened(true),
+                            },
+                        }
+                    }
                     events={events}
                     dateClick={(e) => {
                         e.view.calendar.changeView('timeGridDay', e.dateStr);
@@ -312,6 +322,7 @@ function Index({ bearer, kids, dayKidsCalendar }) {
                     }}
                     timeZone="UTC"
                     locale="fr"
+                    eventColor
                 />
             </>
         </>
@@ -326,7 +337,7 @@ export async function getServerSideProps(ctx) {
     const authToken = new AuthToken(sessionCallBack.user.access_token);
 
     const res1 = await fetch(
-        process.env.BASE_URL + `calendar/nurse/${authToken.decodedToken.id}`,
+        `${process.env.BASE_URL}calendar/nurse/${authToken.decodedToken.id}`,
         {
             method: 'GET',
             headers: {
@@ -338,7 +349,7 @@ export async function getServerSideProps(ctx) {
     const dayKidsCalendar = await res1.json();
 
     const res2 = await fetch(
-        process.env.BASE_URL + `kid/nurse/${authToken.decodedToken.id}/all`,
+        `${process.env.BASE_URL}kid/nurse/${authToken.decodedToken.id}/all`,
         {
             method: 'GET',
             headers: {

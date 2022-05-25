@@ -1,11 +1,27 @@
 import MenuList from '../../../../components/MenuList';
 import { getSession } from 'next-auth/react';
 import { AuthToken } from '../../../../services/auth_token';
+import Menu from '../../../../components/Menu';
+import NonKidsMessage from '../../../../components/NoKidsMessage';
 
 function MenuListFamily({ menus, role }) {
+    let wKid = true;
+    if (menus) {
+        if (menus.hasOwnProperty('kids')) {
+            wKid = false;
+        }
+    }
     return (
         <>
-            <MenuList menus={menus} role={role} />
+            {wKid ? (
+                <MenuList menus={menus} role={role} />
+            ) : (
+                <NonKidsMessage
+                    message={
+                        ' Vous devez enregistrer au moins un enfant pour visualiser le menu'
+                    }
+                />
+            )}
         </>
     );
 }
@@ -18,7 +34,7 @@ export async function getServerSideProps(ctx) {
     const authToken = new AuthToken(sessionCallBack.user.access_token);
 
     const res = await fetch(
-        process.env.BASE_URL + `menu/family/${sessionCallBack.user.id}/list`,
+        `${process.env.BASE_URL}menu/family/${sessionCallBack.user.id}/list`,
         {
             method: 'GET',
             headers: {
