@@ -1,9 +1,9 @@
-import { Button, Space, Text, Title } from '@mantine/core';
+import { Space, Text, Title } from '@mantine/core';
 import { getSession } from 'next-auth/react';
 import { AuthToken } from '../../../services/auth_token';
 import GalleryNurse from '../../../components/GalleryNurse';
 import dayjs from 'dayjs';
-import Link from 'next/link';
+import NonKidsMessage from '../../../components/NoKidsMessage';
 
 function Feed({ feed }) {
     function createMarkup(text) {
@@ -54,15 +54,12 @@ function Feed({ feed }) {
                     ))}
                 </>
             ) : (
-                <>
-                    <Text>
-                        Vous devez enregistrer au moins un enfant pour voir
-                        apparaitre les posts sur l'actualité
-                    </Text>
-                    <Link href={'create-kid'}>
-                        <Button>Ajouter un enfant</Button>
-                    </Link>
-                </>
+                <NonKidsMessage
+                    message={
+                        'Vous devez enregistrer au moins un enfant pour voir\n' +
+                        "                        apparaitre les posts sur l'actualité"
+                    }
+                />
             )}
         </>
     );

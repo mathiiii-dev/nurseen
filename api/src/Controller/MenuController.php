@@ -106,8 +106,12 @@ class MenuController extends AbstractController
         $this->denyAccessUnlessGranted('owner', $family);
         $family = $this->familyRepository->findOneBy(['parent' => $family->getId()]);
         $kid = $this->kidRepository->findOneBy(['family' => $family->getId()]);
-        $nurse = $this->nurseRepository->findOneBy(['nurse' => $kid->getNurse()->getNurse()->getId()]);
-        $menu = $this->menuRepository->findBy(['nurse' => $nurse->getId()]);
+
+        $menu = ['kids' => false];;
+        if ($kid) {
+            $nurse = $this->nurseRepository->findOneBy(['nurse' => $kid->getNurse()->getNurse()->getId()]);
+            $menu = $this->menuRepository->findBy(['nurse' => $nurse->getId()]);
+        }
 
         return $this->json($menu, Response::HTTP_OK, [], ['groups' => 'menu']);
     }

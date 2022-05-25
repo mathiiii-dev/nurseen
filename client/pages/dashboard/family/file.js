@@ -11,7 +11,7 @@ import {
 import { Dropzone, MIME_TYPES } from '@mantine/dropzone';
 import { useState } from 'react';
 import FileManager from '../../../components/FileManager';
-import Link from 'next/link';
+import NonKidsMessage from '../../../components/NoKidsMessage';
 
 export const dropzoneChildrenUploaded = () => (
     <Text>Votre fichier à bien été ajouté</Text>
@@ -131,15 +131,12 @@ export default function Page({ userId, bearer, nurse, files }) {
                     </Accordion>
                 </>
             ) : (
-                <>
-                    <Text>
-                        Vous devez enregistrer au moins un enfant pour envoyer
-                        des fichies a votre nourrice
-                    </Text>
-                    <Link href={'create-kid'}>
-                        <Button>Ajouter un enfant</Button>
-                    </Link>
-                </>
+                <NonKidsMessage
+                    message={
+                        'Vous devez enregistrer au moins un enfant pour envoyer\n' +
+                        '                        des fichies a votre nourrice'
+                    }
+                />
             )}
         </>
     );

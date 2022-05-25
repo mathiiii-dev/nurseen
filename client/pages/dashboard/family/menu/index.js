@@ -1,8 +1,7 @@
 import Menu from '../../../../components/Menu';
 import { getSession } from 'next-auth/react';
 import { AuthToken } from '../../../../services/auth_token';
-import { Button, Text } from '@mantine/core';
-import Link from 'next/link';
+import NonKidsMessage from '../../../../components/NoKidsMessage';
 
 function MenuFamily({ menu, role }) {
     let wKid = true;
@@ -17,15 +16,11 @@ function MenuFamily({ menu, role }) {
             {wKid ? (
                 <Menu menu={menu} role={role} />
             ) : (
-                <>
-                    <Text>
-                        Vous devez enregistrer au moins un enfant pour
-                        visualiser le menu
-                    </Text>
-                    <Link href={'create-kid'}>
-                        <Button>Ajouter un enfant</Button>
-                    </Link>
-                </>
+                <NonKidsMessage
+                    message={
+                        ' Vous devez enregistrer au moins un enfant pour visualiser le menu'
+                    }
+                />
             )}
         </>
     );

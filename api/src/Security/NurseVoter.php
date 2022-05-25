@@ -5,6 +5,7 @@ namespace App\Security;
 use App\Entity\Calendar;
 use App\Entity\Chat;
 use App\Entity\Feed;
+use App\Entity\Gallery;
 use App\Entity\Kid;
 use App\Entity\Menu;
 use App\Entity\User;
@@ -23,8 +24,7 @@ class NurseVoter extends Voter
             return false;
         }
 
-        if (!$subject instanceof Kid && !$subject instanceof User && !$subject instanceof Feed
-            && !$subject instanceof Calendar && !$subject instanceof Menu && !$subject instanceof Chat) {
+        if (!$subject instanceof Kid && !$subject instanceof User && !$subject instanceof Feed && !$subject instanceof Calendar && !$subject instanceof Menu && !$subject instanceof Chat && !$subject instanceof Gallery) {
             return false;
         }
 
@@ -62,6 +62,10 @@ class NurseVoter extends Voter
             return $this->canHandleChat($subject, $user);
         }
 
+        if ($subject instanceof Gallery) {
+            return $this->canHandleGallery($subject, $user);
+        }
+
         return $this->isUserNurse($subject, $user);
     }
 
@@ -83,9 +87,18 @@ class NurseVoter extends Voter
         return true;
     }
 
+    private function canHandleGallery(Gallery $gallery, User $user): bool
+    {
+        if ($gallery->getNurse()->getNurse()->getId() !== $user->getId()) {
+            throw new AccessDeniedHttpException("You can't do this", null, 404);
+        }
+
+        return true;
+    }
+
     private function canHandleChat(Chat $chat, User $user): bool
     {
-        if ($chat->getNurse()->getNurse()->getId() !== $user->getId() || $chat->getFamily()->getParent()->getId() !== $user->getId()) {
+        if ($chat->getNurse()->getNurse()->getId() !== $user->getId() && $chat->getFamily()->getParent()->getId() !== $user->getId()) {
             throw new AccessDeniedHttpException("You can't do this", null, 404);
         }
 
@@ -103,6 +116,7 @@ class NurseVoter extends Voter
 
     private function canHandleCalendar(Calendar $calendar, User $user): bool
     {
+        dd($calendar->getKid()->getNurse()->getNurse()->getId());
         if ($calendar->getKid()->getNurse()->getNurse()->getId() !== $user->getId()) {
             throw new AccessDeniedHttpException("You can't do this", null, 404);
         }

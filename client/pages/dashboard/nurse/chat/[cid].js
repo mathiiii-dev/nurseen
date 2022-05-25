@@ -69,6 +69,7 @@ export async function getServerSideProps(ctx) {
     });
 
     const messages = await res.json();
+    console.log(messages);
 
     if (messages.error) {
         return {
