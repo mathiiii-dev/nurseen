@@ -4,7 +4,6 @@ namespace App\Manager;
 
 use App\Entity\Kid;
 use App\Entity\Nurse;
-use JetBrains\PhpStorm\ArrayShape;
 
 class FamilyManager
 {
@@ -45,9 +44,11 @@ class FamilyManager
     public function getNurse(Nurse $nurse): array
     {
         return [
-            'userId' => $nurse->getNurse()->getId(),
-            'lastname' => $nurse->getNurse()->getLastname(),
-            'firstname' => $nurse->getNurse()->getFirstname(),
+            'nurse' => [
+                'userId' => $nurse->getNurse()->getId(),
+                'lastname' => $nurse->getNurse()->getLastname(),
+                'firstname' => $nurse->getNurse()->getFirstname(),
+            ],
         ];
     }
 }
