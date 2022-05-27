@@ -76,8 +76,11 @@ const options = {
                     }
                 );
 
+                console.log(res);
+
                 if (res.status === 401) {
                     const user = await res.json();
+                    console.log(user);
                     if (!res.ok) {
                         throw new Error(user.message);
                     }
