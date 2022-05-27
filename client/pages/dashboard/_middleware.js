@@ -8,22 +8,26 @@ export async function middleware(req) {
 
     const session = await getToken({
         req,
-        secret: process.env.NEXT_PUBLIC_BASE_URL,
+        secret: process.env.NEXT_PUBLIC_SECRET,
     });
 
     if (!session) {
-        return NextResponse.redirect('http://localhost:3000/sign-in');
+        return NextResponse.redirect(`${process.env.NEXTAUTH_URL}sign-in`);
     }
 
     if (req.url.includes('/dashboard/nurse') && session.role !== 'ROLE_NURSE') {
-        return NextResponse.redirect('http://localhost:3000/dashboard/family');
+        return NextResponse.redirect(
+            `${process.env.NEXTAUTH_URL}dashboard/family`
+        );
     }
 
     if (
         req.url.includes('/dashboard/family') &&
         session.role !== 'ROLE_PARENT'
     ) {
-        return NextResponse.redirect('http://localhost:3000/dashboard/nurse');
+        return NextResponse.redirect(
+            `${process.env.NEXTAUTH_URL}dashboard/nurse`
+        );
     }
 
     return NextResponse.next();
