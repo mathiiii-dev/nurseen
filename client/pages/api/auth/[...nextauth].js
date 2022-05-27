@@ -6,7 +6,7 @@ import { AuthToken } from '../../../services/auth_token';
 async function refreshAccessToken(token) {
     try {
         const response = await fetch(
-            process.env.NEXT_PUBLIC_BASE_URL + 'token/refresh',
+            `${process.env.NEXT_PUBLIC_BASE_URL}token/refresh`,
             {
                 method: 'POST',
                 body: JSON.stringify({
@@ -131,7 +131,7 @@ const options = {
     pages: {
         signIn: '/sign-in',
     },
-    secret: process.env.NEXT_PUBLIC_BASE_URL,
+    secret: process.env.NEXT_PUBLIC_SECRET,
 };
 
 export default (req, res) => NextAuth(req, res, options);
