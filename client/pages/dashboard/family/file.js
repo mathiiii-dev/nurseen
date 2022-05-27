@@ -70,7 +70,7 @@ export default function Page({ userId, bearer, nurse, files }) {
 
     return (
         <>
-            {nurse.length > 0 ? (
+            {nurse.nurse ? (
                 <>
                     <Accordion initialItem={0} multiple>
                         <Accordion.Item label="Formulaire d'envoie de fichier">
