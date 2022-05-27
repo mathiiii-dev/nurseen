@@ -51,7 +51,7 @@ export default function Page({ userId, bearer, nurse, files }) {
         const data = new FormData();
         data.append('file', file[0]);
         data.append('sender', userId);
-        data.append('recipient', nurse.userId);
+        data.append('recipient', nurse.nurse.userId);
         data.append('name', title);
         fetch(`${process.env.NEXT_PUBLIC_BASE_URL}file/${userId}/send`, {
             body: data,
@@ -76,7 +76,9 @@ export default function Page({ userId, bearer, nurse, files }) {
                         <Accordion.Item label="Formulaire d'envoie de fichier">
                             <Text>
                                 Envoyé un fichier à votre nourrice{' '}
-                                {nurse.firstname + ' ' + nurse.lastname}
+                                {nurse.nurse.firstname +
+                                    ' ' +
+                                    nurse.nurse.lastname}
                             </Text>
                             <form onSubmit={send}>
                                 <Space h={'md'} />
