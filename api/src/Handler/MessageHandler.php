@@ -9,6 +9,7 @@ use App\Service\MercureService;
 use DateTime;
 use Doctrine\Persistence\ManagerRegistry;
 use Exception;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class MessageHandler
@@ -16,12 +17,14 @@ class MessageHandler
     private ValidatorInterface $validator;
     private ManagerRegistry $doctrine;
     private MercureService $mercure;
+    private ParameterBagInterface $bag;
 
-    public function __construct(ValidatorInterface $validator, ManagerRegistry $doctrine, MercureService $mercure)
+    public function __construct(ValidatorInterface $validator, ManagerRegistry $doctrine, MercureService $mercure, ParameterBagInterface $bag)
     {
         $this->validator = $validator;
         $this->doctrine = $doctrine;
         $this->mercure = $mercure;
+        $this->bag = $bag;
     }
 
     /**
@@ -41,17 +44,22 @@ class MessageHandler
             $em = $this->doctrine->getManager();
             $em->persist($message);
             $em->flush();
-            $this->mercure->update(
-                'http://localhost:8010/proxy/api/message/'.$chat->getId(),
-                json_encode([
-                    'data' => $message->getMessage(),
-                    'id' => $message->getId(),
-                    'sendDate' => $message->getSendDate()->format("Y-m-d\TH:i:s+00:00"),
-                    'userId' => $user->getId(),
-                    'lastname' => $user->getLastname(),
-                    'firstname' => $user->getFirstname(),
-                ])
-            );
+            try {
+                $this->mercure->update(
+                    $this->bag->get('api_url').'message/'.$chat->getId(),
+                    json_encode([
+                        'data' => $message->getMessage(),
+                        'id' => $message->getId(),
+                        'sendDate' => $message->getSendDate()->format("Y-m-d\TH:i:s+00:00"),
+                        'userId' => $user->getId(),
+                        'lastname' => $user->getLastname(),
+                        'firstname' => $user->getFirstname(),
+                    ])
+                );
+            } catch (Exception $exception) {
+                dd($exception);
+            }
+
 
             return true;
         }

@@ -7,6 +7,7 @@ parameters:
     gallery_directory: '%kernel.project_dir%/public/uploads/gallery'
     file_directory: '%kernel.project_dir%/public/uploads/file'
     feed_directory: '%kernel.project_dir%/public/uploads/feed'
+    api_url: '%env(API_URL)%'
 
 services:
     # default configuration for services in *this* file

@@ -14,10 +14,10 @@ export default function MessageNurse({ messages, userId, bearer }) {
 
     useEffect(() => {
         scrollToBottom(viewport);
-        const url = new URL('http://localhost:9090/.well-known/mercure');
+        const url = new URL(`${process.env.NEXT_PUBLIC_MERCURE_URL}`);
         url.searchParams.append(
             'topic',
-            `http://localhost:8010/proxy/api/message/${cid}`
+            `${process.env.NEXT_PUBLIC_BASE_URL}message/${cid}`
         );
         const eventSource = new EventSource(url.toString());
         eventSource.onmessage = (e) => {

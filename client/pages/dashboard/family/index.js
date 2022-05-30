@@ -54,10 +54,10 @@ export default function Page({
 
     if (chat) {
         useEffect(() => {
-            const url = new URL('http://localhost:9090/.well-known/mercure');
+            const url = new URL(`${process.env.NEXT_PUBLIC_MERCURE_URL}`);
             url.searchParams.append(
                 'topic',
-                `http://localhost:8010/proxy/api/message/${chat[0].id}`
+                `${process.env.NEXT_PUBLIC_BASE_URL}message/${chat[0].id}`
             );
             const eventSource = new EventSource(url.toString());
             eventSource.onmessage = (e) => {
