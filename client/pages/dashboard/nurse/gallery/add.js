@@ -13,6 +13,7 @@ import { getServerSideProps } from './../index';
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
+import { loadGetInitialProps } from 'next/dist/shared/lib/utils';
 
 function getIconColor(status, theme) {
     return status.accepted
@@ -101,18 +102,40 @@ function AddGallery({ bearer, userId }) {
                 data.append(photo.name, photo);
             });
         }
-        fetch(`${process.env.NEXT_PUBLIC_BASE_URL}gallery/${userId}`, {
-            body: data,
-            method: 'POST',
-            headers: {
-                Authorization: bearer,
-            },
-        })
-            .then((response) => response.json())
-            .then((data) => {
-                setLoading(false);
-                router.push('/dashboard/nurse/gallery');
+
+        if (files) {
+            files.forEach((photo) => {
+                const data = new FormData();
+                data.append('file', photo);
+                data.append('upload_preset', 'eekmglxg');
+                data.append('folder', `nurseen/gallery/${userId}`);
+                fetch(
+                    'https://api.cloudinary.com/v1_1/devmathias/image/upload',
+                    {
+                        method: 'POST',
+                        body: data,
+                    }
+                )
+                    .then((response) => {
+                        return response.text();
+                    })
+                    .then((data) => {
+                        const d = JSON.parse(data);
+                        fetch(
+                            `${process.env.NEXT_PUBLIC_BASE_URL}gallery/${userId}`,
+                            {
+                                body: JSON.stringify({
+                                    public_id: d.public_id,
+                                }),
+                                method: 'POST',
+                                headers: {
+                                    Authorization: bearer,
+                                },
+                            }
+                        ).then((response) => response.json());
+                    });
             });
+        }
     };
 
     return (

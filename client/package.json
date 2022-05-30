@@ -25,6 +25,7 @@
         "@mantine/notifications": "^4.1.5",
         "@mantine/rte": "^4.1.5",
         "@mui/x-data-grid": "^5.11.0",
+        "cloudinary": "^1.30.0",
         "dayjs": "^1.11.1",
         "embla-carousel-react": "^6.2.0",
         "eventsource": "^2.0.1",

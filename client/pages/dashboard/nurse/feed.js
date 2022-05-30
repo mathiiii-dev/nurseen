@@ -117,22 +117,56 @@ function Feed({ userId, bearer, feed }) {
 
     const send = (event) => {
         event.preventDefault();
+
         const data = new FormData();
-        if (images.length > 0) {
-            images.forEach((photo) => {
-                data.append(photo.name, photo);
-            });
-        }
-        data.append('text', value);
+        let feedId = null;
+
         fetch(`${process.env.NEXT_PUBLIC_BASE_URL}feed/${userId}`, {
-            body: data,
+            body: JSON.stringify({
+                text: value,
+            }),
             method: 'POST',
             headers: {
                 Authorization: bearer,
             },
         })
             .then((response) => response.json())
-            .then(() => {
+            .then((id) => {
+                if (images.length > 0) {
+                    images.forEach((photo) => {
+                        feedId = id;
+                        data.append('file', photo);
+                        data.append('upload_preset', 'eekmglxg');
+                        data.append('folder', `nurseen/feed/${id}`);
+                        fetch(
+                            'https://api.cloudinary.com/v1_1/devmathias/image/upload',
+                            {
+                                method: 'POST',
+                                body: data,
+                            }
+                        )
+                            .then((response) => {
+                                return response.text();
+                            })
+                            .then((data) => {
+                                console.log(feedId);
+                                const d = JSON.parse(data);
+                                fetch(
+                                    `${process.env.NEXT_PUBLIC_BASE_URL}feed/${feedId}/images`,
+                                    {
+                                        body: JSON.stringify({
+                                            public_id: d.public_id,
+                                        }),
+                                        method: 'POST',
+                                        headers: {
+                                            Authorization: bearer,
+                                        },
+                                    }
+                                ).then((response) => response.json());
+                            });
+                    });
+                }
+
                 onChange(
                     '<p>Racontez les activités effectuer par les enfants</p>'
                 );
@@ -140,6 +174,7 @@ function Feed({ userId, bearer, feed }) {
                 setUploaded(false);
                 refreshData();
             });
+        data.append('text', value);
     };
 
     const update = (event) => {
@@ -330,7 +365,7 @@ function Feed({ userId, bearer, feed }) {
                             />
                             <GalleryNurse
                                 galleryPhoto={f.feedImages.map((i) => ({
-                                    src: `${process.env.NEXT_PUBLIC_MEDIA_URL}/feed/${f.id}/${i.url}`,
+                                    src: `${process.env.NEXT_PUBLIC_MEDIA_URL}/${i.url}`,
                                     width: 2,
                                     height: 3,
                                 }))}

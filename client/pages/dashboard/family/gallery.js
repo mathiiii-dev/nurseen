@@ -39,12 +39,7 @@ function AddGallery({ bearer, userId }) {
     let galleryPhoto = [];
     if (photos.length !== 0) {
         galleryPhoto = photos.map((element) => ({
-            src:
-                process.env.NEXT_PUBLIC_MEDIA_URL +
-                'gallery/' +
-                element.nurse.nurse.id +
-                '/' +
-                element.url,
+            src: process.env.NEXT_PUBLIC_MEDIA_URL + element.url,
             width: 4,
             height: 3,
         }));

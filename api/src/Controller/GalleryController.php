@@ -14,7 +14,6 @@ use App\Service\UploadService;
 use Exception;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -56,21 +55,10 @@ class GalleryController extends AbstractController
     public function index(Request $request, User $nurse): JsonResponse
     {
         $this->denyAccessUnlessGranted('owner', $nurse);
-        $files = $request->files;
+
+        $data = $request->toArray();
         $nurse = $this->nurseRepository->findOneBy(['nurse' => $nurse->getId()]);
-
-        /* @var UploadedFile $file */
-        foreach ($files as $file) {
-            $fileName = $this->uploadService->getFileName($file);
-
-            $this->galleryHandler->handleGalleryCreate($fileName, $nurse);
-
-            $this->uploadService->uploadFile(
-                $file,
-                $this->getParameter('gallery_directory').'/'.$nurse->getId(),
-                $fileName
-            );
-        }
+        $this->galleryHandler->handleGalleryCreate($data['public_id'], $nurse);
 
         return $this->json([], Response::HTTP_CREATED);
     }

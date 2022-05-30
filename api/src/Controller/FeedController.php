@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Feed;
+use App\Entity\FeedImage;
 use App\Entity\Kid;
 use App\Entity\User;
 use App\Handler\FeedHandler;
@@ -10,6 +11,7 @@ use App\Handler\FeedImageHandler;
 use App\Repository\FamilyRepository;
 use App\Repository\FeedRepository;
 use App\Repository\NurseRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,19 +25,22 @@ class FeedController extends AbstractController
     private FamilyRepository $familyRepository;
     private FeedHandler $feedHandler;
     private FeedImageHandler $feedImageHandler;
+    private ManagerRegistry $doctrine;
 
     public function __construct(
         NurseRepository $nurseRepository,
         FeedRepository $feedRepository,
         FamilyRepository $familyRepository,
         FeedHandler $feedHandler,
-        FeedImageHandler $feedImageHandler
+        FeedImageHandler $feedImageHandler,
+        ManagerRegistry $doctrine
     ) {
         $this->nurseRepository = $nurseRepository;
         $this->feedRepository = $feedRepository;
         $this->familyRepository = $familyRepository;
         $this->feedHandler = $feedHandler;
         $this->feedImageHandler = $feedImageHandler;
+        $this->doctrine = $doctrine;
     }
 
     #[IsGranted('ROLE_NURSE', message: 'Vous ne pouvez pas faire ça')]
@@ -77,13 +82,23 @@ class FeedController extends AbstractController
     public function post(Request $request, User $nurse): Response
     {
         $this->denyAccessUnlessGranted('owner', $nurse);
-        $text = $request->get('text');
-        $feed = $this->feedHandler->handleFeedCreate($text, $nurse);
-        $files = $request->files;
+        $data = $request->toArray();
+        $feed = $this->feedHandler->handleFeedCreate($data['text'], $nurse);
 
-        if ($files) {
-            $this->feedImageHandler->handleFeedImageCreate($files, $feed);
-        }
+        return $this->json($feed->getId(), Response::HTTP_CREATED);
+    }
+
+    #[IsGranted('ROLE_NURSE', message: 'Vous ne pouvez pas faire ça')]
+    #[Route('/feed/{feed}/images', name: 'app_feed_post_images', methods: 'POST')]
+    public function postImages(Request $request, Feed $feed): Response
+    {
+        $this->denyAccessUnlessGranted('owner', $feed->getNurse()->getNurse());
+        $data = $request->toArray();
+
+        $feedImage = (new FeedImage())->setFeed($feed)->setUrl($data['public_id']);
+        $entityManager = $this->doctrine->getManager();
+        $entityManager->persist($feedImage);
+        $entityManager->flush();
 
         return $this->json([], Response::HTTP_CREATED);
     }
