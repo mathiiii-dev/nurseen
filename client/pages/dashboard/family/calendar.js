@@ -21,7 +21,6 @@ export default function Calendar({ dayKidsCalendar }) {
     return (
         <>
             <FullCalendar
-                className={'test'}
                 buttonText={{
                     today: "Aujourd'hui",
                     month: 'Mois',

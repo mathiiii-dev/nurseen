@@ -14,7 +14,6 @@ import {
     LoadingOverlay,
     ColorInput,
     ActionIcon,
-    Select,
     TextInput,
 } from '@mantine/core';
 import { useEffect, useState } from 'react';
@@ -29,7 +28,6 @@ import { cards, verticalCards } from '../../../data/cards';
 import { usePagination } from '@mantine/hooks';
 import '../../../styles/globals.css';
 import { AiOutlineBgColors } from 'react-icons/ai';
-import { loadGetInitialProps } from 'next/dist/shared/lib/utils';
 
 const randomColor = () =>
     `#${Math.floor(Math.random() * 16777215).toString(16)}`;
@@ -249,12 +247,10 @@ export default function Page({ bearer, userId, code, firstname, lastname }) {
                             </Button>
                         }
                     >
-                        <div style={{ display: 'flex' }}>
-                            <Text size="sm">
-                                Code nécessaire à l'ajout d'un enfant pour les
-                                parents
-                            </Text>
-                        </div>
+                        <Text size="sm">
+                            Code nécessaire à l'ajout d'un enfant pour les
+                            parents
+                        </Text>
                     </Popover>
                 </Grid.Col>
             </Grid>
@@ -264,7 +260,7 @@ export default function Page({ bearer, userId, code, firstname, lastname }) {
                 {cards &&
                     Object.values(cards).map((card) => {
                         return (
-                            <Grid.Col md={3}>
+                            <Grid.Col md={3} key={card.id}>
                                 <DashboardCard
                                     title={card.title}
                                     buttonText={card.buttonText}
@@ -323,7 +319,7 @@ export default function Page({ bearer, userId, code, firstname, lastname }) {
                                 <tbody>
                                     {kids.map((kid) => {
                                         return (
-                                            <tr>
+                                            <tr key={kid.id}>
                                                 <td data-label="Nom">
                                                     <Text>{kid.lastname}</Text>
                                                 </td>
@@ -435,6 +431,7 @@ export default function Page({ bearer, userId, code, firstname, lastname }) {
                                     text={card.text}
                                     link={card.linkHref}
                                     button={card.button}
+                                    key={card.id}
                                 >
                                     {card.children}
                                 </VerticalCard>

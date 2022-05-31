@@ -105,7 +105,7 @@ function NurseChat({ bearer, userId, family }) {
             {chat.length > 0 ? (
                 chat.map(function (d, idx) {
                     return (
-                        <>
+                        <div key={idx}>
                             <Link
                                 href={{
                                     pathname: '/dashboard/nurse/chat/[cid]',
@@ -162,7 +162,7 @@ function NurseChat({ bearer, userId, family }) {
                                 </Grid>
                             </Link>
                             <Space h={'xl'} />
-                        </>
+                        </div>
                     );
                 })
             ) : (

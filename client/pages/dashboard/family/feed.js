@@ -12,9 +12,10 @@ function Feed({ feed }) {
         };
     }
 
+    console.log(feed);
     return (
         <>
-            {feed.length > 0 ? (
+            {!feed.hasOwnProperty('kid') ? (
                 <>
                     <Title>Les actualités de vos enfants</Title>
                     <Space h={'xl'} />

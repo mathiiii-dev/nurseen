@@ -120,22 +120,6 @@ export default function CustomNavbar() {
                     }}
                     hidden={!opened}
                 >
-                    <Button
-                        variant={'subtle'}
-                        size={'xl'}
-                        color={'dark'}
-                        onClick={() => setOpened((o) => !o)}
-                    >
-                        A propos
-                    </Button>
-                    <Button
-                        variant={'subtle'}
-                        size={'xl'}
-                        color={'dark'}
-                        onClick={() => setOpened((o) => !o)}
-                    >
-                        Contact
-                    </Button>
                     {status === 'unauthenticated' ? (
                         <>
                             <Link href="/sign-up">
@@ -155,16 +139,27 @@ export default function CustomNavbar() {
                             </Button>
                         </>
                     ) : (
-                        <Button
-                            color="dark"
-                            size="md"
-                            onClick={() => {
-                                signOut({ callbackUrl: '/' });
-                                setOpened((o) => !o);
-                            }}
-                        >
-                            Sign out
-                        </Button>
+                        <>
+                            <Link href={'/' + dashboard}>
+                                <Button
+                                    variant={'subtle'}
+                                    color="dark"
+                                    size="md"
+                                >
+                                    Dashboard
+                                </Button>
+                            </Link>
+                            <Button
+                                color="dark"
+                                size="md"
+                                onClick={() => {
+                                    signOut({ callbackUrl: '/' });
+                                    setOpened((o) => !o);
+                                }}
+                            >
+                                Sign out
+                            </Button>
+                        </>
                     )}
                 </Navbar>
             }

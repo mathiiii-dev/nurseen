@@ -156,7 +156,7 @@ export default function Page({
                                 <tbody>
                                     {kids.map((kid) => {
                                         return (
-                                            <tr>
+                                            <tr key={kid.id}>
                                                 <td data-label="Nom">
                                                     <Text>{kid.lastname}</Text>
                                                 </td>

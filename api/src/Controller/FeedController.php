@@ -68,7 +68,7 @@ class FeedController extends AbstractController
          * @var Kid $kid
          */
         $kid = $family->getKids()->get(0);
-        $feed = [];
+        $feed = ['kid' => false];
         if ($kid) {
             $nurseId = $kid->getNurse()->getId();
             $feed = $this->feedRepository->findBy(['nurse' => $nurseId], ['id' => 'DESC']);

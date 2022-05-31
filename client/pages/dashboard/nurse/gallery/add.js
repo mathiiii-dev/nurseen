@@ -13,7 +13,6 @@ import { getServerSideProps } from './../index';
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import { loadGetInitialProps } from 'next/dist/shared/lib/utils';
 
 function getIconColor(status, theme) {
     return status.accepted
@@ -95,7 +94,6 @@ function AddGallery({ bearer, userId }) {
 
     const upload = (event) => {
         event.preventDefault();
-        setLoading(true);
         const data = new FormData();
         if (files) {
             files.forEach((photo) => {
@@ -109,6 +107,7 @@ function AddGallery({ bearer, userId }) {
                 data.append('file', photo);
                 data.append('upload_preset', 'eekmglxg');
                 data.append('folder', `nurseen/gallery/${userId}`);
+                setLoading(true);
                 fetch(
                     'https://api.cloudinary.com/v1_1/devmathias/image/upload',
                     {
@@ -132,7 +131,10 @@ function AddGallery({ bearer, userId }) {
                                     Authorization: bearer,
                                 },
                             }
-                        ).then((response) => response.json());
+                        ).then((response) => {
+                            setLoading(false);
+                            response.json();
+                        });
                     });
             });
         }
