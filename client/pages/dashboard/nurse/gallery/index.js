@@ -46,6 +46,7 @@ function AddGallery({ bearer, userId }) {
     if (photos.length !== 0) {
         galleryPhoto = photos.map((element) => ({
             id: element.id,
+            public_id: element.url,
             src: process.env.NEXT_PUBLIC_MEDIA_URL + element.url,
             sizes: ['(min-width: 480px) 50vw,(min-width: 1024px) 33.3vw,100vw'],
             width: 3,

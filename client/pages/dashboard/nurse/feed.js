@@ -133,7 +133,7 @@ function Feed({ userId, bearer, feed }) {
             .then((response) => response.json())
             .then((id) => {
                 if (images.length > 0) {
-                    images.forEach((photo) => {
+                    images.forEach((photo, idx, array) => {
                         feedId = id;
                         data.append('file', photo);
                         data.append('upload_preset', 'eekmglxg');
@@ -162,19 +162,22 @@ function Feed({ userId, bearer, feed }) {
                                             Authorization: bearer,
                                         },
                                     }
-                                ).then((response) => response.json());
+                                )
+                                    .then((response) => response.json())
+                                    .then((r) => {
+                                        if (idx === array.length - 1) {
+                                            onChange(
+                                                '<p>Racontez les activités effectuer par les enfants</p>'
+                                            );
+                                            setImages([]);
+                                            setUploaded(false);
+                                            refreshData();
+                                        }
+                                    });
                             });
                     });
                 }
-
-                onChange(
-                    '<p>Racontez les activités effectuer par les enfants</p>'
-                );
-                setImages([]);
-                setUploaded(false);
-                refreshData();
             });
-        data.append('text', value);
     };
 
     const update = (event) => {
@@ -319,8 +322,8 @@ function Feed({ userId, bearer, feed }) {
             <Space h={'xl'} />
             <Space h={'xl'} />
             {feed &&
-                feed.map((f) => (
-                    <>
+                feed.map((f, idf) => (
+                    <div key={idf}>
                         <div
                             style={{
                                 backgroundColor: '#edf2f4',
@@ -373,7 +376,7 @@ function Feed({ userId, bearer, feed }) {
                             />
                         </div>
                         <Space h={'xl'} />
-                    </>
+                    </div>
                 ))}
         </>
     );

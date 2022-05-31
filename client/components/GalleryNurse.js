@@ -11,6 +11,7 @@ import {
 import { useCallback, useState } from 'react';
 import { AiOutlineClose, AiTwotoneDelete } from 'react-icons/ai';
 import { useRouter } from 'next/router';
+import { lowerFirst } from '@mantine/hooks';
 
 export default function GalleryNurse({
     galleryPhoto,

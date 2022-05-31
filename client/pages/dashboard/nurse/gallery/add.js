@@ -102,7 +102,7 @@ function AddGallery({ bearer, userId }) {
         }
 
         if (files) {
-            files.forEach((photo) => {
+            files.forEach((photo, idx, array) => {
                 const data = new FormData();
                 data.append('file', photo);
                 data.append('upload_preset', 'eekmglxg');
@@ -132,8 +132,11 @@ function AddGallery({ bearer, userId }) {
                                 },
                             }
                         ).then((response) => {
-                            setLoading(false);
-                            response.json();
+                            if (idx === array.length - 1) {
+                                setLoading(false);
+                                response.json();
+                                router.push('/dashboard/nurse/gallery');
+                            }
                         });
                     });
             });
