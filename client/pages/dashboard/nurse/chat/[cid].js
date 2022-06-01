@@ -15,14 +15,17 @@ export default function MessageNurse({ messages, userId, bearer }) {
     useEffect(() => {
         scrollToBottom(viewport);
         const url = new URL(`${process.env.NEXT_PUBLIC_MERCURE_URL}`);
+        console.log(url);
         url.searchParams.append(
             'topic',
             `${process.env.NEXT_PUBLIC_BASE_URL}message/${cid}`
         );
         const eventSource = new EventSource(url.toString());
+        console.log('avant event source');
         eventSource.onmessage = (e) => {
+            console.log(e);
             let origin = JSON.parse(e.data);
-
+            console.log(origin);
             setStateMessages((state) => [
                 ...state,
                 {
@@ -36,8 +39,10 @@ export default function MessageNurse({ messages, userId, bearer }) {
                     sendDate: origin.sendDate,
                 },
             ]);
+            console.log('end');
             scrollToBottom(viewport);
         };
+        console.log('sortie');
     }, []);
 
     return (
