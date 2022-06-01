@@ -60,7 +60,6 @@ class MessageHandler
                 dd($exception);
             }
 
-
             return true;
         }
 
