@@ -28,13 +28,14 @@ class FeedController extends AbstractController
     private ManagerRegistry $doctrine;
 
     public function __construct(
-        NurseRepository $nurseRepository,
-        FeedRepository $feedRepository,
+        NurseRepository  $nurseRepository,
+        FeedRepository   $feedRepository,
         FamilyRepository $familyRepository,
-        FeedHandler $feedHandler,
+        FeedHandler      $feedHandler,
         FeedImageHandler $feedImageHandler,
-        ManagerRegistry $doctrine
-    ) {
+        ManagerRegistry  $doctrine
+    )
+    {
         $this->nurseRepository = $nurseRepository;
         $this->feedRepository = $feedRepository;
         $this->familyRepository = $familyRepository;
@@ -94,11 +95,13 @@ class FeedController extends AbstractController
     {
         $this->denyAccessUnlessGranted('owner', $feed->getNurse()->getNurse());
         $data = $request->toArray();
-
-        $feedImage = (new FeedImage())->setFeed($feed)->setUrl($data['public_id']);
         $entityManager = $this->doctrine->getManager();
-        $entityManager->persist($feedImage);
-        $entityManager->flush();
+
+        foreach ($data as $image) {
+            $feedImage = (new FeedImage())->setFeed($feed)->setUrl($image['public_id']);
+            $entityManager->persist($feedImage);
+            $entityManager->flush();
+        }
 
         return $this->json([], Response::HTTP_CREATED);
     }

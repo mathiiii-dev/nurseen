@@ -1,30 +1,22 @@
-import {
-    Group,
-    Text,
-    useMantineTheme,
-    Space,
-    Button,
-    Title,
-    LoadingOverlay,
-} from '@mantine/core';
-import { Upload, Photo, X } from 'tabler-icons-react';
-import { Dropzone, IMAGE_MIME_TYPE } from '@mantine/dropzone';
-import { getServerSideProps } from './../index';
-import { useState } from 'react';
-import { useRouter } from 'next/router';
+import {Button, Group, LoadingOverlay, Space, Text, Title, useMantineTheme,} from '@mantine/core';
+import {Photo, Upload, X} from 'tabler-icons-react';
+import {Dropzone, IMAGE_MIME_TYPE} from '@mantine/dropzone';
+import {getServerSideProps} from './../index';
+import {useState} from 'react';
+import {useRouter} from 'next/router';
 import Link from 'next/link';
 
 function getIconColor(status, theme) {
     return status.accepted
         ? theme.colors[theme.primaryColor][theme.colorScheme === 'dark' ? 4 : 6]
         : status.rejected
-        ? theme.colors.red[theme.colorScheme === 'dark' ? 4 : 6]
-        : theme.colorScheme === 'dark'
-        ? theme.colors.dark[0]
-        : theme.colors.gray[7];
+            ? theme.colors.red[theme.colorScheme === 'dark' ? 4 : 6]
+            : theme.colorScheme === 'dark'
+                ? theme.colors.dark[0]
+                : theme.colors.gray[7];
 }
 
-function ImageUploadIcon({ status, ...props }) {
+function ImageUploadIcon({status, ...props}) {
     if (status.accepted) {
         return <Upload {...props} />;
     }
@@ -40,11 +32,11 @@ export const dropzoneChildren = (status, theme) => (
     <Group
         position="center"
         spacing="xl"
-        style={{ minHeight: 220, pointerEvents: 'none' }}
+        style={{minHeight: 220, pointerEvents: 'none'}}
     >
         <ImageUploadIcon
             status={status}
-            style={{ color: getIconColor(status, theme) }}
+            style={{color: getIconColor(status, theme)}}
             size={80}
         />
         <div>
@@ -63,11 +55,11 @@ export const dropzoneChildrenUploaded = (status, theme, files) => (
     <Group
         position="center"
         spacing="xl"
-        style={{ minHeight: 220, pointerEvents: 'none' }}
+        style={{minHeight: 220, pointerEvents: 'none'}}
     >
         <ImageUploadIcon
             status={status}
-            style={{ color: getIconColor(status, theme) }}
+            style={{color: getIconColor(status, theme)}}
             size={80}
         />
         <div>
@@ -85,7 +77,7 @@ export const dropzoneChildrenUploaded = (status, theme, files) => (
     </Group>
 );
 
-function AddGallery({ bearer, userId }) {
+function AddGallery({bearer, userId}) {
     const theme = useMantineTheme();
     const [files, setFiles] = useState(null);
     const [uploaded, setUploaded] = useState(false);
@@ -102,13 +94,14 @@ function AddGallery({ bearer, userId }) {
         }
 
         if (files) {
+            const result = [];
             files.forEach((photo, idx, array) => {
                 const data = new FormData();
                 data.append('file', photo);
                 data.append('upload_preset', 'eekmglxg');
                 data.append('folder', `nurseen/gallery/${userId}`);
                 setLoading(true);
-                fetch(
+                result[idx] = fetch(
                     'https://api.cloudinary.com/v1_1/devmathias/image/upload',
                     {
                         method: 'POST',
@@ -116,43 +109,41 @@ function AddGallery({ bearer, userId }) {
                     }
                 )
                     .then((response) => {
-                        return response.text();
+                        if (response.ok) {
+                            return response.json();
+                        }
                     })
-                    .then((data) => {
-                        const d = JSON.parse(data);
-                        fetch(
-                            `${process.env.NEXT_PUBLIC_BASE_URL}gallery/${userId}`,
-                            {
-                                body: JSON.stringify({
-                                    public_id: d.public_id,
-                                }),
-                                method: 'POST',
-                                headers: {
-                                    Authorization: bearer,
-                                },
-                            }
-                        ).then((response) => {
-                            if (idx === array.length - 1) {
-                                setLoading(false);
-                                response.json();
-                                router.push('/dashboard/nurse/gallery');
-                            }
-                        });
-                    });
             });
+
+            Promise.all(result).then((values) => {
+                fetch(
+                    `${process.env.NEXT_PUBLIC_BASE_URL}gallery/${userId}`,
+                    {
+                        body: JSON.stringify(values),
+                        method: 'POST',
+                        headers: {
+                            Authorization: bearer,
+                        },
+                    }
+                ).then(() => {
+                    setLoading(false);
+                    router.push('/dashboard/nurse/gallery');
+                });
+            });
+
         }
     };
 
     return (
         <>
             <Title>Ajouter des images à la gallerie</Title>
-            <Space h={'xl'} />
+            <Space h={'xl'}/>
             <Link href={'/dashboard/nurse/gallery'}>
                 <Button>Retour Gallerie</Button>
             </Link>
-            <Space h={'xl'} />
+            <Space h={'xl'}/>
 
-            <LoadingOverlay visible={isLoading} />
+            <LoadingOverlay visible={isLoading}/>
             <form onSubmit={upload}>
                 <Dropzone
                     onDrop={(files) => {
@@ -165,10 +156,10 @@ function AddGallery({ bearer, userId }) {
                 >
                     {uploaded
                         ? (status) =>
-                              dropzoneChildrenUploaded(status, theme, files)
+                            dropzoneChildrenUploaded(status, theme, files)
                         : (status) => dropzoneChildren(status, theme)}
                 </Dropzone>
-                <Space h={'xl'} />
+                <Space h={'xl'}/>
                 <Button fullWidth type="submit">
                     Ajouter
                 </Button>
@@ -179,4 +170,4 @@ function AddGallery({ bearer, userId }) {
 
 export default AddGallery;
 
-export { getServerSideProps };
+export {getServerSideProps};

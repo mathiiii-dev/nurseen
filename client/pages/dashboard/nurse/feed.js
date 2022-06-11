@@ -1,5 +1,5 @@
 import RichTextEditor from '../../../components/rte';
-import { useState } from 'react';
+import {useState} from 'react';
 import {
     Accordion,
     Button,
@@ -9,15 +9,15 @@ import {
     Title,
     Modal,
     Center,
-    Drawer,
+    Drawer, LoadingOverlay,
 } from '@mantine/core';
-import { Dropzone, IMAGE_MIME_TYPE } from '@mantine/dropzone';
-import { getSession } from 'next-auth/react';
-import { AuthToken } from '../../../services/auth_token';
-import { useRouter } from 'next/router';
+import {Dropzone, IMAGE_MIME_TYPE} from '@mantine/dropzone';
+import {getSession} from 'next-auth/react';
+import {AuthToken} from '../../../services/auth_token';
+import {useRouter} from 'next/router';
 import GalleryNurse from '../../../components/GalleryNurse';
 import dayjs from 'dayjs';
-import { AiOutlineDelete, AiOutlineEdit } from 'react-icons/ai';
+import {AiOutlineDelete, AiOutlineEdit} from 'react-icons/ai';
 
 export const dropzoneChildren = (rejected) => (
     <>
@@ -25,7 +25,7 @@ export const dropzoneChildren = (rejected) => (
             <Group
                 position="center"
                 spacing="xl"
-                style={{ minHeight: 220, pointerEvents: 'none' }}
+                style={{minHeight: 220, pointerEvents: 'none'}}
             >
                 <div>
                     <Text size="xl" inline>
@@ -42,7 +42,7 @@ export const dropzoneChildren = (rejected) => (
             <Group
                 position="center"
                 spacing="xl"
-                style={{ minHeight: 220, pointerEvents: 'none' }}
+                style={{minHeight: 220, pointerEvents: 'none'}}
             >
                 <div>
                     <Text size="xl" inline>
@@ -60,7 +60,7 @@ export const dropzoneChildrenUploaded = (files, rejected) => (
             <Group
                 position="center"
                 spacing="xl"
-                style={{ minHeight: 220, pointerEvents: 'none' }}
+                style={{minHeight: 220, pointerEvents: 'none'}}
             >
                 <div>
                     <Text size="xl" inline>
@@ -79,7 +79,7 @@ export const dropzoneChildrenUploaded = (files, rejected) => (
             <Group
                 position="center"
                 spacing="xl"
-                style={{ minHeight: 220, pointerEvents: 'none' }}
+                style={{minHeight: 220, pointerEvents: 'none'}}
             >
                 <div>
                     <Text size="xl" inline>
@@ -91,7 +91,7 @@ export const dropzoneChildrenUploaded = (files, rejected) => (
     </>
 );
 
-function Feed({ userId, bearer, feed }) {
+function Feed({userId, bearer, feed}) {
     const [value, onChange] = useState(
         '<p>Racontez les activités effectuer par les enfants</p>'
     );
@@ -102,6 +102,7 @@ function Feed({ userId, bearer, feed }) {
     const [openDrawer, setOpenDrawer] = useState(false);
     const [feedId, setFeedId] = useState();
     const [feedText, setFeedText] = useState();
+    const [isLoading, setLoading] = useState(false);
 
     const router = useRouter();
 
@@ -115,13 +116,11 @@ function Feed({ userId, bearer, feed }) {
         router.replace(router.asPath);
     };
 
-    const send = (event) => {
+    const send = async (event) => {
         event.preventDefault();
-
+        setLoading(true)
         const data = new FormData();
-        let feedId = null;
-
-        fetch(`${process.env.NEXT_PUBLIC_BASE_URL}feed/${userId}`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}feed/${userId}`, {
             body: JSON.stringify({
                 text: value,
             }),
@@ -130,54 +129,50 @@ function Feed({ userId, bearer, feed }) {
                 Authorization: bearer,
             },
         })
-            .then((response) => response.json())
-            .then((id) => {
-                if (images.length > 0) {
-                    images.forEach((photo, idx, array) => {
-                        feedId = id;
-                        data.append('file', photo);
-                        data.append('upload_preset', 'eekmglxg');
-                        data.append('folder', `nurseen/feed/${id}`);
-                        fetch(
-                            'https://api.cloudinary.com/v1_1/devmathias/image/upload',
-                            {
-                                method: 'POST',
-                                body: data,
-                            }
-                        )
-                            .then((response) => {
-                                return response.text();
-                            })
-                            .then((data) => {
-                                console.log(feedId);
-                                const d = JSON.parse(data);
-                                fetch(
-                                    `${process.env.NEXT_PUBLIC_BASE_URL}feed/${feedId}/images`,
-                                    {
-                                        body: JSON.stringify({
-                                            public_id: d.public_id,
-                                        }),
-                                        method: 'POST',
-                                        headers: {
-                                            Authorization: bearer,
-                                        },
-                                    }
-                                )
-                                    .then((response) => response.json())
-                                    .then((r) => {
-                                        if (idx === array.length - 1) {
-                                            onChange(
-                                                '<p>Racontez les activités effectuer par les enfants</p>'
-                                            );
-                                            setImages([]);
-                                            setUploaded(false);
-                                            refreshData();
-                                        }
-                                    });
-                            });
-                    });
-                }
+
+        const feedId = await res.json();
+
+        const result = [];
+        if (images.length > 0) {
+            images.forEach((photo, idx, array) => {
+                data.append('file', photo);
+                data.append('upload_preset', 'eekmglxg');
+                data.append('folder', `nurseen/feed/${feedId}`);
+                result [idx] = fetch(
+                    'https://api.cloudinary.com/v1_1/devmathias/image/upload',
+                    {
+                        method: 'POST',
+                        body: data,
+                    }
+                )
+                    .then((response) => {
+                        return response.json();
+                    })
             });
+
+            Promise.all(result).then((values) => {
+                fetch(
+                    `${process.env.NEXT_PUBLIC_BASE_URL}feed/${feedId}/images`,
+                    {
+                        body: JSON.stringify(values),
+                        method: 'POST',
+                        headers: {
+                            Authorization: bearer,
+                        },
+                    }
+                ).then(() => {
+                    onChange(
+                        '<p>Racontez les activités effectuer par les enfants</p>'
+                    );
+                    setImages([]);
+                    setUploaded(false);
+                    setLoading(false);
+                    refreshData();
+                });
+            })
+
+        }
+
     };
 
     const update = (event) => {
@@ -215,6 +210,7 @@ function Feed({ userId, bearer, feed }) {
 
     return (
         <>
+            <LoadingOverlay visible={isLoading} />
             <Drawer
                 opened={openDrawer}
                 onClose={() => setOpenDrawer(false)}
@@ -235,7 +231,7 @@ function Feed({ userId, bearer, feed }) {
                                 ['alignLeft', 'alignCenter', 'alignRight'],
                             ]}
                         />
-                        <Space h={'xl'} />
+                        <Space h={'xl'}/>
                         <Button
                             type="submit"
                             size={'md'}
@@ -271,7 +267,7 @@ function Feed({ userId, bearer, feed }) {
                 }
             </Modal>
             <Title>Donnez des nouvelles des enfants aux parents</Title>
-            <Space h={'xl'} />
+            <Space h={'xl'}/>
             <form onSubmit={send}>
                 <RichTextEditor
                     placeholder="Résumer en quelques phrases la journée d'un enfant"
@@ -284,7 +280,7 @@ function Feed({ userId, bearer, feed }) {
                         ['alignLeft', 'alignCenter', 'alignRight'],
                     ]}
                 />
-                <Space h={'xl'} />
+                <Space h={'xl'}/>
                 <Accordion>
                     <Accordion.Item label="Ajouter des photos (max. 5)">
                         <Dropzone
@@ -303,81 +299,81 @@ function Feed({ userId, bearer, feed }) {
                         >
                             {uploaded
                                 ? () =>
-                                      dropzoneChildrenUploaded(images, rejected)
+                                    dropzoneChildrenUploaded(images, rejected)
                                 : () => dropzoneChildren(rejected)}
                         </Dropzone>
                     </Accordion.Item>
                 </Accordion>
-                <Space h={'xl'} />
+                <Space h={'xl'}/>
                 <Button
                     type="submit"
                     size={'md'}
-                    style={{ backgroundColor: '#4ad4c6', float: 'right' }}
+                    style={{backgroundColor: '#4ad4c6', float: 'right'}}
                     disabled={rejected}
                 >
                     Envoyez
                 </Button>
             </form>
-            <Space h={'xl'} />
-            <Space h={'xl'} />
-            <Space h={'xl'} />
+            <Space h={'xl'}/>
+            <Space h={'xl'}/>
+            <Space h={'xl'}/>
             {feed &&
-                feed.map((f, idf) => (
-                    <div key={idf}>
-                        <div
-                            style={{
-                                backgroundColor: '#edf2f4',
-                                padding: '16px',
-                                borderRadius: '8px',
-                            }}
-                        >
-                            <Group position="right">
-                                <Button
-                                    style={{
-                                        marginleft: 'auto',
-                                        marginRight: 0,
-                                    }}
-                                    color="red"
-                                    onClick={() => {
-                                        setFeedId(f.id);
-                                        setOpened(true);
-                                    }}
-                                >
-                                    <AiOutlineDelete size={25} />
-                                </Button>
-                                <Button
-                                    onClick={() => {
-                                        setFeedId(f.id);
-                                        setFeedText(f.text);
-                                        setOpenDrawer(true);
-                                    }}
-                                >
-                                    <AiOutlineEdit size={25} />
-                                </Button>
-                            </Group>
-                            <Text>
-                                {f.nurse.nurse.firstname +
-                                    ' ' +
-                                    f.nurse.nurse.lastname +
-                                    ' - ' +
-                                    dayjs(f.creationDate).format('DD MMM YYYY')}
-                            </Text>
+            feed.map((f, idf) => (
+                <div key={idf}>
+                    <div
+                        style={{
+                            backgroundColor: '#edf2f4',
+                            padding: '16px',
+                            borderRadius: '8px',
+                        }}
+                    >
+                        <Group position="right">
+                            <Button
+                                style={{
+                                    marginleft: 'auto',
+                                    marginRight: 0,
+                                }}
+                                color="red"
+                                onClick={() => {
+                                    setFeedId(f.id);
+                                    setOpened(true);
+                                }}
+                            >
+                                <AiOutlineDelete size={25}/>
+                            </Button>
+                            <Button
+                                onClick={() => {
+                                    setFeedId(f.id);
+                                    setFeedText(f.text);
+                                    setOpenDrawer(true);
+                                }}
+                            >
+                                <AiOutlineEdit size={25}/>
+                            </Button>
+                        </Group>
+                        <Text>
+                            {f.nurse.nurse.firstname +
+                            ' ' +
+                            f.nurse.nurse.lastname +
+                            ' - ' +
+                            dayjs(f.creationDate).format('DD MMM YYYY')}
+                        </Text>
 
-                            <Text
-                                dangerouslySetInnerHTML={createMarkup(f.text)}
-                            />
-                            <GalleryNurse
-                                galleryPhoto={f.feedImages.map((i) => ({
-                                    src: `${process.env.NEXT_PUBLIC_MEDIA_URL}/${i.url}`,
-                                    width: 2,
-                                    height: 3,
-                                }))}
-                                bearer={bearer}
-                            />
-                        </div>
-                        <Space h={'xl'} />
+                        <Text
+                            dangerouslySetInnerHTML={createMarkup(f.text)}
+                        />
+                        <GalleryNurse
+                            galleryPhoto={f.feedImages.map((i) => ({
+                                src: `${process.env.NEXT_PUBLIC_MEDIA_URL}/${i.url}`,
+                                width: 2,
+                                height: 3,
+                            }))}
+                            bearer={bearer}
+                        />
                     </div>
-                ))}
+                    <Space h={'xl'}/>
+                </div>
+            ))}
         </>
     );
 }

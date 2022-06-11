@@ -57,8 +57,9 @@ class GalleryController extends AbstractController
         $this->denyAccessUnlessGranted('owner', $nurse);
 
         $data = $request->toArray();
+
         $nurse = $this->nurseRepository->findOneBy(['nurse' => $nurse->getId()]);
-        $this->galleryHandler->handleGalleryCreate($data['public_id'], $nurse);
+        $this->galleryHandler->handleGalleryCreate($data, $nurse);
 
         return $this->json([], Response::HTTP_CREATED);
     }

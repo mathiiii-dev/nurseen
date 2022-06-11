@@ -15,12 +15,15 @@ class GalleryHandler
         $this->doctrine = $doctrine;
     }
 
-    public function handleGalleryCreate(string $fileName, Nurse $nurse): void
+    public function handleGalleryCreate(array $data, Nurse $nurse): void
     {
         $entityManager = $this->doctrine->getManager();
-        $photo = (new Gallery())->setUrl($fileName)->setNurse($nurse);
-        $entityManager->persist($photo);
-        $entityManager->flush();
+
+        foreach ($data as $image) {
+            $photo = (new Gallery())->setUrl($image['public_id'])->setNurse($nurse);
+            $entityManager->persist($photo);
+            $entityManager->flush();
+        }
     }
 
     public function handleGalleryDelete(Gallery $gallery): void
