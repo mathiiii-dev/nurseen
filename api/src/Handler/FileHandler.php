@@ -20,12 +20,13 @@ class FileHandler
     private UploadService $uploadService;
 
     public function __construct(
-        ManagerRegistry $doctrine,
-        SluggerInterface $slugger,
-        UserRepository $userRepository,
+        ManagerRegistry       $doctrine,
+        SluggerInterface      $slugger,
+        UserRepository        $userRepository,
         ParameterBagInterface $bag,
-        UploadService $uploadService
-    ) {
+        UploadService         $uploadService
+    )
+    {
         $this->doctrine = $doctrine;
         $this->slugger = $slugger;
         $this->userRepository = $userRepository;
@@ -35,24 +36,16 @@ class FileHandler
 
     public function handleFileCreate(Request $request)
     {
-        /**
-         * @var $file UploadedFile
-         */
-        $file = $request->files->get('file');
+        $data = $request->toArray();
         $entityManager = $this->doctrine->getManager();
-        $fileName = $this->uploadService->getFileName($file);
-
-        $recipient = $this->userRepository->findOneBy(['id' => $request->get('recipient')]);
-
+        $recipient = $this->userRepository->findOneBy(['id' => $data['recipient']]);
         $photo = (new File())
-            ->setUrl($fileName)
+            ->setUrl($data['url'])
             ->setSender(
-                $this->userRepository->findOneBy(['id' => $request->get('sender')])
-            )->setRecipient($recipient)->setSendDate(new \DateTime())->setName($request->get('name'));
+                $this->userRepository->findOneBy(['id' => $data['sender']])
+            )->setRecipient($recipient)->setSendDate(new \DateTime())->setName($data['name']);
 
         $entityManager->persist($photo);
         $entityManager->flush();
-
-        $this->uploadService->uploadFile($file, $this->bag->get('file_directory').'/'.$recipient->getId(), $fileName);
     }
 }

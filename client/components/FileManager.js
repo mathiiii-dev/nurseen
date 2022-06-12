@@ -43,7 +43,7 @@ export default function Page({ files, userId }) {
                                     fullWidth
                                     onClick={() =>
                                         downloadUsingFetch(
-                                            `${process.env.NEXT_PUBLIC_MEDIA_URL}file/${userId}/${file.url}`,
+                                            `${process.env.NEXT_PUBLIC_FILE_URL}${file.url}`,
                                             file.url
                                         )
                                     }

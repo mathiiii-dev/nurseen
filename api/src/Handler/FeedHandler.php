@@ -5,6 +5,7 @@ namespace App\Handler;
 use App\Entity\Feed;
 use App\Entity\User;
 use App\Repository\NurseRepository;
+use App\Service\CloudinaryService;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -12,11 +13,13 @@ class FeedHandler
 {
     private NurseRepository $nurseRepository;
     private ManagerRegistry $doctrine;
+    private CloudinaryService $cloudinaryService;
 
-    public function __construct(NurseRepository $nurseRepository, ManagerRegistry $doctrine)
+    public function __construct(NurseRepository $nurseRepository, ManagerRegistry $doctrine, CloudinaryService $cloudinaryService)
     {
         $this->nurseRepository = $nurseRepository;
         $this->doctrine = $doctrine;
+        $this->cloudinaryService = $cloudinaryService;
     }
 
     public function handleFeedCreate(string $text, User $nurse): Feed
@@ -37,6 +40,7 @@ class FeedHandler
         $em = $this->doctrine->getManager();
 
         foreach ($feed->getFeedImages() as $feedImage) {
+            $this->cloudinaryService->delete($feedImage->getUrl());
             $em->remove($feedImage);
             $em->flush();
         }

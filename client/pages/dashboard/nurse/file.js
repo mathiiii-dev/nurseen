@@ -1,5 +1,5 @@
-import { getSession } from 'next-auth/react';
-import { AuthToken } from '../../../services/auth_token';
+import {getSession} from 'next-auth/react';
+import {AuthToken} from '../../../services/auth_token';
 import {
     Accordion,
     Button,
@@ -9,8 +9,8 @@ import {
     Text,
     TextInput,
 } from '@mantine/core';
-import { Dropzone, MIME_TYPES } from '@mantine/dropzone';
-import { useState } from 'react';
+import {Dropzone, MIME_TYPES} from '@mantine/dropzone';
+import {useState} from 'react';
 import FileManager from '../../../components/FileManager';
 
 export const dropzoneChildrenUploaded = () => (
@@ -27,7 +27,7 @@ export const dropzoneChildren = (rejected) => (
     </>
 );
 
-export default function Page({ userId, bearer, family, files }) {
+export default function Page({userId, bearer, family, files}) {
     const [select, setSelect] = useState(null);
     const [file, setFile] = useState();
     const [uploaded, setUploaded] = useState(false);
@@ -58,16 +58,30 @@ export default function Page({ userId, bearer, family, files }) {
         event.preventDefault();
         const data = new FormData();
         data.append('file', file[0]);
-        data.append('sender', userId);
-        data.append('recipient', select);
-        data.append('name', title);
-        fetch(`${process.env.NEXT_PUBLIC_BASE_URL}file/${userId}/send`, {
-            body: data,
-            method: 'POST',
-            headers: {
-                Authorization: bearer,
-            },
-        }).then((response) => response.json());
+        data.append('upload_preset', 'eekmglxg');
+        data.append('folder', `nurseen/file/${select}`);
+        fetch(
+            'https://api.cloudinary.com/v1_1/devmathias/raw/upload',
+            {
+                method: 'POST',
+                body: data,
+            }
+        ).then((response) => {
+            return response.json()
+        }).then((data) => {
+            fetch(`${process.env.NEXT_PUBLIC_BASE_URL}file/${userId}/send`, {
+                body: JSON.stringify({
+                    name: title,
+                    recipient: select,
+                    sender: userId,
+                    url: data.public_id
+                }),
+                method: 'POST',
+                headers: {
+                    Authorization: bearer,
+                },
+            }).then((response) => response.json());
+        })
     };
 
     return (
@@ -82,7 +96,7 @@ export default function Page({ userId, bearer, family, files }) {
                             value={select}
                             onChange={setSelect}
                         />
-                        <Space h={'md'} />
+                        <Space h={'md'}/>
                         <TextInput
                             placeholder="Contrat du mois"
                             label="Nom du fichier"
@@ -90,7 +104,7 @@ export default function Page({ userId, bearer, family, files }) {
                             onChange={(e) => setTitle(e.currentTarget.value)}
                             required
                         />
-                        <Space h={'md'} />
+                        <Space h={'md'}/>
                         <InputWrapper label="Fichier">
                             <Dropzone
                                 styles={{
@@ -120,7 +134,7 @@ export default function Page({ userId, bearer, family, files }) {
                                     : () => dropzoneChildren(rejected)}
                             </Dropzone>
                         </InputWrapper>
-                        <Space h={'md'} />
+                        <Space h={'md'}/>
                         <Button
                             type={'submit'}
                             disabled={parents.length === 0 ? true : false}
@@ -131,7 +145,7 @@ export default function Page({ userId, bearer, family, files }) {
                 </Accordion.Item>
 
                 <Accordion.Item label="Mes fichiers reçus">
-                    <FileManager files={files} userId={userId} />
+                    <FileManager files={files} userId={userId}/>
                 </Accordion.Item>
             </Accordion>
         </>

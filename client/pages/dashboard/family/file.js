@@ -50,22 +50,30 @@ export default function Page({ userId, bearer, nurse, files }) {
         event.preventDefault();
         const data = new FormData();
         data.append('file', file[0]);
-        data.append('sender', userId);
-        data.append('recipient', nurse.nurse.userId);
-        data.append('name', title);
-        fetch(`${process.env.NEXT_PUBLIC_BASE_URL}file/${userId}/send`, {
-            body: data,
-            method: 'POST',
-            headers: {
-                Authorization: bearer,
-            },
-        }).then((response) => response.json());
-    };
-
-    const download = (url) => {
-        if (typeof window !== 'undefined') {
-            window.location.href = url;
-        }
+        data.append('upload_preset', 'eekmglxg');
+        data.append('folder', `nurseen/file/${nurse.nurse.userId}`);
+        fetch(
+            'https://api.cloudinary.com/v1_1/devmathias/raw/upload',
+            {
+                method: 'POST',
+                body: data,
+            }
+        ).then((response) => {
+            return response.json()
+        }).then((data) => {
+            fetch(`${process.env.NEXT_PUBLIC_BASE_URL}file/${userId}/send`, {
+                body: JSON.stringify({
+                    name: title,
+                    recipient: nurse.nurse.userId,
+                    sender: userId,
+                    url: data.public_id
+                }),
+                method: 'POST',
+                headers: {
+                    Authorization: bearer,
+                },
+            }).then((response) => response.json());
+        })
     };
 
     return (

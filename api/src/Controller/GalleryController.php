@@ -9,8 +9,11 @@ use App\Repository\FamilyRepository;
 use App\Repository\GalleryRepository;
 use App\Repository\KidRepository;
 use App\Repository\NurseRepository;
+use App\Service\CloudinaryService;
 use App\Service\PaginationService;
 use App\Service\UploadService;
+use Cloudinary\Api\Upload\UploadApi;
+use Cloudinary\Cloudinary;
 use Exception;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -28,6 +31,7 @@ class GalleryController extends AbstractController
     private UploadService $uploadService;
     private GalleryHandler $galleryHandler;
     private PaginationService $paginationService;
+    private CloudinaryService $cloudinary;
 
     public function __construct(
         NurseRepository $nurseRepository,
@@ -36,7 +40,8 @@ class GalleryController extends AbstractController
         FamilyRepository $familyRepository,
         UploadService $uploadService,
         GalleryHandler $galleryHandler,
-        PaginationService $paginationService
+        PaginationService $paginationService,
+        CloudinaryService $cloudinary
     ) {
         $this->nurseRepository = $nurseRepository;
         $this->galleryRepository = $galleryRepository;
@@ -45,6 +50,7 @@ class GalleryController extends AbstractController
         $this->uploadService = $uploadService;
         $this->galleryHandler = $galleryHandler;
         $this->paginationService = $paginationService;
+        $this->cloudinary = $cloudinary;
     }
 
     /**
@@ -105,9 +111,9 @@ class GalleryController extends AbstractController
     #[Route('/gallery/{gallery}', name: 'app_gallery_delete', methods: 'DELETE')]
     public function delete(Gallery $gallery): JsonResponse
     {
+        $this->cloudinary->delete($gallery->getUrl());
         $this->denyAccessUnlessGranted('owner', $gallery);
         $this->galleryHandler->handleGalleryDelete($gallery);
-
         return $this->json([], Response::HTTP_NO_CONTENT);
     }
 }

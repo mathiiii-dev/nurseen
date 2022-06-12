@@ -1,56 +1,54 @@
 import Gallery from 'react-photo-gallery';
-import Carousel, { Modal, ModalGateway } from 'react-images';
+import Carousel, {Modal, ModalGateway} from 'react-images';
 import {
     ActionIcon,
-    Center,
     Divider,
-    Group,
-    Pagination,
-    Space,
+    Group
 } from '@mantine/core';
-import { useCallback, useState } from 'react';
-import { AiOutlineClose, AiTwotoneDelete } from 'react-icons/ai';
-import { useRouter } from 'next/router';
-import { lowerFirst } from '@mantine/hooks';
+import {useCallback, useState} from 'react';
+import {AiOutlineClose, AiTwotoneDelete} from 'react-icons/ai';
+import {useRouter} from 'next/router';
+import {sha1} from 'crypto-hash';
 
 export default function GalleryNurse({
-    galleryPhoto,
-    bearer,
-    gallery = false,
-}) {
+                                         galleryPhoto,
+                                         bearer,
+                                         gallery = false,
+                                     }) {
     const [currentImage, setCurrentImage] = useState(0);
     const [viewerIsOpen, setViewerIsOpen] = useState(false);
     const router = useRouter();
 
-    const openLightbox = useCallback((event, { photo, index }) => {
+    const openLightbox = useCallback((event, {index}) => {
         setCurrentImage(index);
         setViewerIsOpen(true);
     }, []);
-
     const closeLightbox = () => {
         setCurrentImage(0);
         setViewerIsOpen(false);
     };
 
     const deleteImage = async () => {
-        console.log('image : ', galleryPhoto[currentImage])
-        const res = await fetch(
+        fetch(
             `${process.env.NEXT_PUBLIC_BASE_URL}gallery/${galleryPhoto[currentImage].id}`,
             {
                 method: 'DELETE',
+                body: JSON.stringify({
+                    public_id: galleryPhoto[currentImage].public_id
+                }),
                 headers: {
                     'Content-type': 'application/json',
                     Authorization: bearer,
                 },
             }
-        );
-
-        if (res.status === 204) {
-            router.reload();
-        }
+        ).then((res) => {
+            if (res.status === 204) {
+                router.reload();
+            }
+        });
     };
 
-    const CustomHeader = ({ innerProps, isModal }) =>
+    const CustomHeader = ({isModal}) =>
         isModal ? (
             <div
                 style={{
@@ -66,7 +64,7 @@ export default function GalleryNurse({
                         radius="xs"
                         variant="filled"
                     >
-                        <AiTwotoneDelete size={25} />
+                        <AiTwotoneDelete size={25}/>
                     </ActionIcon>
                     <Divider
                         size="xl"
@@ -80,7 +78,7 @@ export default function GalleryNurse({
                         radius="xs"
                         variant="filled"
                     >
-                        <AiOutlineClose size={25} />
+                        <AiOutlineClose size={25}/>
                     </ActionIcon>
                 </Group>
             </div>
@@ -92,13 +90,13 @@ export default function GalleryNurse({
                 ''
             ) : (
                 <>
-                    <Gallery photos={galleryPhoto} onClick={openLightbox} />
+                    <Gallery photos={galleryPhoto} onClick={openLightbox}/>
                     <ModalGateway>
                         {viewerIsOpen ? (
                             <Modal onClose={closeLightbox}>
                                 <Carousel
                                     components={
-                                        gallery && { Header: CustomHeader }
+                                        gallery && {Header: CustomHeader}
                                     }
                                     currentIndex={currentImage}
                                     views={galleryPhoto.map((x) => ({
