@@ -1,44 +1,32 @@
-import { Button, Space, Spoiler, Table, Text, Title } from '@mantine/core';
-import { useRouter } from 'next/router';
+import {Button, Center, Image, SimpleGrid, Space, Table, Text, Title} from '@mantine/core';
+import {useRouter} from 'next/router';
 import dayjs from 'dayjs';
 import 'dayjs/locale/fr';
-import utc from 'dayjs/plugin/utc';
 import Link from 'next/link';
-import { getSession } from 'next-auth/react';
-import { AuthToken } from '../../../../../../services/auth_token';
+import {getSession} from 'next-auth/react';
+import {AuthToken} from '../../../../../../services/auth_token';
+import React from "react";
 
-function KidNotes({ kid, notes }) {
+function KidNotes({kid, notes}) {
     const router = useRouter();
 
-    dayjs.locale('fr');
-    dayjs.extend(utc);
-    dayjs.utc().format();
-
     let rows = null;
-    if (notes) {
+    if (notes.length > 0) {
         rows = notes.map((element) => (
             <tr key={element.id}>
-                <td>{dayjs(element.data).utc().format('DD MMMM YYYY')}</td>
+                <td>{dayjs(element.data).format('DD MMMM YYYY')}</td>
                 <td>
-                    <Spoiler
-                        maxHeight={120}
-                        showLabel="Show more"
-                        hideLabel="Hide"
-                    >
-                        {
-                            <Text
-                                dangerouslySetInnerHTML={{
-                                    __html: element.note,
-                                }}
-                            />
-                        }
-                    </Spoiler>
+                    <Text
+                        dangerouslySetInnerHTML={{
+                            __html: element.note.substring(0, 100) + '...'
+                        }}
+                    />
                 </td>
                 <td>
                     <Link
                         href={`/dashboard/family/kid/${router.query.pid}/notes/${element.id}`}
                     >
-                        <Button>Note</Button>
+                        <Button>Voir la note</Button>
                     </Link>
                 </td>
             </tr>
@@ -48,21 +36,44 @@ function KidNotes({ kid, notes }) {
     return (
         <>
             {kid ? <Title>Les notes de {kid.firstname} </Title> : ''}
-            <Space h="xl" />
-            <Table
-                horizontalSpacing="xl"
-                verticalSpacing="xl"
-                style={{ marginTop: 10 }}
-            >
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Note</th>
-                        <th>Voir</th>
-                    </tr>
-                </thead>
-                <tbody>{rows}</tbody>
-            </Table>
+            {
+                notes.length > 0 ? (
+                    <>
+                        <Space h="xl"/>
+                        <Table
+                            horizontalSpacing="xl"
+                            verticalSpacing="xl"
+                            style={{marginTop: 10}}
+                        >
+                            <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Note</th>
+                                <th>Voir</th>
+                            </tr>
+                            </thead>
+                            <tbody>{rows}</tbody>
+                        </Table>
+                    </>
+                ) : (
+                    <SimpleGrid cols={1}>
+                        <Center>
+                            <Space h={"xl"}/>
+                            <div style={{width: 380, marginLeft: 'auto', marginRight: 'auto'}}>
+                                <Image
+                                    radius="md"
+                                    src="/img/undraw_empty_re_opql.svg"
+                                    alt="Random unsplash image"
+                                />
+                            </div>
+                        </Center>
+                        <Center>
+                            <Text>Cet enfant ne possède aucune note</Text>
+                        </Center>
+                    </SimpleGrid>
+                )
+            }
+
         </>
     );
 }

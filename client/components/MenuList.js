@@ -1,13 +1,10 @@
 import { Button, Drawer, Space, Table, Text, Textarea } from '@mantine/core';
 import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
 import { useState } from 'react';
 import { DatePicker } from '@mantine/dates';
+import 'dayjs/locale/fr';
 
 function Menu({ menus, role, bearer }) {
-    dayjs.locale('fr');
-    dayjs.extend(utc);
-    dayjs.utc().format();
 
     const [opened, setOpened] = useState(false);
     const [entry, setEntry] = useState('');
@@ -138,11 +135,12 @@ function Menu({ menus, role, bearer }) {
                                         />
                                         <Space h={'xl'} />
                                         <DatePicker
-                                            placeholder="Pick date"
-                                            label="Event date"
+                                            placeholder="Choisissez une date"
+                                            label="Date"
                                             required
                                             value={date}
                                             onChange={setDate}
+                                            locale="fr"
                                         />
                                         <Space h={'xl'} />
                                         <Button fullWidth type="submit">

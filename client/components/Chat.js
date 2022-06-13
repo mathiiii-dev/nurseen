@@ -15,7 +15,6 @@ function Chat({ userId, messages, viewport, bearer, cid, height }) {
     const [value, setValue] = useState('');
 
     const send = (event) => {
-        console.log(`${process.env.NEXT_PUBLIC_BASE_URL}message/${cid}`);
         event.preventDefault();
         fetch(`${process.env.NEXT_PUBLIC_BASE_URL}message/${cid}`, {
             method: 'POST',
@@ -30,11 +29,9 @@ function Chat({ userId, messages, viewport, bearer, cid, height }) {
             },
         })
             .then((r) => {
-                console.log(r);
                 r.json();
             })
             .then((res) => {
-                console.log(res);
                 setValue('');
                 scrollToBottom(viewport);
             });

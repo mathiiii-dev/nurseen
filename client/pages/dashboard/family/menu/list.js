@@ -1,7 +1,6 @@
 import MenuList from '../../../../components/MenuList';
 import { getSession } from 'next-auth/react';
 import { AuthToken } from '../../../../services/auth_token';
-import Menu from '../../../../components/Menu';
 import NonKidsMessage from '../../../../components/NoKidsMessage';
 
 function MenuListFamily({ menus, role }) {

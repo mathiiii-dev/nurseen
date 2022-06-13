@@ -1,9 +1,9 @@
-import { useRouter } from 'next/router';
-import { Button, Text } from '@mantine/core';
-import { getSession } from 'next-auth/react';
-import { AuthToken } from '../../../../../../services/auth_token';
+import {useRouter} from 'next/router';
+import {Button, SimpleGrid, Text} from '@mantine/core';
+import {getSession} from 'next-auth/react';
+import {AuthToken} from '../../../../../../services/auth_token';
 
-function Note({ note }) {
+function Note({note}) {
     const router = useRouter();
 
     return (
@@ -12,7 +12,11 @@ function Note({ note }) {
                 Retour
             </Button>
             {note ? (
-                <Text dangerouslySetInnerHTML={{ __html: note.note }} />
+                <SimpleGrid cols={1}>
+                    <div>
+                        <Text align={'justify'} dangerouslySetInnerHTML={{__html: note.note}}/>
+                    </div>
+                </SimpleGrid>
             ) : (
                 ''
             )}

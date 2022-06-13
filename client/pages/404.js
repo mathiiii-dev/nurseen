@@ -1,9 +1,9 @@
-import { Button, Center, Grid, Image, Text, Title } from '@mantine/core';
+import { Button, Grid, Image, Text, Title } from '@mantine/core';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 
 export default function Custom404() {
-    const { data: session, status } = useSession();
+    const { data: session } = useSession();
     let dashboard = '';
 
     if (session) {

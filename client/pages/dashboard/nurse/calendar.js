@@ -12,6 +12,7 @@ import { AuthToken } from '../../../services/auth_token';
 import { getSession } from 'next-auth/react';
 import { useClickOutside } from '@mantine/hooks';
 import '../../../styles/globals.css';
+import 'dayjs/locale/fr';
 
 function Index({ bearer, kids, dayKidsCalendar }) {
     const [selectEvent, setSelectEvent] = useState('');
@@ -58,7 +59,7 @@ function Index({ bearer, kids, dayKidsCalendar }) {
     const [showError, setShowError] = useState(false);
     const [editModal, setEditModal] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
-    const [hKids, setHKids] = useState(kids.length === 0 ? false : true);
+    const [hKids, __] = useState(kids.length === 0 ? false : true);
 
     let events = null;
     if (dayKidsCalendar) {
@@ -193,6 +194,7 @@ function Index({ bearer, kids, dayKidsCalendar }) {
                         label="Jour de présence"
                         value={day}
                         onChange={setDay}
+                        locale="fr"
                         required
                     />
                     <Space h={'xl'} />
@@ -246,6 +248,7 @@ function Index({ bearer, kids, dayKidsCalendar }) {
                         label="Jour de présence"
                         value={day}
                         onChange={setDay}
+                        locale="fr"
                         required
                     />
                     <Space h={'xl'} />

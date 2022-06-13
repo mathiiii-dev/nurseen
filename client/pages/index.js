@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {
     Button,
     Center,
@@ -7,14 +7,17 @@ import {
     Space,
     Text,
     Title,
-    SimpleGrid,
     Group,
 } from '@mantine/core';
+import {useClickOutside} from "@mantine/hooks";
 
 function Home() {
     const [nurse, setNurse] = useState(false);
     const [family, setFamily] = useState(false);
-
+    const ref = useClickOutside(() => {
+        setNurse(false);
+        setFamily(false);
+    });
     return (
         <>
             <Grid
@@ -26,22 +29,20 @@ function Home() {
             >
                 <Grid.Col md={6}>
                     <Center>
-                        <Title style={{ fontSize: 80 }}>Nurseen</Title>
+                        <Title style={{fontSize: 80}}>Nurseen</Title>
                     </Center>
-                    <Space h={'xl'} />
-                    <Text>
+                    <Space h={'xl'}/>
+                    <Text align={"justify"}>
                         Ce projet est un projet personnel, me permettant de
                         découvrir Next.JS et donc React. Le but du projet est
                         d'aider les nourrices dans la vie de tous les jours et
                         facilité leur travail (Calendrier des enfants, Ajout de
                         note personnel etc..). Il y a aussi un côté pour les
                         parents, pour qu'ils puissent suivre leurs enfants
-                        (Galerie photo, Fil d'actualité etc..). Je vous invite à
-                        tester les deux parties, pour ceci voilà deux comptes de
-                        test avec des données fictives. Vous pouvez aussi créer
-                        vos propres comptes si vous le souhaitez
+                        (Galerie photo, Fil d'actualité etc..).
                     </Text>
-                    <Space h={'xl'} />
+                    <Space h={'xl'}/>
+                    <Text>Compte de test : </Text>
                     <Center>
                         <Group>
                             <Button
@@ -74,16 +75,16 @@ function Home() {
                             </Button>
                         </Group>
                     </Center>
-                    <Space h={'xl'} />
+                    <Space h={'xl'}/>
                     <Center>
                         {nurse && (
-                            <div>
+                            <div ref={ref}>
                                 <Text>Email : nurse@mail.com</Text>
                                 <Text>Mot de passe : password</Text>
                             </div>
                         )}
                         {family && (
-                            <div>
+                            <div ref={ref}>
                                 <Text>Email : family@mail.com</Text>
                                 <Text>Mot de passe : password</Text>
                             </div>

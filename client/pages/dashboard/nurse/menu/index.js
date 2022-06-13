@@ -2,8 +2,8 @@ import Menu from '../../../../components/Menu';
 import { getSession } from 'next-auth/react';
 import { AuthToken } from '../../../../services/auth_token';
 
-function MenuNurse({ menu }) {
-    return <Menu menu={menu} />;
+function MenuNurse({ menu, role }) {
+    return <Menu menu={menu} role={role} />;
 }
 
 export default MenuNurse;
@@ -22,12 +22,12 @@ export async function getServerSideProps(ctx) {
             },
         }
     );
-
     const menu = await res.json();
 
     return {
         props: {
             menu,
+            role: authToken.decodedToken.roles[0],
         },
     };
 }

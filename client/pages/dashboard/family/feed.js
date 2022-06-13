@@ -12,7 +12,6 @@ function Feed({ feed }) {
         };
     }
 
-    console.log(feed);
     return (
         <>
             {!feed.hasOwnProperty('kid') ? (

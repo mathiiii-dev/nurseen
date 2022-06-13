@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import RichTextEditor from '/components/rte';
-import { Autocomplete, Button, Select, Space } from '@mantine/core';
+import { Button, Select, Space } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
 import { getSession } from 'next-auth/react';
 import { AuthToken } from '../../../services/auth_token';

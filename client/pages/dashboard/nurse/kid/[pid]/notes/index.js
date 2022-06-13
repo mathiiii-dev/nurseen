@@ -1,24 +1,24 @@
-import { useState } from 'react';
+import React, {useState} from 'react';
 import RichTextEditor from '../../../../../../components/rte';
 import {
     Alert,
     Button,
     Modal,
     Space,
-    Spoiler,
     Table,
     Text,
     Title,
-    Drawer,
+    Drawer, SimpleGrid, Center, Image,
 } from '@mantine/core';
-import { useRouter } from 'next/router';
+import {useRouter} from 'next/router';
 import dayjs from 'dayjs';
 import 'dayjs/locale/fr';
 import utc from 'dayjs/plugin/utc';
-import { getSession } from 'next-auth/react';
-import { AuthToken } from '../../../../../../services/auth_token';
+import {getSession} from 'next-auth/react';
+import {AuthToken} from '../../../../../../services/auth_token';
+import Link from "next/link";
 
-function NoteList({ bearer, kid, notes }) {
+function NoteList({bearer, kid, notes}) {
     const [opened, setOpened] = useState(false);
     const [openedDrawer, setOpenedDrawer] = useState(false);
     const router = useRouter();
@@ -30,24 +30,17 @@ function NoteList({ bearer, kid, notes }) {
     dayjs.utc().format();
 
     let rows = null;
-    if (notes) {
+    if (notes.length > 0) {
         rows = notes.map((element) => (
             <tr key={element.id}>
                 <td>{dayjs(element.data).utc().format('DD MMMM YYYY')}</td>
                 <td>
-                    <Spoiler
-                        maxHeight={120}
-                        showLabel="Show more"
-                        hideLabel="Hide"
-                    >
-                        {
-                            <Text
-                                dangerouslySetInnerHTML={{
-                                    __html: element.note,
-                                }}
-                            />
-                        }
-                    </Spoiler>
+                    <Text
+                        dangerouslySetInnerHTML={{
+                            __html: element.note.substring(0,80) + '...'
+                        }}
+                    />
+
                 </td>
                 <td>
                     <Button
@@ -100,7 +93,7 @@ function NoteList({ bearer, kid, notes }) {
                 'Content-type': 'application/json',
                 Authorization: bearer,
             },
-        });
+        })
     };
 
     return (
@@ -118,11 +111,11 @@ function NoteList({ bearer, kid, notes }) {
                         value={value}
                         onChange={onChange}
                     />
-                    <Space h={'xl'} />
+                    <Space h={'xl'}/>
                     <Button
                         type="submit"
                         size={'lg'}
-                        style={{ backgroundColor: '#4ad4c6', float: 'right' }}
+                        style={{backgroundColor: '#4ad4c6', float: 'right'}}
                     >
                         Modifier
                     </Button>
@@ -135,32 +128,59 @@ function NoteList({ bearer, kid, notes }) {
                 centered
             >
                 <Alert title="Attention !" color="red">
-                    Êtes-vous sûr de vouloir supprimer cette note ? <br />
+                    Êtes-vous sûr de vouloir supprimer cette note ? <br/>
                     Elle n'apparaitra plus dans cette liste
                 </Alert>
-                <Space h={'xl'} />
+                <Space h={'xl'}/>
                 <Button fullWidth color="red" onClick={() => deleteNote()}>
                     Supprimer
                 </Button>
             </Modal>
-            <Space h="xl" />
+            <Space h="xl"/>
+            <Space h="xl"/>
             {kid ? <Title>Les notes de {kid.firstname} </Title> : ''}
-            <Space h="xl" />
-            <Table
-                horizontalSpacing="xl"
-                verticalSpacing="xl"
-                style={{ marginTop: 10 }}
-            >
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Note</th>
-                        <th>Modifier</th>
-                        <th>Supprimer</th>
-                    </tr>
-                </thead>
-                <tbody>{rows}</tbody>
-            </Table>
+            {
+                notes.length > 0 ? (
+                    <>
+                        <Table
+                            horizontalSpacing="xl"
+                            verticalSpacing="xl"
+                            style={{marginTop: 10}}
+                        >
+                            <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Note</th>
+                                <th>Modifier</th>
+                                <th>Supprimer</th>
+                            </tr>
+                            </thead>
+                            <tbody>{rows}</tbody>
+                        </Table>
+                    </>
+                ) : (
+                    <SimpleGrid cols={1}>
+                        <Center>
+                            <Space h={"xl"}/>
+                            <div style={{width: 380, marginLeft: 'auto', marginRight: 'auto'}}>
+                                <Image
+                                    radius="md"
+                                    src="/img/undraw_empty_re_opql.svg"
+                                    alt="Random unsplash image"
+                                />
+                            </div>
+                        </Center>
+                        <Center>
+                            <Text>Cet enfant ne possède aucune note</Text>
+                        </Center>
+                        <Center>
+                            <Link href="../../../../dashboard/nurse/note">
+                                <Button>Ajouter une note</Button>
+                            </Link>
+                        </Center>
+                    </SimpleGrid>
+                )
+            }
         </>
     );
 }
