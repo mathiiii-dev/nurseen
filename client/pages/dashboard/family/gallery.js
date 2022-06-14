@@ -1,11 +1,12 @@
-import { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { AuthToken } from '../../../services/auth_token';
 import { getSession } from 'next-auth/react';
 import Carousel, { Modal, ModalGateway } from 'react-images';
-import { Center, LoadingOverlay, Pagination, Space } from '@mantine/core';
+import {Button, Center, Image, LoadingOverlay, Pagination, SimpleGrid, Space, Text} from '@mantine/core';
 import { usePagination } from '@mantine/hooks';
 import GalleryNurse from '../../../components/GalleryNurse';
 import NonKidsMessage from '../../../components/NoKidsMessage';
+import Link from "next/link";
 
 function AddGallery({ bearer, userId }) {
     const [currentImage, setCurrentImage] = useState(0);
@@ -45,21 +46,16 @@ function AddGallery({ bearer, userId }) {
         }));
     }
 
-    const openLightbox = useCallback((event, { photo, index }) => {
-        setCurrentImage(index);
-        setViewerIsOpen(true);
-    }, []);
-
     const closeLightbox = () => {
         setCurrentImage(0);
         setViewerIsOpen(false);
     };
-
+    console.log(galleryPhoto);
     return (
         <div>
             <LoadingOverlay visible={isLoading} />
             <Space h={'xl'} />
-            {galleryPhoto && galleryPhoto.length === 0 ? (
+            {galleryPhoto.kids ? (
                 <NonKidsMessage
                     message={
                         'Vous devez enregistrer au moins un enfant pour voir les photos de la galerie'
@@ -67,26 +63,53 @@ function AddGallery({ bearer, userId }) {
                 />
             ) : (
                 <>
-                    <GalleryNurse galleryPhoto={galleryPhoto} bearer={bearer} />
-                    <ModalGateway>
-                        {viewerIsOpen ? (
-                            <Modal onClose={closeLightbox}>
-                                <Carousel
-                                    currentIndex={currentImage}
-                                    views={galleryPhoto.map((x) => ({
-                                        ...x,
-                                        srcset: x.srcSet,
-                                        caption: x.title,
-                                    }))}
-                                />
-                            </Modal>
-                        ) : null}
-                    </ModalGateway>
-                    <Space h={'xl'} />
-                    <Center>
-                        <Pagination total={total} onChange={onChange} />
-                    </Center>
-                    <Space h={'xl'} />
+                    {
+                        galleryPhoto.length !== 0 ? (
+                            <>
+                                <GalleryNurse galleryPhoto={galleryPhoto} bearer={bearer} />
+                                <ModalGateway>
+                                    {viewerIsOpen ? (
+                                        <Modal onClose={closeLightbox}>
+                                            <Carousel
+                                                currentIndex={currentImage}
+                                                views={galleryPhoto.map((x) => ({
+                                                    ...x,
+                                                    srcset: x.srcSet,
+                                                    caption: x.title,
+                                                }))}
+                                            />
+                                        </Modal>
+                                    ) : null}
+                                </ModalGateway>
+                                <Space h={'xl'} />
+                                <Center>
+                                    <Pagination total={total} onChange={onChange} />
+                                </Center>
+                                <Space h={'xl'} />
+                            </>
+                        ) : (
+                            <>
+                                <SimpleGrid cols={1}>
+                                    <Center>
+                                        <Space h={"xl"}/>
+                                        <div style={{width: 380, marginLeft: 'auto', marginRight: 'auto'}}>
+                                            <Image
+                                                radius="md"
+                                                src="/img/undraw_empty_re_opql.svg"
+                                                alt="Random unsplash image"
+                                            />
+                                        </div>
+                                    </Center>
+                                    <Center>
+                                        <Text>
+                                            La galerie ne comporte aucune image pour le moment
+                                        </Text>
+                                    </Center>
+                                </SimpleGrid>
+                            </>
+                        )
+                    }
+
                 </>
             )}
         </div>

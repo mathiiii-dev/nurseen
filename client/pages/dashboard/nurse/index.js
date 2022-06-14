@@ -181,7 +181,7 @@ export default function Page({ bearer, userId, code, firstname, lastname }) {
                 onClose={() => setOpened(false)}
                 title="Création d'un code parent nécessaire à l'ajout d'un enfant"
             >
-                {code ? (
+                {code || link ? (
                     <>
                         <Box
                             sx={(theme) => ({
@@ -206,7 +206,7 @@ export default function Page({ bearer, userId, code, firstname, lastname }) {
                                 copyToClipboard();
                             }}
                         >
-                            <Text>{code}</Text>
+                            <Text>{code || link}</Text>
                         </Box>
                         <Text>Cliquez sur le code pour le copier</Text>
                     </>

@@ -3,10 +3,10 @@ import { AuthToken } from '../../../../services/auth_token';
 import { getSession } from 'next-auth/react';
 import {
     Button,
-    Center,
+    Center, Image,
     LoadingOverlay,
-    Pagination,
-    Space,
+    Pagination, SimpleGrid,
+    Space, Text,
 } from '@mantine/core';
 import GalleryNurse from '../../../../components/GalleryNurse';
 
@@ -57,15 +57,38 @@ function AddGallery({ bearer, userId }) {
     return (
         <>
             <LoadingOverlay visible={isLoading} />
-            <Link href={'gallery/add'}>
-                <Button>Ajouter des photos</Button>
-            </Link>
-            <Space h={'xl'} />
-            <GalleryNurse galleryPhoto={galleryPhoto} bearer={bearer} gallery />
             {galleryPhoto && galleryPhoto.length === 0 ? (
-                ''
+                <>
+                    <SimpleGrid cols={1}>
+                        <Center>
+                            <Space h={"xl"}/>
+                            <div style={{width: 380, marginLeft: 'auto', marginRight: 'auto'}}>
+                                <Image
+                                    radius="md"
+                                    src="/img/undraw_empty_re_opql.svg"
+                                    alt="Random unsplash image"
+                                />
+                            </div>
+                        </Center>
+                        <Center>
+                            <Text>
+                                La galerie ne comporte aucune image pour le moment
+                            </Text>
+                        </Center>
+                        <Center>
+                            <Link href={'gallery/add'}>
+                                <Button>Ajouter des photos</Button>
+                            </Link>
+                        </Center>
+                    </SimpleGrid>
+                </>
             ) : (
                 <>
+                    <Link href={'gallery/add'}>
+                        <Button>Ajouter des photos</Button>
+                    </Link>
+                    <Space h={'xl'} />
+                    <GalleryNurse galleryPhoto={galleryPhoto} bearer={bearer} gallery />
                     <Space h={'xl'} />
                     <Center>
                         <Pagination total={total} onChange={onChange} />

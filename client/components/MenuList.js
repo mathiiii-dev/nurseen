@@ -1,10 +1,16 @@
-import { Button, Drawer, Space, Table, Text, Textarea } from '@mantine/core';
+import {Button, Center, Drawer, Image, SimpleGrid, Space, Table, Text, Textarea} from '@mantine/core';
 import dayjs from 'dayjs';
 import { useState } from 'react';
 import { DatePicker } from '@mantine/dates';
 import 'dayjs/locale/fr';
+import utc from "dayjs/plugin/utc";
+import Link from "next/link";
 
 function Menu({ menus, role, bearer }) {
+
+    dayjs.locale('fr');
+    dayjs.extend(utc);
+    dayjs.utc().format();
 
     const [opened, setOpened] = useState(false);
     const [entry, setEntry] = useState('');
@@ -32,7 +38,7 @@ function Menu({ menus, role, bearer }) {
         );
     };
 
-    let list = null;
+    let list = [];
     if (menus) {
         list = menus.map((element) => (
             <tr key={element.id}>
@@ -69,7 +75,7 @@ function Menu({ menus, role, bearer }) {
     }
     return (
         <div>
-            {list ? (
+            {list.length > 0 ? (
                 <>
                     {role === 'ROLE_PARENT' ? (
                         <Table
@@ -170,7 +176,28 @@ function Menu({ menus, role, bearer }) {
                 </>
             ) : (
                 <>
-                    <Text>Le menu du jour n'as pas encore été renseigné</Text>
+                    <SimpleGrid cols={1}>
+                        <Center>
+                            <Space h={"xl"}/>
+                            <div style={{width: 380, marginLeft: 'auto', marginRight: 'auto'}}>
+                                <Image
+                                    radius="md"
+                                    src="/img/undraw_empty_re_opql.svg"
+                                    alt="Random unsplash image"
+                                />
+                            </div>
+                        </Center>
+                        <Center>
+                            <Text>
+                                Aucun menu n'a encore été ajouté.
+                            </Text>
+                        </Center>
+                        <Center>
+                            <Link href={'add'}>
+                                <Button>Ajouter un menu</Button>
+                            </Link>
+                        </Center>
+                    </SimpleGrid>
                 </>
             )}
         </div>

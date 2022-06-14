@@ -40,7 +40,7 @@ class ChatHandler
         $em->flush();
     }
 
-    public function handleCreateFamilyChat(Request $request): void
+    public function handleCreateFamilyChat(Request $request): Chat
     {
         $data = $request->toArray();
 
@@ -55,5 +55,7 @@ class ChatHandler
         $em = $this->doctrine->getManager();
         $em->persist($chat);
         $em->flush();
+
+        return $chat;
     }
 }

@@ -1,44 +1,37 @@
-import { getSession } from 'next-auth/react';
-import {
-    Button,
-    Center,
-    Grid,
-    Pagination,
-    Space,
-    Text,
-    Title,
-    LoadingOverlay,
-    Group,
-} from '@mantine/core';
-import { useEffect, useRef, useState } from 'react';
-import { AuthToken } from '../../../services/auth_token';
+import {getSession} from 'next-auth/react';
+import {Button, Center, Grid, Group, LoadingOverlay, Pagination, Space, Text, Title,} from '@mantine/core';
+import {useEffect, useRef, useState} from 'react';
+import {AuthToken} from '../../../services/auth_token';
 import Link from 'next/link';
 import '../../../styles/globals.css';
 import DashboardCard from '../../../components/DashboardCard';
-import { familyCards } from '../../../data/cards';
-import { usePagination } from '@mantine/hooks';
+import {familyCards} from '../../../data/cards';
+import {usePagination} from '@mantine/hooks';
 import Chat from '../../../components/Chat';
-import { scrollToBottom } from '../../../services/scroll';
 import EventSource from 'eventsource';
 import dayjs from 'dayjs';
+import {useRouter} from "next/router";
+
 
 export default function Page({
-    bearer,
-    userId,
-    messages,
-    chat,
-    firstname,
-    lastname,
-}) {
+                                 bearer,
+                                 userId,
+                                 messages,
+                                 chat,
+                                 firstname,
+                                 lastname,
+                             }) {
+
     const [kids, setKids] = useState([]);
     const [page, onChange] = useState(1);
     const [total, setTotal] = useState(1);
-    const pagination = usePagination({ total, page, onChange });
+    const pagination = usePagination({total, page, onChange});
     const [visible, setVisible] = useState(false);
     const viewport = useRef();
+    const router = useRouter()
 
-    const open = async () => {
-        await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}chat/family`, {
+    const open = () => {
+        fetch(`${process.env.NEXT_PUBLIC_BASE_URL}chat/family`, {
             method: 'POST',
             body: JSON.stringify({
                 family: userId,
@@ -47,7 +40,9 @@ export default function Page({
                 'Content-type': 'application/json',
                 Authorization: bearer,
             },
-        });
+        }).then(res => res.json()).then(res => {
+            router.reload(window.location.pathname)
+        })
     };
 
     const [stateMessages, setStateMessages] = useState(messages);
@@ -99,6 +94,7 @@ export default function Page({
             });
     }, [page]);
 
+
     return (
         <>
             <Grid>
@@ -117,72 +113,72 @@ export default function Page({
                 </Grid.Col>
             </Grid>
 
-            <Space h={'xl'} />
+            <Space h={'xl'}/>
             <Grid>
                 {familyCards &&
-                    Object.values(familyCards).map((card, id) => {
-                        return (
-                            <Grid.Col md={3} key={id}>
-                                <DashboardCard
-                                    title={card.title}
-                                    buttonText={card.buttonText}
-                                    text={card.text}
-                                    linkHref={card.linkHref}
-                                />
-                            </Grid.Col>
-                        );
-                    })}
+                Object.values(familyCards).map((card, id) => {
+                    return (
+                        <Grid.Col md={3} key={id}>
+                            <DashboardCard
+                                title={card.title}
+                                buttonText={card.buttonText}
+                                text={card.text}
+                                linkHref={card.linkHref}
+                            />
+                        </Grid.Col>
+                    );
+                })}
             </Grid>
-            <Space h={'xl'} />
+            <Space h={'xl'}/>
             <Grid gutter="xl">
                 <Grid.Col md={6}>
-                    <LoadingOverlay visible={visible} />
+                    <LoadingOverlay visible={visible}/>
                     {kids.length > 0 && (
                         <>
                             <table>
                                 <thead>
-                                    <tr>
-                                        <th scope="col">
-                                            <Text>Nom</Text>
-                                        </th>
-                                        <th scope="col">
-                                            <Text>Prénom</Text>
-                                        </th>
-                                        <th scope="col">
-                                            <Text>Note</Text>
-                                        </th>
-                                    </tr>
+                                <tr>
+                                    <th scope="col">
+                                        <Text>Nom</Text>
+                                    </th>
+                                    <th scope="col">
+                                        <Text>Prénom</Text>
+                                    </th>
+                                    <th scope="col">
+                                        <Text>Note</Text>
+                                    </th>
+                                </tr>
                                 </thead>
                                 <tbody>
-                                    {kids.map((kid) => {
-                                        return (
-                                            <tr key={kid.id}>
-                                                <td data-label="Nom">
-                                                    <Text>{kid.lastname}</Text>
-                                                </td>
-                                                <td data-label="Prénom">
-                                                    <Text>{kid.firstname}</Text>
-                                                </td>
-                                                <td data-label="Note">
-                                                    <Link
-                                                        href={{
-                                                            pathname: `/dashboard/family/kid/[pid]/notes`,
-                                                            query: {
-                                                                pid: kid.id,
-                                                            },
-                                                        }}
-                                                    >
-                                                        <Button>Note</Button>
-                                                    </Link>
-                                                </td>
-                                            </tr>
-                                        );
-                                    })}
+                                {kids.map((kid) => {
+                                    return (
+                                        <tr key={kid.id}>
+                                            <td data-label="Nom">
+                                                <Text>{kid.lastname}</Text>
+                                            </td>
+                                            <td data-label="Prénom">
+                                                <Text>{kid.firstname}</Text>
+                                            </td>
+                                            <td data-label="Note">
+                                                <Link
+                                                    href={{
+                                                        pathname: `/dashboard/family/kid/[pid]/notes`,
+                                                        query: {
+                                                            pid: kid.id,
+                                                        },
+                                                    }}
+                                                >
+                                                    <Button>Note</Button>
+                                                </Link>
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
                                 </tbody>
                             </table>
-                            <Space h={'xl'} />
+                            <Space h={'xl'}/>
                             <Center>
-                                <Pagination total={total} onChange={onChange} />
+                                <Pagination total={total} onChange={onChange}/>
                             </Center>
                         </>
                     )}

@@ -46,7 +46,7 @@ export const dropzoneChildren = (rejected) => (
             >
                 <div>
                     <Text size="xl" inline>
-                        Vous avez ajouté trop de fichiers (max. 5)
+                        Vous avez ajouté trop de fichiers (max. 4)
                     </Text>
                 </div>
             </Group>
@@ -83,7 +83,7 @@ export const dropzoneChildrenUploaded = (files, rejected) => (
             >
                 <div>
                     <Text size="xl" inline>
-                        Vous avez ajouté trop de fichiers (max. 5)
+                        Vous avez ajouté trop de fichiers (max. 4)
                     </Text>
                 </div>
             </Group>
@@ -134,7 +134,7 @@ function Feed({userId, bearer, feed}) {
 
         const result = [];
         if (images.length > 0) {
-            images.forEach((photo, idx, array) => {
+            images.forEach((photo, idx) => {
                 data.append('file', photo);
                 data.append('upload_preset', 'eekmglxg');
                 data.append('folder', `nurseen/feed/${feedId}`);
@@ -282,13 +282,13 @@ function Feed({userId, bearer, feed}) {
                 />
                 <Space h={'xl'}/>
                 <Accordion>
-                    <Accordion.Item label="Ajouter des photos (max. 5)">
+                    <Accordion.Item label="Ajouter des photos (max. 4)">
                         <Dropzone
                             onDrop={(files) => {
                                 setRejected(false);
                                 setImages(files);
                                 setUploaded(true);
-                                if (files.length > 5) {
+                                if (files.length > 4) {
                                     setRejected(true);
                                 }
                             }}
@@ -366,7 +366,7 @@ function Feed({userId, bearer, feed}) {
                             galleryPhoto={f.feedImages.map((i) => ({
                                 src: `${process.env.NEXT_PUBLIC_MEDIA_URL}/${i.url}`,
                                 width: 2,
-                                height: 3,
+                                height: 2,
                             }))}
                             bearer={bearer}
                         />

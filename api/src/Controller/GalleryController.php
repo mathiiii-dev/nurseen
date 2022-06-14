@@ -28,7 +28,6 @@ class GalleryController extends AbstractController
     private GalleryRepository $galleryRepository;
     private KidRepository $kidRepository;
     private FamilyRepository $familyRepository;
-    private UploadService $uploadService;
     private GalleryHandler $galleryHandler;
     private PaginationService $paginationService;
     private CloudinaryService $cloudinary;
@@ -38,7 +37,6 @@ class GalleryController extends AbstractController
         GalleryRepository $galleryRepository,
         KidRepository $kidRepository,
         FamilyRepository $familyRepository,
-        UploadService $uploadService,
         GalleryHandler $galleryHandler,
         PaginationService $paginationService,
         CloudinaryService $cloudinary
@@ -47,7 +45,6 @@ class GalleryController extends AbstractController
         $this->galleryRepository = $galleryRepository;
         $this->kidRepository = $kidRepository;
         $this->familyRepository = $familyRepository;
-        $this->uploadService = $uploadService;
         $this->galleryHandler = $galleryHandler;
         $this->paginationService = $paginationService;
         $this->cloudinary = $cloudinary;
@@ -94,7 +91,7 @@ class GalleryController extends AbstractController
         $family = $this->familyRepository->findOneBy(['parent' => $family->getId()]);
         $kid = $this->kidRepository->findOneBy(['family' => $family->getId()]);
 
-        $photos = [];
+        $photos = ['kids' => false];
         if ($kid) {
             $photos = $this->galleryRepository->findBy(['nurse' => $kid->getNurse()->getId()]);
         }

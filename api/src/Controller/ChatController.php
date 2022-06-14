@@ -41,9 +41,9 @@ class ChatController extends AbstractController
     #[Route('/chat/family', name: 'app_chat_family')]
     public function chatFamily(Request $request): Response
     {
-        $this->chatHandler->handleCreateFamilyChat($request);
+        $chat = $this->chatHandler->handleCreateFamilyChat($request);
 
-        return $this->json([], Response::HTTP_CREATED);
+        return $this->json($chat->getId(), Response::HTTP_CREATED);
     }
 
     #[Route('/chat/{family}', name: 'app_chat_get_id', methods: 'GET')]

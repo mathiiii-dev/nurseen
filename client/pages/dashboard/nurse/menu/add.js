@@ -3,6 +3,7 @@ import { getServerSideProps } from './../index';
 import { DatePicker } from '@mantine/dates';
 import { useForm } from '@mantine/hooks';
 import { useRouter } from 'next/router';
+import 'dayjs/locale/fr';
 
 function AddMenu({ bearer, userId }) {
     const router = useRouter();
@@ -69,9 +70,10 @@ function AddMenu({ bearer, userId }) {
                 />
                 <Space h={'xl'} />
                 <DatePicker
-                    placeholder="Pick date"
-                    label="Event date"
+                    placeholder="Choisissez une date"
+                    label="Date du jour"
                     required
+                    locale="fr"
                     {...form.getInputProps('date')}
                 />
                 <Space h={'xl'} />
