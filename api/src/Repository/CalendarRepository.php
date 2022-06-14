@@ -55,7 +55,7 @@ class CalendarRepository extends ServiceEntityRepository
         $sql = '
                 select c.*, k.firstname, k.lastname, k.color from kid k 
                 inner join calendar c on c.kid_id = k.id
-                where k.family_id = '.$nurseId.'
+                where k.nurse_id = '.$nurseId.'
                 ';
 
         return $this->connection->fetchAllAssociative($sql);

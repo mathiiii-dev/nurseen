@@ -57,8 +57,7 @@ class CalendarController extends AbstractController
     public function calendarNurse(User $nurse): JsonResponse
     {
         $this->denyAccessUnlessGranted('owner', $nurse);
-        $userNurse = $this->nurseRepository->findOneBy(['nurse' => $nurse->getId()]);
-        return $this->json($this->calendarRepository->getCalendarByNurse($userNurse->getId()), Response::HTTP_OK);
+        return $this->json($this->calendarRepository->getCalendarByNurse($nurse->getId()), Response::HTTP_OK);
     }
 
     /**
