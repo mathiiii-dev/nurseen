@@ -50,7 +50,6 @@ function AddGallery({ bearer, userId }) {
         setCurrentImage(0);
         setViewerIsOpen(false);
     };
-    console.log(galleryPhoto);
     return (
         <div>
             <LoadingOverlay visible={isLoading} overlayOpacity={100} />

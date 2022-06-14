@@ -22,7 +22,6 @@ export default function MessageNurse({ messages, userId, bearer }) {
         const eventSource = new EventSource(url.toString());
 
         eventSource.onmessage = (e) => {
-            console.log(e);
             let origin = JSON.parse(e.data);
             setStateMessages((state) => [
                 ...state,

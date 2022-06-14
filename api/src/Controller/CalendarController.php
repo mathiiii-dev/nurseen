@@ -8,6 +8,7 @@ use App\Entity\User;
 use App\Handler\CalendarHandler;
 use App\Repository\CalendarRepository;
 use App\Repository\FamilyRepository;
+use App\Repository\NurseRepository;
 use Exception;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -21,12 +22,17 @@ class CalendarController extends AbstractController
     private CalendarHandler $calendarHandler;
     private CalendarRepository $calendarRepository;
     private FamilyRepository $familyRepository;
+    private NurseRepository $nurseRepository;
 
-    public function __construct(CalendarHandler $calendarHandler, CalendarRepository $calendarRepository, FamilyRepository $familyRepository)
+    public function __construct(CalendarHandler    $calendarHandler,
+                                CalendarRepository $calendarRepository,
+                                FamilyRepository   $familyRepository,
+                                NurseRepository    $nurseRepository)
     {
         $this->calendarHandler = $calendarHandler;
         $this->calendarRepository = $calendarRepository;
         $this->familyRepository = $familyRepository;
+        $this->nurseRepository = $nurseRepository;
     }
 
     /**
@@ -51,7 +57,8 @@ class CalendarController extends AbstractController
     public function calendarNurse(User $nurse): JsonResponse
     {
         $this->denyAccessUnlessGranted('owner', $nurse);
-        return $this->json($this->calendarRepository->getCalendarByNurse($nurse->getId()), Response::HTTP_OK);
+        $userNurse = $this->nurseRepository->findOneBy(['id' => $nurse->getId()]);
+        return $this->json($this->calendarRepository->getCalendarByNurse($userNurse->getId()), Response::HTTP_OK);
     }
 
     /**
