@@ -1,31 +1,14 @@
-import Gallery from 'react-photo-gallery';
-import Carousel, {Modal, ModalGateway} from 'react-images';
-import {
-    ActionIcon,
-    Divider,
-    Group
-} from '@mantine/core';
-import {useCallback, useState} from 'react';
+import PhotoAlbum from "react-photo-album";
+import {Lightbox} from "yet-another-react-lightbox";
+import "yet-another-react-lightbox/styles.css";
+import {ActionIcon} from '@mantine/core';
+import {useState} from 'react';
 import {AiOutlineClose, AiTwotoneDelete} from 'react-icons/ai';
 import {useRouter} from 'next/router';
 
-export default function GalleryNurse({
-                                         galleryPhoto,
-                                         bearer,
-                                         gallery = false,
-                                     }) {
-    const [currentImage, setCurrentImage] = useState(0);
-    const [viewerIsOpen, setViewerIsOpen] = useState(false);
+export default function GalleryNurse({galleryPhoto, bearer, gallery = false,}) {
+    const [currentImage, _] = useState(0);
     const router = useRouter();
-
-    const openLightbox = useCallback((event, {index}) => {
-        setCurrentImage(index);
-        setViewerIsOpen(true);
-    }, []);
-    const closeLightbox = () => {
-        setCurrentImage(0);
-        setViewerIsOpen(false);
-    };
 
     const deleteImage = async () => {
         fetch(
@@ -47,41 +30,12 @@ export default function GalleryNurse({
         });
     };
 
-    const CustomHeader = ({isModal}) =>
-        isModal ? (
-            <div
-                style={{
-                    marginTop: 100,
-                    marginLeft: 50,
-                }}
-            >
-                <Group>
-                    <ActionIcon
-                        onClick={deleteImage}
-                        color="gray"
-                        size="xl"
-                        radius="xs"
-                        variant="filled"
-                    >
-                        <AiTwotoneDelete size={25}/>
-                    </ActionIcon>
-                    <Divider
-                        size="xl"
-                        orientation={'vertical'}
-                        variant={'solid'}
-                    />
-                    <ActionIcon
-                        onClick={closeLightbox}
-                        color="gray"
-                        size="xl"
-                        radius="xs"
-                        variant="filled"
-                    >
-                        <AiOutlineClose size={25}/>
-                    </ActionIcon>
-                </Group>
-            </div>
-        ) : null;
+    const [index, setIndex] = useState(-1);
+
+    const slides = galleryPhoto.map(({src, width, height}) => ({
+        src,
+        aspectRatio: width / height,
+    }));
 
     return (
         <>
@@ -89,24 +43,36 @@ export default function GalleryNurse({
                 ''
             ) : (
                 <>
-                    <Gallery photos={galleryPhoto} onClick={openLightbox}/>
-                    <ModalGateway>
-                        {viewerIsOpen ? (
-                            <Modal onClose={closeLightbox}>
-                                <Carousel
-                                    components={
-                                        gallery && {Header: CustomHeader}
-                                    }
-                                    currentIndex={currentImage}
-                                    views={galleryPhoto.map((x) => ({
-                                        ...x,
-                                        srcset: x.srcSet,
-                                        caption: x.title,
-                                    }))}
-                                />
-                            </Modal>
-                        ) : null}
-                    </ModalGateway>
+                    <PhotoAlbum
+                        photos={galleryPhoto}
+                        layout="columns"
+                        targetRowHeight={150}
+                        columns={3}
+                        onClick={(event, photo, index) => setIndex(index)}
+                    />
+                    {gallery ?
+                        <Lightbox toolbar={{
+                            buttons: [<ActionIcon
+                                onClick={deleteImage}
+                                color="dark"
+                                size="xl"
+                                radius="xs"
+                                variant="filled"
+                            >
+                                <AiTwotoneDelete size={25}/>
+                            </ActionIcon>, <ActionIcon
+                                onClick={() => setIndex(-1)}
+                                color="dark"
+                                size="xl"
+                                radius="xs"
+                                variant="filled"
+                            >
+                                <AiOutlineClose size={25}/>
+                            </ActionIcon>]
+                        }} slides={slides} open={index >= 0} index={index} close={() => setIndex(-1)}/>
+                        :
+                        <Lightbox slides={slides} open={index >= 0} index={index} close={() => setIndex(-1)}/>
+                    }
                 </>
             )}
         </>

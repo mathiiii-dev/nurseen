@@ -28,53 +28,107 @@ function ImageUploadIcon({status, ...props}) {
     return <Photo {...props} />;
 }
 
-export const dropzoneChildren = (status, theme) => (
-    <Group
-        position="center"
-        spacing="xl"
-        style={{minHeight: 220, pointerEvents: 'none'}}
-    >
-        <ImageUploadIcon
-            status={status}
-            style={{color: getIconColor(status, theme)}}
-            size={80}
-        />
-        <div>
-            <Text size="xl" inline>
-                Glisser/déposer vos images, ou cliquez pour les sélectionner
-            </Text>
-            <Text size="sm" color="dimmed" inline mt={7}>
-                Ajouter autant d'images que vous voulez, tant qu'elle ne dépasse
-                pas 5MB
-            </Text>
-        </div>
-    </Group>
+export const dropzoneChildren = (status, theme, rejected) => (
+    <>{
+        rejected ?
+            <>
+                <Group
+                    position="center"
+                    spacing="xl"
+                    style={{minHeight: 220, pointerEvents: 'none', border: 'pink 2 px solid'}}
+                >
+                    <ImageUploadIcon
+                        status={status}
+                        style={{color: getIconColor(status, theme)}}
+                        size={80}
+                    />
+                    <div>
+                        <Text size="xl" inline>
+                            Une de vos images a été rejetée.
+                        </Text>
+                        <Text size="sm" color="dimmed" inline mt={7}>
+                            Veuillez vérifier sa taille, elle ne doit pas dépassée 5MB
+                        </Text>
+                    </div>
+                </Group>
+            </> :
+            <>
+                <Group
+                    position="center"
+                    spacing="xl"
+                    style={{minHeight: 220, pointerEvents: 'none'}}
+                >
+                    <ImageUploadIcon
+                        status={status}
+                        style={{color: getIconColor(status, theme)}}
+                        size={80}
+                    />
+                    <div>
+                        <Text size="xl" inline>
+                            Glisser/déposer vos images, ou cliquez pour les sélectionner
+                        </Text>
+                        <Text size="sm" color="dimmed" inline mt={7}>
+                            Ajouter autant d'images que vous voulez, tant qu'elle ne dépasse
+                            pas 5MB
+                        </Text>
+                    </div>
+                </Group>
+            </>
+    }</>
+
 );
 
-export const dropzoneChildrenUploaded = (status, theme, files) => (
-    <Group
-        position="center"
-        spacing="xl"
-        style={{minHeight: 220, pointerEvents: 'none'}}
-    >
-        <ImageUploadIcon
-            status={status}
-            style={{color: getIconColor(status, theme)}}
-            size={80}
-        />
-        <div>
-            <Text size="xl" inline>
-                {files.length > 1 ? (
-                    <>{files.length} images ont été ajoutées</>
-                ) : (
-                    <>{files.length} image a été ajoutée</>
-                )}
-            </Text>
-            <Text size="sm" color="dimmed" inline mt={7}>
-                Vous pouvez envoyer le formulaire
-            </Text>
-        </div>
-    </Group>
+export const dropzoneChildrenUploaded = (status, theme, files, rejected) => (
+    <>{
+        rejected ?
+            <>
+                <Group
+                    position="center"
+                    spacing="xl"
+                    style={{minHeight: 220, pointerEvents: 'none', border: 'pink 2 px solid'}}
+                >
+                    <ImageUploadIcon
+                        status={status}
+                        style={{color: getIconColor(status, theme)}}
+                        size={80}
+                    />
+                    <div>
+                        <Text size="xl" inline>
+                            Une de vos images a été rejetée.
+                        </Text>
+                        <Text size="sm" color="dimmed" inline mt={7}>
+                            Veuillez vérifier sa taille, elle ne doit pas dépassée 5MB
+                        </Text>
+                    </div>
+                </Group>
+            </> :
+            <>
+                <Group
+                    position="center"
+                    spacing="xl"
+                    style={{minHeight: 220, pointerEvents: 'none'}}
+                >
+                    <ImageUploadIcon
+                        status={status}
+                        style={{color: getIconColor(status, theme)}}
+                        size={80}
+                    />
+                    <div>
+                        <Text size="xl" inline>
+                            {files.length > 1 ? (
+                                <>{files.length} images ont été ajoutées</>
+                            ) : (
+                                <>{files.length} image a été ajoutée</>
+                            )}
+                        </Text>
+                        <Text size="sm" color="dimmed" inline mt={7}>
+                            Vous pouvez envoyer le formulaire
+                        </Text>
+                    </div>
+                </Group>
+            </>
+    }</>
+
 );
 
 function AddGallery({bearer, userId}) {
@@ -82,6 +136,7 @@ function AddGallery({bearer, userId}) {
     const [files, setFiles] = useState(null);
     const [uploaded, setUploaded] = useState(false);
     const [isLoading, setLoading] = useState(false);
+    const [rejected, setRejected] = useState(false);
     const router = useRouter();
 
     const upload = (event) => {
@@ -95,14 +150,14 @@ function AddGallery({bearer, userId}) {
 
         if (files) {
             const result = [];
-            files.forEach((photo, idx, array) => {
+            files.forEach((photo, idx) => {
                 const data = new FormData();
                 data.append('file', photo);
                 data.append('upload_preset', 'eekmglxg');
                 data.append('folder', `nurseen/gallery/${userId}`);
                 setLoading(true);
                 result[idx] = fetch(
-                    'https://api.cloudinary.com/v1_1/devmathias/image/upload',
+                    process.env.NEXT_PUBLIC_CLOUDINARY_MEDIA_API_URL,
                     {
                         method: 'POST',
                         body: data,
@@ -143,24 +198,27 @@ function AddGallery({bearer, userId}) {
             </Link>
             <Space h={'xl'}/>
 
-            <LoadingOverlay visible={isLoading}/>
+            <LoadingOverlay visible={isLoading} overlayOpacity={100}/>
             <form onSubmit={upload}>
                 <Dropzone
                     onDrop={(files) => {
+                        setRejected(false);
                         setFiles(files);
                         setUploaded(true);
                     }}
-                    onReject={(files) => console.log('rejected files', files)}
+                    onReject={(files) => {
+                        setRejected(true)
+                    }}
                     maxSize={3 * 1024 ** 2}
                     accept={IMAGE_MIME_TYPE}
                 >
                     {uploaded
                         ? (status) =>
-                            dropzoneChildrenUploaded(status, theme, files)
-                        : (status) => dropzoneChildren(status, theme)}
+                            dropzoneChildrenUploaded(status, theme, files, rejected)
+                        : (status) => dropzoneChildren(status, theme, rejected)}
                 </Dropzone>
                 <Space h={'xl'}/>
-                <Button fullWidth type="submit">
+                <Button fullWidth type="submit" disabled={rejected}>
                     Ajouter
                 </Button>
             </form>

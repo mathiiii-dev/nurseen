@@ -46,7 +46,7 @@ export const dropzoneChildren = (rejected) => (
             >
                 <div>
                     <Text size="xl" inline>
-                        Vous avez ajouté trop de fichiers (max. 4)
+                        Vous avez ajouté trop de fichiers (max. 3)
                     </Text>
                 </div>
             </Group>
@@ -83,7 +83,7 @@ export const dropzoneChildrenUploaded = (files, rejected) => (
             >
                 <div>
                     <Text size="xl" inline>
-                        Vous avez ajouté trop de fichiers (max. 4)
+                        Vous avez ajouté trop de fichiers (max. 3)
                     </Text>
                 </div>
             </Group>
@@ -210,7 +210,7 @@ function Feed({userId, bearer, feed}) {
 
     return (
         <>
-            <LoadingOverlay visible={isLoading} />
+            <LoadingOverlay visible={isLoading} overlayOpacity={100} />
             <Drawer
                 opened={openDrawer}
                 onClose={() => setOpenDrawer(false)}
@@ -282,13 +282,13 @@ function Feed({userId, bearer, feed}) {
                 />
                 <Space h={'xl'}/>
                 <Accordion>
-                    <Accordion.Item label="Ajouter des photos (max. 4)">
+                    <Accordion.Item label="Ajouter des photos (max. 3)">
                         <Dropzone
                             onDrop={(files) => {
                                 setRejected(false);
                                 setImages(files);
                                 setUploaded(true);
-                                if (files.length > 4) {
+                                if (files.length > 3) {
                                     setRejected(true);
                                 }
                             }}

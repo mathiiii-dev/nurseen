@@ -290,7 +290,7 @@ export default function Page({ bearer, userId, code, firstname, lastname }) {
             <Space h={'xl'} />
             <Grid gutter="xl">
                 <Grid.Col md={8}>
-                    <LoadingOverlay visible={visible} />
+                    <LoadingOverlay visible={visible} overlayOpacity={100}/>
                     {kids.length > 0 ? (
                         <>
                             <table>

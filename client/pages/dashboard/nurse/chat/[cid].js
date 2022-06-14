@@ -20,7 +20,7 @@ export default function MessageNurse({ messages, userId, bearer }) {
             `${process.env.NEXT_PUBLIC_BASE_URL}message/${cid}`
         );
         const eventSource = new EventSource(url.toString());
-        console.log(eventSource)
+
         eventSource.onmessage = (e) => {
             console.log(e);
             let origin = JSON.parse(e.data);

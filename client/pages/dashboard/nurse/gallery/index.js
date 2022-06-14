@@ -48,15 +48,14 @@ function AddGallery({ bearer, userId }) {
             id: element.id,
             public_id: element.url,
             src: process.env.NEXT_PUBLIC_MEDIA_URL + element.url,
-            sizes: ['(min-width: 480px) 50vw,(min-width: 1024px) 33.3vw,100vw'],
-            width: 3,
-            height: 4,
+            width: 150,
+            height: 150,
         }));
     }
 
     return (
         <>
-            <LoadingOverlay visible={isLoading} />
+            <LoadingOverlay visible={isLoading} overlayOpacity={100}/>
             {galleryPhoto && galleryPhoto.length === 0 ? (
                 <>
                     <SimpleGrid cols={1}>

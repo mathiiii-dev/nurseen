@@ -17,7 +17,7 @@ import 'dayjs/locale/fr';
 function Index({ bearer, kids, dayKidsCalendar }) {
     const [selectEvent, setSelectEvent] = useState('');
     const notifications = useNotifications();
-
+    console.log(dayKidsCalendar)
     const now = new Date();
     const [day, setDay] = useState(null);
     const then = dayjs(now).add(8, 'hours').toDate();
@@ -72,7 +72,7 @@ function Index({ bearer, kids, dayKidsCalendar }) {
             color: element.color,
         }));
     }
-
+    console.log(events)
     let nurseKids = null;
     if (kids) {
         nurseKids = kids.map((element) => ({

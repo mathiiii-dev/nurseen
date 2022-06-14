@@ -11,6 +11,7 @@ import Chat from '../../../components/Chat';
 import EventSource from 'eventsource';
 import dayjs from 'dayjs';
 import {useRouter} from "next/router";
+import {scrollToBottom} from "../../../services/scroll";
 
 
 export default function Page({
@@ -21,13 +22,13 @@ export default function Page({
                                  firstname,
                                  lastname,
                              }) {
+    const viewport = useRef();
 
     const [kids, setKids] = useState([]);
     const [page, onChange] = useState(1);
     const [total, setTotal] = useState(1);
     const pagination = usePagination({total, page, onChange});
     const [visible, setVisible] = useState(false);
-    const viewport = useRef();
     const router = useRouter()
 
     const open = () => {
@@ -46,6 +47,10 @@ export default function Page({
     };
 
     const [stateMessages, setStateMessages] = useState(messages);
+
+    if(viewport.current) {
+        scrollToBottom(viewport);
+    }
 
     if (chat) {
         useEffect(() => {
@@ -70,6 +75,7 @@ export default function Page({
                         sendDate: dayjs().toString(),
                     },
                 ]);
+                scrollToBottom(viewport);
             };
         }, []);
     }
@@ -93,7 +99,6 @@ export default function Page({
                 setVisible(false);
             });
     }, [page]);
-
 
     return (
         <>
@@ -132,7 +137,7 @@ export default function Page({
             <Space h={'xl'}/>
             <Grid gutter="xl">
                 <Grid.Col md={6}>
-                    <LoadingOverlay visible={visible}/>
+                    <LoadingOverlay visible={visible} overlayOpacity={100} />
                     {kids.length > 0 && (
                         <>
                             <table>

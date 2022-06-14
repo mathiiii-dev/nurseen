@@ -53,7 +53,7 @@ export default function Page({ userId, bearer, nurse, files }) {
         data.append('upload_preset', 'eekmglxg');
         data.append('folder', `nurseen/file/${nurse.nurse.userId}`);
         fetch(
-            'https://api.cloudinary.com/v1_1/devmathias/raw/upload',
+            process.env.NEXT_PUBLIC_CLOUDINARY_FILE_API_URL,
             {
                 method: 'POST',
                 body: data,

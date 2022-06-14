@@ -6,10 +6,8 @@
     font-family: 'fcicons', 'Open Sans', sans-serif;
 }
 
-[class^="react-photo-gallery"] img {
+[class^="react-photo"] {
     object-fit: cover;
-    width: 400px;
-    height: 300px;
 }
 
 .wordWrap {
@@ -21,11 +19,6 @@
 @media only screen and (max-width: 1026px) {
     .hide {
         display: none;
-    }
-    [class^="react-photo-gallery"] img {
-        object-fit: cover;
-        width: 350px;
-        height: 250px;
     }
 }
 

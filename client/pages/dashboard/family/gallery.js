@@ -53,7 +53,7 @@ function AddGallery({ bearer, userId }) {
     console.log(galleryPhoto);
     return (
         <div>
-            <LoadingOverlay visible={isLoading} />
+            <LoadingOverlay visible={isLoading} overlayOpacity={100} />
             <Space h={'xl'} />
             {galleryPhoto.kids ? (
                 <NonKidsMessage
@@ -67,20 +67,6 @@ function AddGallery({ bearer, userId }) {
                         galleryPhoto.length !== 0 ? (
                             <>
                                 <GalleryNurse galleryPhoto={galleryPhoto} bearer={bearer} />
-                                <ModalGateway>
-                                    {viewerIsOpen ? (
-                                        <Modal onClose={closeLightbox}>
-                                            <Carousel
-                                                currentIndex={currentImage}
-                                                views={galleryPhoto.map((x) => ({
-                                                    ...x,
-                                                    srcset: x.srcSet,
-                                                    caption: x.title,
-                                                }))}
-                                            />
-                                        </Modal>
-                                    ) : null}
-                                </ModalGateway>
                                 <Space h={'xl'} />
                                 <Center>
                                     <Pagination total={total} onChange={onChange} />
