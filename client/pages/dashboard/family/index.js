@@ -140,31 +140,31 @@ export default function Page({
                     <LoadingOverlay visible={visible} overlayOpacity={100} />
                     {kids.length > 0 && (
                         <>
-                            <table>
-                                <thead>
-                                <tr>
-                                    <th scope="col">
+                            <table className="table">
+                                <thead className="thead">
+                                <tr className="tr">
+                                    <th scope="col" className="th">
                                         <Text>Nom</Text>
                                     </th>
-                                    <th scope="col">
+                                    <th scope="col" className="th">
                                         <Text>Prénom</Text>
                                     </th>
-                                    <th scope="col">
+                                    <th scope="col" className="th">
                                         <Text>Note</Text>
                                     </th>
                                 </tr>
                                 </thead>
-                                <tbody>
+                                <tbody className="tbody">
                                 {kids.map((kid) => {
                                     return (
-                                        <tr key={kid.id}>
-                                            <td data-label="Nom">
+                                        <tr key={kid.id} className="tr">
+                                            <td data-label="Nom" className="td">
                                                 <Text>{kid.lastname}</Text>
                                             </td>
-                                            <td data-label="Prénom">
+                                            <td data-label="Prénom" className="td">
                                                 <Text>{kid.firstname}</Text>
                                             </td>
-                                            <td data-label="Note">
+                                            <td data-label="Note" className="td">
                                                 <Link
                                                     href={{
                                                         pathname: `/dashboard/family/kid/[pid]/notes`,

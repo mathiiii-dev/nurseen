@@ -13,16 +13,16 @@ function KidNotes({kid, notes}) {
     let rows = null;
     if (notes.length > 0) {
         rows = notes.map((element) => (
-            <tr key={element.id}>
-                <td>{dayjs(element.data).format('DD MMMM YYYY')}</td>
-                <td>
+            <tr key={element.id} className="tr">
+                <td data-label="Date" className="td">{dayjs(element.data).format('DD MMMM YYYY')}</td>
+                <td data-label="Note" className="td">
                     <Text
                         dangerouslySetInnerHTML={{
                             __html: element.note.substring(0, 100) + '...'
                         }}
                     />
                 </td>
-                <td>
+                <td className="td" data-label="Voir la note">
                     <Link
                         href={`/dashboard/family/kid/${router.query.pid}/notes/${element.id}`}
                     >
@@ -40,20 +40,16 @@ function KidNotes({kid, notes}) {
                 notes.length > 0 ? (
                     <>
                         <Space h="xl"/>
-                        <Table
-                            horizontalSpacing="xl"
-                            verticalSpacing="xl"
-                            style={{marginTop: 10}}
-                        >
-                            <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Note</th>
-                                <th>Voir</th>
+                        <table className="table">
+                            <thead className="thead">
+                            <tr className="tr">
+                                <th scope="col" className="th">Date</th>
+                                <th scope="col" className="th">Note</th>
+                                <th scope="col" className="th">Voir</th>
                             </tr>
                             </thead>
-                            <tbody>{rows}</tbody>
-                        </Table>
+                            <tbody className="tbody">{rows}</tbody>
+                        </table>
                     </>
                 ) : (
                     <SimpleGrid cols={1}>

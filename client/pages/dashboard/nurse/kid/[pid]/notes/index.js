@@ -32,9 +32,9 @@ function NoteList({bearer, kid, notes}) {
     let rows = null;
     if (notes.length > 0) {
         rows = notes.map((element) => (
-            <tr key={element.id}>
-                <td>{dayjs(element.data).utc().format('DD MMMM YYYY')}</td>
-                <td>
+            <tr key={element.id} className="tr">
+                <td className="td" data-label="Date">{dayjs(element.data).utc().format('DD MMMM YYYY')}</td>
+                <td className="td" data-label="Note">
                     <Text
                         dangerouslySetInnerHTML={{
                             __html: element.note.substring(0,80) + '...'
@@ -42,7 +42,7 @@ function NoteList({bearer, kid, notes}) {
                     />
 
                 </td>
-                <td>
+                <td className="td" data-label="Modifier">
                     <Button
                         onClick={() => {
                             setOpenedDrawer(true);
@@ -53,7 +53,7 @@ function NoteList({bearer, kid, notes}) {
                         Modifier
                     </Button>
                 </td>
-                <td>
+                <td className="td" data-label="Supprimer">
                     <Button
                         color="red"
                         onClick={() => {
@@ -142,21 +142,17 @@ function NoteList({bearer, kid, notes}) {
             {
                 notes.length > 0 ? (
                     <>
-                        <Table
-                            horizontalSpacing="xl"
-                            verticalSpacing="xl"
-                            style={{marginTop: 10}}
-                        >
-                            <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Note</th>
-                                <th>Modifier</th>
-                                <th>Supprimer</th>
+                        <table className="table">
+                            <thead className="thead">
+                            <tr className="tr">
+                                <th className="th" scope="col">Date</th>
+                                <th className="th" scope="col">Note</th>
+                                <th className="th" scope="col">Modifier</th>
+                                <th className="th" scope="col">Supprimer</th>
                             </tr>
                             </thead>
-                            <tbody>{rows}</tbody>
-                        </Table>
+                            <tbody className="tbody">{rows}</tbody>
+                        </table>
                     </>
                 ) : (
                     <SimpleGrid cols={1}>

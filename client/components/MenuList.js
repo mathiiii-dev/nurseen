@@ -41,12 +41,12 @@ function Menu({ menus, role, bearer }) {
     let list = [];
     if (menus) {
         list = menus.map((element) => (
-            <tr key={element.id}>
-                <td>{dayjs(element.date).utc().format('DD MMMM YYYY')}</td>
-                <td>{element.entry}</td>
-                <td>{element.meal}</td>
-                <td>{element.dessert}</td>
-                <td>
+            <tr key={element.id} className="tr">
+                <td className="td" data-label="Date">{dayjs(element.date).utc().format('DD MMMM YYYY')}</td>
+                <td className="td" data-label="Entrée">{element.entry}</td>
+                <td className="td" data-label="Plat">{element.meal}</td>
+                <td className="td" data-label="Dessert">{element.dessert}</td>
+                <td className="td" data-label="Modifier">
                     <Button
                         onClick={() => {
                             setSelected(element.id);
@@ -64,11 +64,11 @@ function Menu({ menus, role, bearer }) {
         ));
         if (role === 'ROLE_PARENT') {
             list = menus.map((element) => (
-                <tr key={element.id}>
-                    <td>{dayjs(element.date).utc().format('DD MMMM YYYY')}</td>
-                    <td>{element.entry}</td>
-                    <td>{element.meal}</td>
-                    <td>{element.dessert}</td>
+                <tr key={element.id} className="tr">
+                    <td className="td" data-label="Date">{dayjs(element.date).utc().format('DD MMMM YYYY')}</td>
+                    <td className="td" data-label="Entrée">{element.entry}</td>
+                    <td className="td" data-label="Plat">{element.meal}</td>
+                    <td className="td" data-label="Dessert">{element.dessert}</td>
                 </tr>
             ));
         }
@@ -78,21 +78,17 @@ function Menu({ menus, role, bearer }) {
             {list.length > 0 ? (
                 <>
                     {role === 'ROLE_PARENT' ? (
-                        <Table
-                            horizontalSpacing="xl"
-                            verticalSpacing="xl"
-                            style={{ marginTop: 10 }}
-                        >
-                            <thead>
-                                <tr>
-                                    <th>Date</th>
-                                    <th>Entrée</th>
-                                    <th>Plat</th>
-                                    <th>Dessert</th>
+                        <table className="table">
+                            <thead className="thead">
+                                <tr className="tr">
+                                    <th className="th" scope="col">Date</th>
+                                    <th className="th" scope="col">Entrée</th>
+                                    <th className="th" scope="col">Plat</th>
+                                    <th className="th" scope="col">Dessert</th>
                                 </tr>
                             </thead>
-                            <tbody>{list}</tbody>
-                        </Table>
+                            <tbody className="tbody">{list}</tbody>
+                        </table>
                     ) : (
                         <>
                             <Drawer
@@ -155,22 +151,18 @@ function Menu({ menus, role, bearer }) {
                                     </form>
                                 }
                             </Drawer>
-                            <Table
-                                horizontalSpacing="xl"
-                                verticalSpacing="xl"
-                                style={{ marginTop: 10 }}
-                            >
-                                <thead>
-                                    <tr>
-                                        <th>Date</th>
-                                        <th>Entrée</th>
-                                        <th>Plat</th>
-                                        <th>Dessert</th>
-                                        <th>Modifier</th>
+                            <table className="table">
+                                <thead className="thead">
+                                    <tr className="tr">
+                                        <th className="th" scope="col">Date</th>
+                                        <th className="th" scope="col">Entrée</th>
+                                        <th className="th" scope="col">Plat</th>
+                                        <th className="th" scope="col">Dessert</th>
+                                        <th className="th" scope="col">Modifier</th>
                                     </tr>
                                 </thead>
-                                <tbody>{list}</tbody>
-                            </Table>
+                                <tbody className="tbody">{list}</tbody>
+                            </table>
                         </>
                     )}
                 </>

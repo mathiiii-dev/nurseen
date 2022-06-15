@@ -11,9 +11,9 @@
 }
 
 .wordWrap {
-    word-wrap: break-word;      /* IE 5.5-7 */
+    word-wrap: break-word; /* IE 5.5-7 */
     white-space: -moz-pre-wrap; /* Firefox 1.0-2.0 */
-    white-space: pre-wrap;      /* current browsers */
+    white-space: pre-wrap; /* current browsers */
 }
 
 @media only screen and (max-width: 1026px) {
@@ -22,83 +22,80 @@
     }
 }
 
-table {
-    border: 1px solid #ccc;
+.table {
     border-collapse: collapse;
-    margin: 0;
-    padding: 0;
+    margin-top: 10px;
+    margin-bottom: 10px;
     width: 100%;
-    table-layout: fixed;
 }
 
-table caption {
-    font-size: 1.5em;
-    margin: .5em 0 .75em;
+/* Zebra striping */
+.tr:nth-of-type(odd) {
+    background: #eee;
 }
 
-table tr {
-    background-color: #f8f8f8;
-    border: 1px solid #ddd;
-    padding: .35em;
+.th {
+    background: #d0ebffa6;
+    color: black;
+    font-weight: bold;
 }
 
-table th,
-table td {
-    padding: .625em;
-    text-align: center;
+.td, .th {
+    padding: 11px;
+    border: 1px solid #ccc;
+    text-align: left;
+    font-size: 18px;
+    font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
 }
 
-table th {
-    font-size: .85em;
-    letter-spacing: .1em;
-    text-transform: uppercase;
-}
 
-@media screen and (max-width: 600px) {
-    table {
-        border: 0;
+@media only screen and (max-width: 760px),
+(min-device-width: 768px) and (max-device-width: 1024px) {
+
+    .table {
+        width: 100%;
     }
 
-    table caption {
-        font-size: 1.3em;
+    /* Force table to not be like tables anymore */
+    .table, .thead, .tbody, .th, .td, .tr {
+        display: block;
     }
 
-    table thead {
-        border: none;
-        clip: rect(0 0 0 0);
-        height: 1px;
-        margin: -1px;
-        overflow: hidden;
-        padding: 0;
+    /* Hide table headers (but not display: none;, for accessibility) */
+    .thead .tr {
         position: absolute;
-        width: 1px;
+        top: -9999px;
+        left: -9999px;
     }
 
-    table tr {
-        border-bottom: 3px solid #ddd;
-        display: block;
-        margin-bottom: .625em;
+    .tr {
+        margin-top: 10px;
+        border: 1px solid #ccc;
     }
 
-    table td {
-        border-bottom: 1px solid #ddd;
-        display: block;
-        font-size: .8em;
-        text-align: right;
+    .td {
+        /* Behave  like a "row" */
+        border: none;
+        border-bottom: 1px solid #eee;
+        position: relative;
+        padding-left: 50%;
+        font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
     }
 
-    table td::before {
-        /*
-        * aria-label has no advantage, it won't be read inside a table
-        content: attr(aria-label);
-        */
+    .td:before {
+        /* Now like a table header */
+        position: absolute;
+        /* Top/left values mimic padding */
+        top: 6px;
+        left: 6px;
+        width: 45%;
+        padding-right: 10px;
+        white-space: nowrap;
+        /* Label the data */
         content: attr(data-label);
-        float: left;
+        font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
+        color: #000;
         font-weight: bold;
-        text-transform: uppercase;
     }
 
-    table td:last-child {
-        border-bottom: 0;
-    }
 }
