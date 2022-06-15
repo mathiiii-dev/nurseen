@@ -1,10 +1,11 @@
-import {Button, Center, Drawer, Image, SimpleGrid, Space, Table, Text, Textarea} from '@mantine/core';
+import {Button, Center, Drawer, Image, SimpleGrid, Space, Text, Textarea} from '@mantine/core';
 import dayjs from 'dayjs';
 import { useState } from 'react';
 import { DatePicker } from '@mantine/dates';
 import 'dayjs/locale/fr';
 import utc from "dayjs/plugin/utc";
 import Link from "next/link";
+import '../styles/globals.css';
 
 function Menu({ menus, role, bearer }) {
 

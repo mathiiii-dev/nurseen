@@ -10,9 +10,9 @@ import {
     Space,
     Title,
 } from '@mantine/core';
-import { useState } from 'react';
+import {useState} from 'react';
 import Link from 'next/link';
-import { signIn, signOut, useSession } from 'next-auth/react';
+import {signIn, signOut, useSession} from 'next-auth/react';
 
 const useStyles = createStyles((theme) => ({
     navbar: {
@@ -29,7 +29,7 @@ const useStyles = createStyles((theme) => ({
 }));
 
 export default function CustomNavbar() {
-    const { data: session, status } = useSession();
+    const {data: session, status} = useSession();
     let dashboard = '';
 
     if (session) {
@@ -40,12 +40,12 @@ export default function CustomNavbar() {
         }
     }
 
-    const { classes } = useStyles();
+    const {classes} = useStyles();
     const [opened, setOpened] = useState(false);
 
     return (
-        <Header height={60} padding="xs" style={{ marginBottom: 50 }}>
-            <MediaQuery largerThan="sm" styles={{ display: 'none' }}>
+        <Header height={60} padding="xs" style={{marginBottom: 50}}>
+            <MediaQuery largerThan="sm" styles={{display: 'none'}}>
                 <Burger
                     opened={opened}
                     onClick={() => setOpened((o) => !o)}
@@ -54,15 +54,15 @@ export default function CustomNavbar() {
                 />
             </MediaQuery>
             <Grid className={classes.links}>
-                <Grid.Col md={2}>
+                <Grid.Col md={2} sm={2}>
                     <Link href="/">
                         <Title>Nurseen</Title>
                     </Link>
                 </Grid.Col>
                 {
-                    <Grid.Col md={10}>
+                    <Grid.Col md={10} sm={10}>
                         <Group position={'right'}>
-                            <Space w="xl" />
+                            <Space w="xl"/>
                             {status === 'unauthenticated' ? (
                                 <>
                                     <Link href="/sign-up">
@@ -93,7 +93,7 @@ export default function CustomNavbar() {
                                         color="dark"
                                         size="md"
                                         onClick={() =>
-                                            signOut({ callbackUrl: '/' })
+                                            signOut({callbackUrl: '/'})
                                         }
                                     >
                                         Sign out
@@ -123,10 +123,16 @@ export default function CustomNavbar() {
                     {status === 'unauthenticated' ? (
                         <>
                             <Link href="/sign-up">
-                                <Button color="dark" size="md">
+                                <Button
+                                    color="dark"
+                                    size="md"
+                                    onClick={() => {
+                                        setOpened((o) => !o);
+                                    }}>
                                     Inscription
                                 </Button>
                             </Link>
+                            <Space h="xl"/>
                             <Button
                                 color="dark"
                                 size="md"
@@ -145,15 +151,19 @@ export default function CustomNavbar() {
                                     variant={'subtle'}
                                     color="dark"
                                     size="md"
+                                    onClick={() => {
+                                        setOpened((o) => !o);
+                                    }}
                                 >
                                     Dashboard
                                 </Button>
                             </Link>
+                            <Space h="xl"/>
                             <Button
                                 color="dark"
                                 size="md"
                                 onClick={() => {
-                                    signOut({ callbackUrl: '/' });
+                                    signOut({callbackUrl: '/'});
                                     setOpened((o) => !o);
                                 }}
                             >
