@@ -139,7 +139,7 @@ function Feed({userId, bearer, feed}) {
                 data.append('upload_preset', 'eekmglxg');
                 data.append('folder', `nurseen/feed/${feedId}`);
                 result [idx] = fetch(
-                    'https://api.cloudinary.com/v1_1/devmathias/image/upload',
+                    process.env.NEXT_PUBLIC_CLOUDINARY_MEDIA_API_URL,
                     {
                         method: 'POST',
                         body: data,

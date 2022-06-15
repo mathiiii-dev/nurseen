@@ -43,7 +43,7 @@ function Feed({ feed }) {
                                 />
                                 <GalleryNurse
                                     galleryPhoto={f.feedImages.map((i) => ({
-                                        src: `${process.env.NEXT_PUBLIC_MEDIA_URL}/feed/${f.id}/${i.url}`,
+                                        src: `${process.env.NEXT_PUBLIC_MEDIA_URL}/${i.url}`,
                                         width: 2,
                                         height: 3,
                                     }))}
